@@ -1,0 +1,64 @@
+SPDXVersion: SPDX-2.3
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: TestDocument
+DocumentNamespace: http://spdx.org/spdxdocs/TestDocument-1b90cdde-fadc-4c9c-9360-5c3f0017023d
+LicenseListVersion: 3.18
+Creator: Tool: lib4sbom-0.1.0
+Created: 2022-12-01T15:38:49Z
+CreatorComment: <text>This document has been automatically generated.</text>
+##### 
+
+PackageName: virtualenv
+SPDXID: SPDXRef-Package-1-virtualenv
+PackageVersion: 20.16.7
+PackageSupplier: Person: Bernat_Gabor
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/virtualenv@20.16.7
+##### 
+
+PackageName: distlib
+SPDXID: SPDXRef-Package-2-distlib
+PackageVersion: 0.3.6
+PackageSupplier: Person: Vinay_Sajip
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/distlib@0.3.6
+##### 
+
+PackageName: filelock
+SPDXID: SPDXRef-Package-3-filelock
+PackageVersion: 3.8.0
+PackageSupplier: Person: Benedikt_Schmitt
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: Unlicense
+PackageLicenseDeclared: Unlicense
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/filelock@3.8.0
+##### 
+
+PackageName: platformdirs
+SPDXID: SPDXRef-Package-4-platformdirs
+PackageVersion: 2.5.4
+PackageSupplier: Organization: Unknown
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/platformdirs@2.5.4
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-1-virtualenv
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-2-distlib
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-3-filelock
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-4-platformdirs
+Relationship: SPDXRef-Package-1-virtualenv CONTAINS SPDXRef-Package-2-distlib
+Relationship: SPDXRef-Package-1-virtualenv CONTAINS SPDXRef-Package-3-filelock
+Relationship: SPDXRef-Package-1-virtualenv CONTAINS SPDXRef-Package-4-platformdirs

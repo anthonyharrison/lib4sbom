@@ -1,0 +1,87 @@
+SPDXID: SPDXRef-DOCUMENT
+creationInfo:
+  comment: This document has been automatically generated.
+  created: '2022-12-01T15:38:49Z'
+  creators:
+  - 'Tool: lib4sbom-0.1.0'
+  licenseListVersion: '3.18'
+dataLicense: CC0-1.0
+documentNamespace: http://spdx.org/spdxdocs/TestDocument-48f37694-05f8-4c38-9f59-1b3b47f68fa7
+name: TestDocument
+packages:
+- SPDXID: SPDXRef-Package-1-virtualenv
+  copyrightText: NOASSERTION
+  downloadLocation: NONE
+  externalRefs:
+  - referenceCategory: PACKAGE-MANAGER
+    referenceLocator: pkg:pypi/virtualenv@20.16.7
+    referenceType: purl
+  filesAnalyzed: 'false'
+  licenseConcluded: MIT
+  licenseDeclared: MIT
+  name: virtualenv
+  supplier: 'Person: Bernat_Gabor'
+  versionInfo: 20.16.7
+- SPDXID: SPDXRef-Package-2-distlib
+  copyrightText: NOASSERTION
+  downloadLocation: NONE
+  externalRefs:
+  - referenceCategory: PACKAGE-MANAGER
+    referenceLocator: pkg:pypi/distlib@0.3.6
+    referenceType: purl
+  filesAnalyzed: 'false'
+  licenseConcluded: NOASSERTION
+  licenseDeclared: NOASSERTION
+  name: distlib
+  supplier: 'Person: Vinay_Sajip'
+  versionInfo: 0.3.6
+- SPDXID: SPDXRef-Package-3-filelock
+  copyrightText: NOASSERTION
+  downloadLocation: NONE
+  externalRefs:
+  - referenceCategory: PACKAGE-MANAGER
+    referenceLocator: pkg:pypi/filelock@3.8.0
+    referenceType: purl
+  filesAnalyzed: 'false'
+  licenseConcluded: Unlicense
+  licenseDeclared: Unlicense
+  name: filelock
+  supplier: 'Person: Benedikt_Schmitt'
+  versionInfo: 3.8.0
+- SPDXID: SPDXRef-Package-4-platformdirs
+  copyrightText: NOASSERTION
+  downloadLocation: NONE
+  externalRefs:
+  - referenceCategory: PACKAGE-MANAGER
+    referenceLocator: pkg:pypi/platformdirs@2.5.4
+    referenceType: purl
+  filesAnalyzed: 'false'
+  licenseConcluded: NOASSERTION
+  licenseDeclared: NOASSERTION
+  name: platformdirs
+  supplier: 'Organization: Unknown'
+  versionInfo: 2.5.4
+relationships:
+- relatedSpdxElement: SPDXRef-Package-1-virtualenv
+  relationshipType: DESCRIBES
+  spdxElementId: SPDXRef-DOCUMENT
+- relatedSpdxElement: SPDXRef-Package-2-distlib
+  relationshipType: DESCRIBES
+  spdxElementId: SPDXRef-DOCUMENT
+- relatedSpdxElement: SPDXRef-Package-3-filelock
+  relationshipType: DESCRIBES
+  spdxElementId: SPDXRef-DOCUMENT
+- relatedSpdxElement: SPDXRef-Package-4-platformdirs
+  relationshipType: DESCRIBES
+  spdxElementId: SPDXRef-DOCUMENT
+- relatedSpdxElement: SPDXRef-Package-2-distlib
+  relationshipType: CONTAINS
+  spdxElementId: SPDXRef-Package-1-virtualenv
+- relatedSpdxElement: SPDXRef-Package-3-filelock
+  relationshipType: CONTAINS
+  spdxElementId: SPDXRef-Package-1-virtualenv
+- relatedSpdxElement: SPDXRef-Package-4-platformdirs
+  relationshipType: CONTAINS
+  spdxElementId: SPDXRef-Package-1-virtualenv
+spdxVersion: SPDX-2.3
+

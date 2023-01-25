@@ -1,0 +1,64 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "comment": "This document has been automatically generated.",
+    "creators": [
+      "Tool: lib4sbom-0.1.0"
+    ],
+    "created": "2023-01-24T12:57:41Z",
+    "licenseListVersion": "3.18"
+  },
+  "name": "TestApp",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "http://spdx.org/spdxdocs/TestApp-08b2474a-2891-48a5-a41a-efc7f28b1745",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-1-glibc",
+      "name": "glibc",
+      "versionInfo": "2.15",
+      "supplier": "organisation: gnu",
+      "downloadLocation": "NONE",
+      "filesAnalyzed": "false",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-2-glibc",
+      "name": "glibc",
+      "versionInfo": "2.29",
+      "supplier": "organisation: gnu",
+      "downloadLocation": "NONE",
+      "filesAnalyzed": "false",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-3-tomcat",
+      "name": "tomcat",
+      "versionInfo": "9.0.46",
+      "supplier": "organisation: apache",
+      "downloadLocation": "NONE",
+      "filesAnalyzed": "false",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-1-glibc",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-2-glibc",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-3-tomcat",
+      "relationshipType": "DESCRIBES"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+SPDXVersion: SPDX-2.2
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: TestDocument
+DocumentNamespace: http://spdx.org/spdxdocs/virtualenv-b7ac9cce-efe8-4fe7-a544-100e6a5664e6
+LicenseListVersion: 3.18
+Creator: Tool: sbom4python-0.4.0
+Created: 2022-11-16T10:14:26Z
+CreatorComment: <text>This document has been automatically generated.</text>
+#####
+
+PackageName: virtualenv
+SPDXID: SPDXRef-Package-1-virtualenv
+PackageSupplier: Person: Bernat_Gabor
+PackageVersion: 20.16.7
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/virtualenv@20.16.7
+#####
+
+PackageName: distlib
+SPDXID: SPDXRef-Package-2-distlib
+PackageSupplier: Person: Vinay_Sajip
+PackageVersion: 0.3.6
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/distlib@0.3.6
+#####
+
+PackageName: filelock
+SPDXID: SPDXRef-Package-3-filelock
+PackageSupplier: Person: Benedikt_Schmitt
+PackageVersion: 3.8.0
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: Unlicense
+PackageLicenseDeclared: Unlicense
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/filelock@3.8.0
+#####
+
+PackageName: platformdirs
+SPDXID: SPDXRef-Package-4-platformdirs
+PackageSupplier: Organization: Unknown
+PackageVersion: 2.5.4
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/platformdirs@2.5.4
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-1-virtualenv
+Relationship: SPDXRef-Package-1-virtualenv CONTAINS SPDXRef-Package-2-distlib
+Relationship: SPDXRef-Package-1-virtualenv CONTAINS SPDXRef-Package-3-filelock
+Relationship: SPDXRef-Package-1-virtualenv CONTAINS SPDXRef-Package-4-platformdirs

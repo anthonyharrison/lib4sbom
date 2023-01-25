@@ -1,0 +1,50 @@
+SPDXVersion: SPDX-2.2
+DataLicense: CC0-1.0
+SPDXID: SPDXRef-DOCUMENT
+DocumentName: TestDocument2
+DocumentNamespace: http://spdx.org/spdxdocs/virtualenv-b7ac9cce-efe8-4fe7-a544-100e6a5664e6
+LicenseListVersion: 3.18
+Creator: Tool: sbom4python-0.4.0
+Created: 2022-11-16T10:14:26Z
+CreatorComment: <text>This document has been automatically generated.</text>
+#####
+
+PackageName: libc
+SPDXID: SPDXRef-Package-1-libc
+PackageSupplier: Organization: GNU
+PackageVersion: 2.14.1
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: GPL2
+PackageLicenseDeclared: GPL2
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/libc@2.14.1
+#####
+
+PackageName: libc
+SPDXID: SPDXRef-Package-2-libc
+PackageSupplier: Organization: GNU
+PackageVersion: 2.29.2
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: GPL2
+PackageLicenseDeclared: GPL2
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/libc@2.29.2
+#####
+
+PackageName: filelock
+SPDXID: SPDXRef-Package-3-filelock
+PackageSupplier: Person: AN Other
+PackageVersion: 0.9.2
+PackageDownloadLocation: NOASSERTION
+FilesAnalyzed: false
+PackageLicenseConcluded: NOASSERTION
+PackageLicenseDeclared: NOASSERTION
+PackageCopyrightText: NOASSERTION
+ExternalRef: PACKAGE-MANAGER purl pkg:pypi/filelock30.9.2
+#####
+
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-Package-3-filelock
+Relationship: SPDXRef-Package-3-filelock CONTAINS SPDXRef-Package-1-libc
+Relationship: SPDXRef-Package-3-filelock CONTAINS SPDXRef-Package-2-libc
