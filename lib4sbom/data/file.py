@@ -39,7 +39,6 @@ class SBOMFile:
         # Only store valid checksums
         if self._valid_checksum(value):
             # Allow multiple entries
-            print(f"Adding checksum  {value}")
             checksum_entry = [type.strip(), value.lower()]
             if "checksum" in self.file:
                 self.file["checksum"].append(checksum_entry)
