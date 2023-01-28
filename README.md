@@ -72,10 +72,13 @@ following filename conventions.
 | CycloneDX | XML       | .xml               |
 | CycloneDX | JSON      | .json              |
 
+The parser will check that the correct JSON files is being processed by the correct parser.
+A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
+
 **Methods**
 
 parse_file(filename)
-Parses the SBOM file.
+Parses the SBOM file. If the file does not exist, a FileNotFoundError exception is raised.
 
 get_files()
 Returns a list of file elements from within a parsed SBOM
