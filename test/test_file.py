@@ -21,14 +21,20 @@ class TestFile:
 
 	def test_set_filetype(self):
 		test_item = test_module()
-		test_item.set_filetype('test_filetype')
+		test_item.set_filetype('font')
+		# If not valid filetype, default to OTHER
+		assert test_item.get_value('filetype') == ['OTHER']
+		test_item.set_filetype('Source')
 		# Filetype is always uppercase
-		assert test_item.get_value('filetype') == ['TEST_FILETYPE']
+		assert test_item.get_value('filetype') == ['OTHER', 'SOURCE']
 
 	def test_set_checksum(self):
 		test_item = test_module()
-		test_item.set_checksum('sha1','test_checksum')
-		assert test_item.get_value('checksum') == [['sha1','test_checksum']]
+		test_item.set_checksum('sha1','03AB567890de')
+		# This in an invalid checksum value
+		test_item.set_checksum('sha1','invalid_sum')
+		# All checkums are stored as lower case
+		assert test_item.get_value('checksum') == [['sha1','03ab567890de']]
 
 	def test_set_licenseconcluded(self):
 		test_item = test_module()

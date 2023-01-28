@@ -68,17 +68,21 @@ class TestPackage:
 
 	def test_set_checksum(self):
 		test_item = test_module()
-		test_item.set_checksum('sha512','test_checksum')
-		assert test_item.get_value('checksum') == [['sha512','test_checksum']]
+		test_item.set_checksum('sha512','ab345c32a')
+		assert test_item.get_value('checksum') == [['sha512','ab345c32a']]
 
 	def test_set_checksum_multiple(self):
 		test_item = test_module()
-		test_item.set_checksum('sha128','test_checksum0')
-		test_item.set_checksum('alg256','test_checksum_2')
+		test_item.set_checksum('sha128','test_1234')
+		test_item.set_checksum('alg256','TEST_ABC123')
+		test_checksum = test_item.get_value('checksum')
+		assert test_checksum == None
+		test_item.set_checksum('sha128','cd45670BE')
+		test_item.set_checksum('alg256','23451deac1239870e')
 		test_checksum = test_item.get_value('checksum')
 		assert len(test_checksum) == 2
-		assert test_checksum[0] ==  ['sha128','test_checksum0']
-		assert test_checksum[1] ==  ['alg256','test_checksum_2']
+		assert test_checksum[0] ==  ['sha128','cd45670be']
+		assert test_checksum[1] ==  ['alg256','23451deac1239870e']
 
 	def test_set_property(self):
 		test_item = test_module()

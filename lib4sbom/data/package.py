@@ -1,6 +1,8 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import string
+
 from lib4sbom.license import LicenseScanner
 
 class SBOMPackage:
@@ -51,12 +53,14 @@ class SBOMPackage:
         self.package["filesanalysis"] = analysis
 
     def set_checksum(self, type, value):
-        # Allow multiple entries
-        checksum_entry = [type.strip(), value]
-        if "checksum" in self.package:
-            self.package["checksum"].append(checksum_entry)
-        else:
-            self.package["checksum"] = [checksum_entry]
+        # Only store valid checksums
+        if self._valid_checksum(value):
+            # Allow multiple entries
+            checksum_entry = [type.strip(), value.lower()]
+            if "checksum" in self.package:
+                self.package["checksum"].append(checksum_entry)
+            else:
+                self.package["checksum"] = [checksum_entry]
 
     def set_property(self, name, value):
         # Allow multiple entries
@@ -132,3 +136,7 @@ class SBOMPackage:
 
     def _semantic_version(self, version):
         return version.split("-")[0] if "-" in version else version
+
+    def _valid_checksum(self, value):
+        # Only allow valid hex or decimal digits
+        return all (c in string.hexdigits for c in value.lower())

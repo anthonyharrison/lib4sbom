@@ -1,6 +1,8 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import string
+
 from lib4sbom.license import LicenseScanner
 
 
@@ -25,18 +27,24 @@ class SBOMFile:
         self.file["id"] = id
 
     def set_filetype(self, type):
+        file_type = type.upper()
+        if file_type not in ["SOURCE", "BINARY", "ARCHIVE", "APPLICATION", "AUDIO", "IMAGE", "TEXT", "VIDEO", "DOCUMENTATION", "SPDX", "OTHER"]:
+            file_type = "OTHER"
         if "filetype" in self.file:
-            self.file["filetype"].append(type.upper())
+            self.file["filetype"].append(file_type)
         else:
-            self.file["filetype"] = [type.upper()]
+            self.file["filetype"] = [file_type]
 
     def set_checksum(self, type, value):
-        # Allow multiple entries
-        checksum_entry = [type.strip(), value]
-        if "checksum" in self.file:
-            self.file["checksum"].append(checksum_entry)
-        else:
-            self.file["checksum"] = [checksum_entry]
+        # Only store valid checksums
+        if self._valid_checksum(value):
+            # Allow multiple entries
+            print(f"Adding checksum  {value}")
+            checksum_entry = [type.strip(), value.lower()]
+            if "checksum" in self.file:
+                self.file["checksum"].append(checksum_entry)
+            else:
+                self.file["checksum"] = [checksum_entry]
 
     def set_licenseconcluded(self, license):
         self.file["licenseconcluded"] = license
@@ -95,3 +103,7 @@ class SBOMFile:
     def copy_file(self, file_info):
         for key in file_info:
             self.set_value(key, file_info[key])
+
+    def _valid_checksum(self, value):
+        # Only allow valid hex or decimal digits
+        return all (c in string.hexdigits for c in value.lower())
