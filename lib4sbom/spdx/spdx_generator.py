@@ -137,7 +137,7 @@ class SPDXGenerator:
     def package_ident(self, id):
         # Only add preamble if not parent document
         if id != self.SPDX_PROJECT_ID:
-            return self.PACKAGE_PREAMBLE + str(id).replace(" ", "-")
+            return self.PACKAGE_PREAMBLE + str(id).replace(" ", "-").replace("_", "-")
         return str(id)
 
     def file_ident(self, id):
@@ -198,8 +198,8 @@ class SPDXGenerator:
             "PackageDownloadLocation",
             package_info.get("downloadlocation", "NOASSERTION"),
         )
-        files_analysed = package_info.get("filesanalysis", "false")
-        self.generateTag("FilesAnalyzed", files_analysed)
+        files_analysed = package_info.get("filesanalysis", False)
+        self.generateTag("FilesAnalyzed", str(files_analysed).lower())
         if "filename" in package_info:
             self.generateTag("PackageFileName", package_info["filename"])
         if "homepage" in package_info:
@@ -222,10 +222,7 @@ class SPDXGenerator:
                 self.license_ident(package_info["licensedeclared"]),
             )
         if "licensecomments" in package_info:
-            self.generateTag(
-                "PackageLicenseComments",
-                self.license_ident(package_info["licensecomments"]),
-            )
+            self.generateTag("PackageLicenseComments", package_info["licensecomments"])
         if files_analysed:
             # Only if files have been analysed
             if "licenseinfoinfiles" in package_info:
@@ -287,7 +284,7 @@ class SPDXGenerator:
         component["downloadLocation"] = package_info.get(
             "downloadlocation", "NOASSERTION"
         )
-        files_analysed = package_info.get("filesanalysis", "false")
+        files_analysed = package_info.get("filesanalysis", False)
         component["filesAnalyzed"] = files_analysed
         if "filename" in package_info:
             component["packageFileName"] = package_info["filename"]
@@ -314,9 +311,7 @@ class SPDXGenerator:
                 package_info["licensedeclared"]
             )
         if "licensecomments" in package_info:
-            component["licenseComments"] = self.license_ident(
-                package_info["licensecomments"]
-            )
+            component["licenseComments"] = package_info["licensecomments"]
         if files_analysed:
             # Only if files have been analysed
             if "licenseinfoinfiles" in package_info:
@@ -370,9 +365,7 @@ class SPDXGenerator:
             for info in file_info["licenseinfoinfile"]:
                 self.generateTag("LicenseInfoInFile", self.license_ident(info))
         if "licensecomment" in file_info:
-            self.generateTag(
-                "LicenseComments", self.license_ident(file_info["licensecomment"])
-            )
+            self.generateTag("LicenseComments", file_info["licensecomment"])
         if "copyrighttext" in file_info:
             self.generateTag("FileCopyrightText", file_info["copyrighttext"])
         if "comment" in file_info:
@@ -408,9 +401,7 @@ class SPDXGenerator:
                 else:
                     component["licenseInfoInFiles"] = [self.license_ident(info)]
         if "licensecomment" in file_info:
-            component["licenseComments"] = self.license_ident(
-                file_info["licensecomment"]
-            )
+            component["licenseComments"] = file_info["licensecomment"]
         if "checksum" in file_info:
             # Potentially multiple entries
             for checksum in file_info["checksum"]:
