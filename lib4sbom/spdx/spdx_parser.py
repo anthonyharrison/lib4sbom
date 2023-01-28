@@ -264,113 +264,115 @@ class SPDXParser:
         spdx_relationship = SBOMRelationship()
         # Maintain mapping of document/file/package ids to names
         elements = {}
-
         spdx_document = SBOMDocument()
-        spdx_document.set_version(data["spdxVersion"])
-        spdx_document.set_id(data["SPDXID"])
-        spdx_document.set_datalicense(data["dataLicense"])
-        spdx_document.set_type("spdx")
-        spdx_document.set_name(data["name"])
-        elements[data["SPDXID"]] = data["name"]
-        if "files" in data:
-            for d in data["files"]:
-                spdx_file.initialise()
-                filename = d["fileName"]
-                spdx_file.set_name(filename)
-                elements[d["SPDXID"]] = filename
-                try:
-                    if "checksum" in d:
-                        # Potentially multiple entries
-                        for checksum in d["checksum"]:
-                            spdx_file.set_checksum(
-                                checksum["algorithm"], checksum["checkumValue"]
-                            )
-                    if "licenseConcluded" in d:
-                        spdx_file.set_licenseconcluded(d["licenseConcluded"])
-                    if "copyrightText" in d:
-                        spdx_file.set_copyrighttext(d["copyrightText"])
-                    if filename not in files:
-                        # Save file metadata
-                        files[filename] = spdx_file.get_file()
-                except KeyError as e:
-                    print(f"{e} Unable to store file info: {filename}")
-        if "packages" in data:
-            for d in data["packages"]:
-                spdx_package.initialise()
-                package = d["name"]
-                spdx_package.set_name(package)
-                elements[d["SPDXID"]] = package
-                # Default type of component
-                spdx_package.set_type("library")
-                try:
-                    version = d["versionInfo"]
-                    spdx_package.set_version(version)
-                    if "supplier" in d:
-                        supplier = d["supplier"].split(":")
-                        # Type not always specified
-                        if len(supplier) == 2:
-                            supplier_type = supplier[0]
-                            supplier_name = supplier[1].strip().rstrip("\n")
-                        else:
-                            # No type specified
-                            supplier_type = "UNKNOWN"
-                            supplier_name = supplier[0].strip().rstrip("\n")
-                        spdx_package.set_supplier(supplier_type, supplier_name)
-                    if "originator" in d:
-                        originator = d["originator"].split(":")
-                        spdx_package.set_originator(originator[0], originator[1])
-                    if "filesAnaylzed" in d:
-                        spdx_package.set_filesAnalyzed(d["filesAnaylzed"])
-                    if "filename" in d:
-                        spdx_package.set_fileName(d["filename"])
-                    if "homepage" in d:
-                        spdx_package.set_homepage(d["homepage"])
-                    if "checksum" in d:
-                        # Potentially multiple entries
-                        for checksum in d["checksum"]:
-                            spdx_package.set_checksum(
-                                checksum["algorithm"], checksum["checkumValue"]
-                            )
-                    if "sourceinfo" in d:
-                        spdx_package.set_sourceInfo(d["sourceinfo"])
-                    if "licenseConcluded" in d:
-                        spdx_package.set_licenseconcluded(d["licenseConcluded"])
-                    if "licenseDeclared" in d:
-                        spdx_package.set_licensedeclared(d["licenseDeclared"])
-                    if "licenseComments" in d:
-                        spdx_package.set_licensecomments(d["licenseComments"])
-                    if "copyrightText" in d:
-                        spdx_package.set_copyrighttext(d["copyrightText"])
-                    if "downloadLocation" in d:
-                        spdx_package.set_downloadlocation(d["downloadLocation"])
-                    if "description" in d:
-                        spdx_package.set_description(d["description"])
-                    if "comment" in d:
-                        spdx_package.set_comment(d["comment"])
-                    if "summary" in d:
-                        spdx_package.set_summary(d["summary"])
-                    if "downloadlocation" in d:
-                        spdx_package.set_downloadlocation(d["downloadlocation"])
-                    if "externalRefs" in d:
-                        for ext_ref in d["externalRefs"]:
-                            spdx_package.set_externalreference(
-                                ext_ref["referenceCategory"],
-                                ext_ref["referenceType"],
-                                ext_ref["referenceLocator"],
-                            )
-                    if package not in packages:
-                        # Save package metadata
-                        packages[package] = spdx_package.get_package()
+        # Check valid SPDX JSON file (and not CycloneDX)
+        spdx_json_file = data.get("spdxVersion", False)
+        if spdx_json_file:
+            spdx_document.set_version(data["spdxVersion"])
+            spdx_document.set_id(data["SPDXID"])
+            spdx_document.set_datalicense(data["dataLicense"])
+            spdx_document.set_type("spdx")
+            spdx_document.set_name(data["name"])
+            elements[data["SPDXID"]] = data["name"]
+            if "files" in data:
+                for d in data["files"]:
+                    spdx_file.initialise()
+                    filename = d["fileName"]
+                    spdx_file.set_name(filename)
+                    elements[d["SPDXID"]] = filename
+                    try:
+                        if "checksum" in d:
+                            # Potentially multiple entries
+                            for checksum in d["checksum"]:
+                                spdx_file.set_checksum(
+                                    checksum["algorithm"], checksum["checkumValue"]
+                                )
+                        if "licenseConcluded" in d:
+                            spdx_file.set_licenseconcluded(d["licenseConcluded"])
+                        if "copyrightText" in d:
+                            spdx_file.set_copyrighttext(d["copyrightText"])
+                        if filename not in files:
+                            # Save file metadata
+                            files[filename] = spdx_file.get_file()
+                    except KeyError as e:
+                        print(f"{e} Unable to store file info: {filename}")
+            if "packages" in data:
+                for d in data["packages"]:
+                    spdx_package.initialise()
+                    package = d["name"]
+                    spdx_package.set_name(package)
+                    elements[d["SPDXID"]] = package
+                    # Default type of component
+                    spdx_package.set_type("library")
+                    try:
+                        version = d["versionInfo"]
+                        spdx_package.set_version(version)
+                        if "supplier" in d:
+                            supplier = d["supplier"].split(":")
+                            # Type not always specified
+                            if len(supplier) == 2:
+                                supplier_type = supplier[0]
+                                supplier_name = supplier[1].strip().rstrip("\n")
+                            else:
+                                # No type specified
+                                supplier_type = "UNKNOWN"
+                                supplier_name = supplier[0].strip().rstrip("\n")
+                            spdx_package.set_supplier(supplier_type, supplier_name)
+                        if "originator" in d:
+                            originator = d["originator"].split(":")
+                            spdx_package.set_originator(originator[0], originator[1])
+                        if "filesAnaylzed" in d:
+                            spdx_package.set_filesAnalyzed(d["filesAnaylzed"])
+                        if "filename" in d:
+                            spdx_package.set_fileName(d["filename"])
+                        if "homepage" in d:
+                            spdx_package.set_homepage(d["homepage"])
+                        if "checksum" in d:
+                            # Potentially multiple entries
+                            for checksum in d["checksum"]:
+                                spdx_package.set_checksum(
+                                    checksum["algorithm"], checksum["checkumValue"]
+                                )
+                        if "sourceinfo" in d:
+                            spdx_package.set_sourceInfo(d["sourceinfo"])
+                        if "licenseConcluded" in d:
+                            spdx_package.set_licenseconcluded(d["licenseConcluded"])
+                        if "licenseDeclared" in d:
+                            spdx_package.set_licensedeclared(d["licenseDeclared"])
+                        if "licenseComments" in d:
+                            spdx_package.set_licensecomments(d["licenseComments"])
+                        if "copyrightText" in d:
+                            spdx_package.set_copyrighttext(d["copyrightText"])
+                        if "downloadLocation" in d:
+                            spdx_package.set_downloadlocation(d["downloadLocation"])
+                        if "description" in d:
+                            spdx_package.set_description(d["description"])
+                        if "comment" in d:
+                            spdx_package.set_comment(d["comment"])
+                        if "summary" in d:
+                            spdx_package.set_summary(d["summary"])
+                        if "downloadlocation" in d:
+                            spdx_package.set_downloadlocation(d["downloadlocation"])
+                        if "externalRefs" in d:
+                            for ext_ref in d["externalRefs"]:
+                                spdx_package.set_externalreference(
+                                    ext_ref["referenceCategory"],
+                                    ext_ref["referenceType"],
+                                    ext_ref["referenceLocator"],
+                                )
+                        if package not in packages:
+                            # Save package metadata
+                            packages[package] = spdx_package.get_package()
 
-                except KeyError as e:
-                    print(f"{e} Unable to store package info: {package}")
-        if "relationships" in data:
-            for d in data["relationships"]:
-                spdx_relationship.initialise()
-                spdx_relationship.set_relationship(
-                    d["spdxElementId"], d["relationshipType"], d["relatedSpdxElement"]
-                )
-                relationships.append(spdx_relationship.get_relationship())
+                    except KeyError as e:
+                        print(f"{e} Unable to store package info: {package}")
+            if "relationships" in data:
+                for d in data["relationships"]:
+                    spdx_relationship.initialise()
+                    spdx_relationship.set_relationship(
+                        d["spdxElementId"], d["relationshipType"], d["relatedSpdxElement"]
+                    )
+                    relationships.append(spdx_relationship.get_relationship())
         return (
             spdx_document,
             files,
