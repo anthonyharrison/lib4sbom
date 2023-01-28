@@ -98,7 +98,7 @@ class SBOMGenerator:
             if len(sbom_data["files"]) is not None:
                 sbom_files = [x for x in sbom_data["files"].values()]
                 id = 1
-                relationship = "DEPENDS_ON"
+                relationship = "CONTAINS"
                 for file in sbom_files:
                     self.bom.generateFileDetails(
                         file["name"],
@@ -253,7 +253,7 @@ class SBOMGenerator:
                 id = 1
                 for file in sbom_files:
                     self.bom.generateComponent(file["name"], "file", file)
-                    self.bom.generateRelationship(0, file["name"])
+                    self.bom.generateRelationship(project_id, file["name"])
                     self._save_element(file["name"], file["name"])
                     id = id + 1
         # Process list of packages
