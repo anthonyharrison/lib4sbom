@@ -16,7 +16,6 @@ try:
 
     # What type of SBOM
     document = SBOMDocument()
-    print (test_parser.get_document())
     document.copy_document(test_parser.get_document())
 
     packages = test_parser.get_packages()
@@ -28,13 +27,19 @@ try:
     print (f"Name         {document.get_name()}")
     print ()
     print (f"Files        {len(files)}")
-    for file in files:
-        print (f"{file['name']:30} - {file.get('type','NOT DEFINED'):20}")
+    if len(files) > 0:
+        print(f"\n{'Name':50} {'Type':20}")
+        print ("-" * 70)
+        for file in files:
+            file_types = file.get("filetype",["NOT DEFINED"])
+            for file_type in file_types:
+                print (f"{file['name'][:50]:50} {file_type:20}")
     print (f"\nPackages     {len(packages)}")
-    print (f"\n{'Name':30} {'Version':15} {'Type':20}")
-    print ("-" * 70)
-    for package in packages:
-        print (f"{package['name']:30} {package.get('version','MISSING'):15} {package['type']:20}")
+    if len(packages) > 0:
+        print (f"\n{'Name':30} {'Version':15} {'Type':20}")
+        print ("-" * 70)
+        for package in packages:
+            print (f"{package['name']:30} {package.get('version','MISSING'):15} {package['type']:20}")
 
 except FileNotFoundError:
     print (f"{sys.argv[1]} not found")
