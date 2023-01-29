@@ -27,7 +27,7 @@ print (f"Name         {document.get_name()}")
 print ()
 print (f"Files        {len(files)}")
 for file in files:
-    print (f"{file['name']} - {file.get('type','NOT STATED')}")
+    print (f"{file['name']:30} - {file.get('type','NOT DEFINED'):20}")
 print (f"\nPackages     {len(packages)}")
 print (f"\n{'Name':30} {'Version':15} {'Type':20}")
 print ("-" * 70)
