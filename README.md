@@ -45,14 +45,9 @@ SBOMs are supported in the following formats
 | SBOM Type | Version | Format         |
 | --------- |---------| ---------------|
 | SPDX      | 2.3     | TagValue       |
-| SPDX      | 2.2     | RDF            |
 | SPDX      | 2.3     | JSON           |
 | SPDX      | 2.3     | YAML           |
-| SPDX      | 2.2     | XML            |
-| CycloneDX | 1.4     | XML            |
 | CycloneDX | 1.4     | JSON           |
-
-SPDX RDF and XML formats are partially supported.
 
 _class_ **SBOMParser**(_sbom_type='auto_')
 
@@ -64,12 +59,9 @@ following filename conventions.
 | SBOM      | Format    | Filename extension |
 | --------- | --------- |--------------------|
 | SPDX      | TagValue  | .spdx              |
-| SPDX      | RDF       | .spdx.rdf          |
 | SPDX      | JSON      | .spdx.json         |
 | SPDX      | YAML      | .spdx.yaml         |
 | SPDX      | YAML      | .spdx.yml          |
-| SPDX      | XML       | .spdx.xml          |
-| CycloneDX | XML       | .xml               |
 | CycloneDX | JSON      | .json              |
 
 The parser will check that the correct JSON files is being processed by the correct parser.

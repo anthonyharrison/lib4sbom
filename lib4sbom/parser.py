@@ -91,7 +91,8 @@ class SBOMParser:
         self.sbom.add_files(self.files)
         self.sbom.add_packages(self.packages)
         self.sbom.add_relationships(self.relationships)
-        self.sbom.add_document(self.document.get_document())
+        if len(self.document) > 0:
+            self.sbom.add_document(self.document.get_document())
         self.sbom.set_type(self.sbom_type)
 
     def get_sbom(self) -> SBOMData:

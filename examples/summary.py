@@ -15,6 +15,7 @@ test_parser.parse_file(sys.argv[1])
 
 # What type of SBOM
 document = SBOMDocument()
+print (test_parser.get_document())
 document.copy_document(test_parser.get_document())
 
 packages = test_parser.get_packages()
