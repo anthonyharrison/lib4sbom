@@ -24,6 +24,20 @@ class SBOMDocument:
     def set_datalicense(self, license):
         self.document["datalicense"] = license
 
+    def set_licenselist(self, license):
+        self.document["licenselist"] = license
+
+    def set_created(self, created):
+        self.document["created"] = created
+
+    def set_creator(self, type, creator):
+        # Allow multiple entries
+        creator_entry = [type.strip(), creator]
+        if "creator" in self.document:
+            self.document["creator"].append(creator_entry)
+        else:
+            self.document["creator"] = [creator_entry]
+
     def set_value(self, key, value):
         self.document[key] = value
 
@@ -52,6 +66,12 @@ class SBOMDocument:
 
     def get_datalicense(self):
         return self.get_value("datalicense")
+
+    def get_created(self):
+        return self.get_value("created")
+
+    def get_creator(self):
+        return self.get_value("creator", default=[])
 
     def get_value(self, attribute, default=None):
         return self.document.get(attribute, default)

@@ -37,6 +37,15 @@ class CycloneDXParser:
         if cyclonedx_json_file:
             cyclonedx_document.set_version(data["specVersion"])
             cyclonedx_document.set_type("cyclonedx")
+            if "metadata" in data:
+                if "timestamp" in data["metadata"]:
+                    cyclonedx_document.set_created(data["metadata"]["timestamp"])
+                if "tools" in data["metadata"]:
+                    cyclonedx_document.set_creator("tool", data["metadata"]["tools"][0]["name"])
+                if "authors" in data["metadata"]:
+                    cyclonedx_document.set_creator("person", data["metadata"]["authors"]["name"])
+                if "component" in data["metadata"]:
+                    cyclonedx_document.set_name(data["metadata"]["component"]["name"])
             for d in data["components"]:
                 cyclonedx_package.initialise()
                 if d["type"] in ["library", "application", "operating-system"]:

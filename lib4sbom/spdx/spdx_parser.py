@@ -64,9 +64,12 @@ class SPDXParser:
                 spdx_document.set_version(spdx_version)
                 spdx_document.set_type("spdx")
                 document_element = True
-            elif line_elements[0] == "LicenseListVersion:":
+            elif line_elements[0] == "DataLicense":
                 license_version = line_elements[1].strip().rstrip("\n")
                 spdx_document.set_datalicense(license_version)
+            elif line_elements[0] == "LicenseListVersion":
+                license_version = line_elements[1].strip().rstrip("\n")
+                spdx_document.set_licenselist(license_version)
             elif line_elements[0] == "DocumentName":
                 spdx_document_name = line_elements[1].strip().rstrip("\n")
                 spdx_document.set_name(spdx_document_name)
@@ -74,7 +77,16 @@ class SPDXParser:
                 if not document_element:
                     # ID can come before name
                     elements[spdx_id] = element_name
-
+            elif line_elements[0] == "Created":
+                # Capture all data after tag
+                created = line[len("Created:"):].strip().rstrip("\n")
+                line.find(created)
+                spdx_document.set_created(created)
+            elif line_elements[0] == "Creator":
+                creator_type = line_elements[1]
+                # Capture all data after creator type
+                creator = line[line.find(creator_type) + len(creator_type) + 1:].strip().rstrip("\n")
+                spdx_document.set_creator(creator_type, creator)
             if line_elements[0] == "FileName":
                 # Is this a new file?
                 if file is not None and file not in files:
@@ -271,8 +283,16 @@ class SPDXParser:
             spdx_document.set_version(data["spdxVersion"])
             spdx_document.set_id(data["SPDXID"])
             spdx_document.set_datalicense(data["dataLicense"])
+            if "licenseListVersion" in data:
+                spdx_document.set_licenselist(data["licenseListVersion"])
             spdx_document.set_type("spdx")
             spdx_document.set_name(data["name"])
+            # Process Creation Info
+            spdx_document.set_created(data["creationInfo"]["created"])
+            # Potentially multiple entries
+            for creator in data["creationInfo"]["creators"]:
+                creator_entry = creator.split(":")
+                spdx_document.set_creator(creator_entry[0], creator_entry[1])
             elements[data["SPDXID"]] = data["name"]
             if "files" in data:
                 for d in data["files"]:

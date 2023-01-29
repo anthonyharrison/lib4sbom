@@ -34,6 +34,11 @@ class TestDocument:
 		test_item.set_datalicense('test_datalicense')
 		assert test_item.get_value('datalicense') == 'test_datalicense'
 
+	def test_set_created(self):
+		test_item = test_module()
+		test_item.set_created('2023-10-21T12:34:56Z')
+		assert test_item.get_value('created') == '2023-10-21T12:34:56Z'
+
 	def test_set_value(self):
 		test_item = test_module()
 		test_item.set_value('attribute','a_value')
@@ -76,6 +81,11 @@ class TestDocument:
 		test_item = test_module()
 		test_item.set_datalicense('test_datalicense')
 		assert test_item.get_datalicense() == 'test_datalicense'
+
+	def test_get_created(self):
+		test_item = test_module()
+		test_item.set_created('2023-10-21T12:34:56Z')
+		assert test_item.get_created() == '2023-10-21T12:34:56Z'
 
 	def test_get_value(self):
 		test_item = test_module()
