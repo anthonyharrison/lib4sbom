@@ -38,7 +38,7 @@ class SBOM:
     def add_data(self, sbom_data: SBOMData) -> None:
         for key, value in sbom_data.items():
             self.sbom[key] = value
-        print(f"AD {self.sbom}")
+        print(f"ADD {self.sbom}")
 
     def set_type(self, sbom_type):
         self.sbom["type"] = sbom_type
@@ -49,23 +49,29 @@ class SBOM:
     def get_sbom(self) -> SBOMData:
         return self.sbom
 
-    def get_document(self) -> List:
-        return self.sbom["document"]
+    def get_document(self) -> Dict:
+        return self.sbom.get("document",{})
 
-    def get_files(self) -> Dict:
-        # return self.sbom['files'
-        return [x for x in self.sbom["files"].values()]
+    def get_files(self) -> List:
+        file_data = self.sbom.get("files",[])
+        if len(file_data) > 0:
+            # return self.sbom['files'
+            return [x for x in self.sbom["files"].values()]
+        return file_data
 
-    def get_packages(self) -> Dict:
-        # return self.sbom['packages']
-        return [x for x in self.sbom["packages"].values()]
+    def get_packages(self) -> List:
+        package_data = self.sbom.get("packages",[])
+        if len(package_data) > 0:
+            # return self.sbom['packages']
+            return [x for x in self.sbom["packages"].values()]
+        return package_data
 
     def get_relationships(self) -> List:
         # return self.sbom['relationships']
-        return self.sbom["relationships"]
+        return self.sbom.get("relationships",[])
 
     def get_version(self) -> str:
-        return self.sbom["version"]
+        return self.sbom.get("version","")
 
     def get_type(self) -> str:
-        return self.sbom["type"]
+        return self.sbom.get("type","")
