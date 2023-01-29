@@ -6,6 +6,9 @@ class SBOMDocument:
     def __init__(self):
         self.document = {}
 
+    def __len__(self):
+        return len(self.document)
+
     def initialise(self):
         self.document = {}
 
