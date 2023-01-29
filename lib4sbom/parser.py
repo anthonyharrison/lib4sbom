@@ -71,8 +71,8 @@ class SBOMParser:
                 self.packages,
                 self.relationships,
             ) = self.parser.parse(filename)
-            # but if no packages found, assume it must be CycloneDX
-            if len(self.packages) == 0:
+            # but if no packages or files found, assume it must be CycloneDX
+            if len(self.packages) == 0 and len(self.files) == 0:
                 self.parser = CycloneDXParser()
                 (
                     self.document,
