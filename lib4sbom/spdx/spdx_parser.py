@@ -325,8 +325,10 @@ class SPDXParser:
                     # Default type of component
                     spdx_package.set_type("library")
                     try:
-                        version = d["versionInfo"]
-                        spdx_package.set_version(version)
+                        # Version info is not mandatory
+                        version = d.get("versionInfo",None)
+                        if version is not None:
+                            spdx_package.set_version(version)
                         if "supplier" in d:
                             supplier = d["supplier"].split(":")
                             # Type not always specified
@@ -516,12 +518,14 @@ class SPDXParser:
         relationships = []
         for rel in relationship_list:
             spdx_relationship.initialise()
-            spdx_relationship.set_relationship(
-                element_mapping[rel["source"]],
-                rel["type"],
-                element_mapping[rel["target"]],
-            )
-            # Retain ids for look up
-            spdx_relationship.set_relationship_id(rel["source"], rel["target"])
-            relationships.append(spdx_relationship.get_relationship())
+            # Only process if relationship source and target have been identified
+            if rel["source"] in element_mapping and rel["target"] in element_mapping:
+                spdx_relationship.set_relationship(
+                    element_mapping[rel["source"]],
+                    rel["type"],
+                    element_mapping[rel["target"]],
+                )
+                # Retain ids for look up
+                spdx_relationship.set_relationship_id(rel["source"], rel["target"])
+                relationships.append(spdx_relationship.get_relationship())
         return relationships
