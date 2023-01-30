@@ -1,3 +1,2 @@
-defusedxml
 pyyaml>=5.4
 semantic_version

@@ -33,7 +33,7 @@ class LicenseScanner:
 
     def find_license(self, license):
         # Search list of licenses to find match
-        if license in ["NOASSERTION","NONE"]:
+        if license in ["NOASSERTION", "NONE"]:
             return license
         for lic in self.licenses["licenses"]:
             # Comparisons ignore case of provided license text

@@ -3,8 +3,6 @@
 
 import json
 
-import defusedxml.ElementTree as ET
-
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
@@ -39,9 +37,13 @@ class CycloneDXParser:
                 if "timestamp" in data["metadata"]:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])
                 if "tools" in data["metadata"]:
-                    cyclonedx_document.set_creator("tool", data["metadata"]["tools"][0]["name"])
+                    cyclonedx_document.set_creator(
+                        "tool", data["metadata"]["tools"][0]["name"]
+                    )
                 if "authors" in data["metadata"]:
-                    cyclonedx_document.set_creator("person", data["metadata"]["authors"]["name"])
+                    cyclonedx_document.set_creator(
+                        "person", data["metadata"]["authors"]["name"]
+                    )
                 if "component" in data["metadata"]:
                     cyclonedx_document.set_name(data["metadata"]["component"]["name"])
             for d in data["components"]:

@@ -28,7 +28,19 @@ class SBOMFile:
 
     def set_filetype(self, type):
         file_type = type.upper()
-        if file_type not in ["SOURCE", "BINARY", "ARCHIVE", "APPLICATION", "AUDIO", "IMAGE", "TEXT", "VIDEO", "DOCUMENTATION", "SPDX", "OTHER"]:
+        if file_type not in [
+            "SOURCE",
+            "BINARY",
+            "ARCHIVE",
+            "APPLICATION",
+            "AUDIO",
+            "IMAGE",
+            "TEXT",
+            "VIDEO",
+            "DOCUMENTATION",
+            "SPDX",
+            "OTHER",
+        ]:
             file_type = "OTHER"
         if "filetype" in self.file:
             self.file["filetype"].append(file_type)
@@ -105,4 +117,4 @@ class SBOMFile:
 
     def _valid_checksum(self, value):
         # Only allow valid hex or decimal digits
-        return all (c in string.hexdigits for c in value.lower())
+        return all(c in string.hexdigits for c in value.lower())

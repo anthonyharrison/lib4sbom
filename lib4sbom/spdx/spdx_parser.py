@@ -2,11 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import re
 
-import defusedxml.ElementTree as ET
 import yaml
-
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.file import SBOMFile
 from lib4sbom.data.package import SBOMPackage
@@ -75,13 +72,17 @@ class SPDXParser:
                     elements[spdx_id] = element_name
             elif line_elements[0] == "Created":
                 # Capture all data after tag
-                created = line[len("Created:"):].strip().rstrip("\n")
+                created = line[len("Created:") :].strip().rstrip("\n")
                 line.find(created)
                 spdx_document.set_created(created)
             elif line_elements[0] == "Creator":
                 creator_type = line_elements[1]
                 # Capture all data after creator type
-                creator = line[line.find(creator_type) + len(creator_type) + 1:].strip().rstrip("\n")
+                creator = (
+                    line[line.find(creator_type) + len(creator_type) + 1 :]
+                    .strip()
+                    .rstrip("\n")
+                )
                 spdx_document.set_creator(creator_type, creator)
             if line_elements[0] == "FileName":
                 # Is this a new file?
@@ -322,7 +323,7 @@ class SPDXParser:
                     spdx_package.set_type("library")
                     try:
                         # Version info is not mandatory
-                        version = d.get("versionInfo",None)
+                        version = d.get("versionInfo", None)
                         if version is not None:
                             spdx_package.set_version(version)
                         if "supplier" in d:
@@ -388,7 +389,9 @@ class SPDXParser:
                 for d in data["relationships"]:
                     spdx_relationship.initialise()
                     spdx_relationship.set_relationship(
-                        d["spdxElementId"], d["relationshipType"], d["relatedSpdxElement"]
+                        d["spdxElementId"],
+                        d["relationshipType"],
+                        d["relatedSpdxElement"],
                     )
                     relationships.append(spdx_relationship.get_relationship())
         return (

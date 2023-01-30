@@ -50,17 +50,17 @@ class SBOM:
         return self.sbom
 
     def get_document(self) -> Dict:
-        return self.sbom.get("document",{})
+        return self.sbom.get("document", {})
 
     def get_files(self) -> List:
-        file_data = self.sbom.get("files",[])
+        file_data = self.sbom.get("files", [])
         if len(file_data) > 0:
             # return self.sbom['files'
             return [x for x in self.sbom["files"].values()]
         return file_data
 
     def get_packages(self) -> List:
-        package_data = self.sbom.get("packages",[])
+        package_data = self.sbom.get("packages", [])
         if len(package_data) > 0:
             # return self.sbom['packages']
             return [x for x in self.sbom["packages"].values()]
@@ -68,10 +68,10 @@ class SBOM:
 
     def get_relationships(self) -> List:
         # return self.sbom['relationships']
-        return self.sbom.get("relationships",[])
+        return self.sbom.get("relationships", [])
 
     def get_version(self) -> str:
-        return self.sbom.get("version","")
+        return self.sbom.get("version", "")
 
     def get_type(self) -> str:
-        return self.sbom.get("type","")
+        return self.sbom.get("type", "")

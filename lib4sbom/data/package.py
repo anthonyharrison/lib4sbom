@@ -5,6 +5,7 @@ import string
 
 from lib4sbom.license import LicenseScanner
 
+
 class SBOMPackage:
     def __init__(self):
         self.package = {}
@@ -139,4 +140,4 @@ class SBOMPackage:
 
     def _valid_checksum(self, value):
         # Only allow valid hex or decimal digits
-        return all (c in string.hexdigits for c in value.lower())
+        return all(c in string.hexdigits for c in value.lower())
