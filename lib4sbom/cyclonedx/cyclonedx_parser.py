@@ -42,7 +42,7 @@ class CycloneDXParser:
                     )
                 if "authors" in data["metadata"]:
                     cyclonedx_document.set_creator(
-                        "person", data["metadata"]["authors"]["name"]
+                        "person", data["metadata"]["authors"][0]["name"]
                     )
                 if "component" in data["metadata"]:
                     cyclonedx_document.set_name(data["metadata"]["component"]["name"])
