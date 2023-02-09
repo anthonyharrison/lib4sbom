@@ -97,9 +97,9 @@ class CycloneDXGenerator:
                         "version": self.application_version,
                     }
                 ],
-                "component": [
+                "component":
                     {"type": "application", "bom-ref": project_id, "name": project_name}
-                ],
+                ,
             },
         }
         return project_id
