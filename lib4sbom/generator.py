@@ -272,9 +272,9 @@ class SBOMGenerator:
                     self._get_element(product, my_id), type, package
                 )
                 # if parent != "-":
-                self.bom.generateRelationship(
-                    self._get_element(parent), self._get_element(product, my_id)
-                )
+                # self.bom.generateRelationship(
+                #     self._get_element(parent), self._get_element(product, my_id)
+                # )
                 id = id + 1
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:

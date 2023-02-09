@@ -133,9 +133,10 @@ class CycloneDXGenerator:
         for element in self.relationship:
             if element["ref"] == parent_id:
                 # Update list of dependencies
-                element["dependsOn"].append(package_id)
-                element_found = True
-                break
+                if package_id not in element["dependsOn"]:
+                    element["dependsOn"].append(package_id)
+                    element_found = True
+                    break
         if not element_found:
             # New item found
             dependency = dict()
