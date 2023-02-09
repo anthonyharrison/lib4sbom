@@ -140,20 +140,20 @@ class SBOMGenerator:
                 )
                 id = id + 1
                 # else:
-                if parent == "-":
-                    parent_id = project_id
-                    relationship = "DESCRIBES"
-                elif parent in self.element_set:
-                    relationship = "DEPENDS_ON"
-                    parent_id = self._get_element(parent)
-                else:
-                    parent_id = None
-                if parent_id is not None:
-                    self.bom.generateRelationship(
-                        self.bom.package_ident(parent_id),
-                        self.bom.package_ident(self._get_element(product)),
-                        relationship,
-                    )
+                # if parent == "-":
+                #     parent_id = project_id
+                #     relationship = "DESCRIBES"
+                # elif parent in self.element_set:
+                #     relationship = "DEPENDS_ON"
+                #     parent_id = self._get_element(parent)
+                # else:
+                #     parent_id = None
+                # if parent_id is not None:
+                #     self.bom.generateRelationship(
+                #         self.bom.package_ident(parent_id),
+                #         self.bom.package_ident(self._get_element(product)),
+                #         relationship,
+                #     )
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
                 if (

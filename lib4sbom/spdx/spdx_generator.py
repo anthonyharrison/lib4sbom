@@ -246,9 +246,9 @@ class SPDXGenerator:
                     "ExternalRef",
                     reference[0] + " " + reference[1] + " " + reference[2],
                 )
-        self.generateRelationship(
-            self.package_ident(parent_id), package_id, relationship
-        )
+        # self.generateRelationship(
+        #     self.package_ident(parent_id), package_id, relationship
+        # )
 
     def generateJSONPackageDetails(
         self, package, id, package_info, parent_id, relationship
@@ -336,9 +336,9 @@ class SPDXGenerator:
                 else:
                     component["externalRefs"] = [reference_data]
         self.component.append(component)
-        self.generateRelationship(
-            self.package_ident(parent_id), package_id, relationship
-        )
+        # self.generateRelationship(
+        #     self.package_ident(parent_id), package_id, relationship
+        # )
 
     def generateTagFileDetails(self, file, id, file_info, parent_id, relationship):
         self.generateComment("\n")
