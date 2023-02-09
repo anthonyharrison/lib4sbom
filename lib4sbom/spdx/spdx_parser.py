@@ -180,8 +180,13 @@ class SPDXParser:
                     supplier = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_supplier(supplier_type, supplier)
             elif line_elements[0] == "PackageOriginator":
-                originator_type = line_elements[1]
-                originator = line_elements[2].strip().rstrip("\n")
+                if len(line_elements) == 3:
+                    originator_type = line_elements[1]
+                    originator = line_elements[2].strip().rstrip("\n")
+                else:
+                    # No type specified
+                    originator_type = "UNKNOWN"
+                    originator = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_originator(originator_type, originator)
             elif line_elements[0] == "PackageDownloadLocation":
                 downloadlocation = line[24:].strip().rstrip("\n")

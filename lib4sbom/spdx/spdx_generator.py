@@ -186,12 +186,15 @@ class SPDXGenerator:
             else:
                 self.generateTag("PackageSupplier", "NOASSERTION")
         if "originator" in package_info:
-            self.generateTag(
-                "PackageOriginator",
-                package_info["originator_type"]
-                + ": "
-                + package_info["originator"]
-            )
+            if package_info["originator_type"] != "UNKNOWN":
+                self.generateTag(
+                    "PackageOriginator",
+                    package_info["originator_type"]
+                    + ": "
+                    + package_info["originator"]
+                )
+            else:
+                self.generateTag("PackageOriginator", "NOASSERTION")
         self.generateTag(
             "PackageDownloadLocation",
             package_info.get("downloadlocation", "NOASSERTION"),
@@ -272,11 +275,14 @@ class SPDXGenerator:
             else:
                 component["supplier"] = "NOASSERTION"
         if "originator" in package_info:
-            component["originator"] = (
-                package_info["originator_type"]
-                + ": "
-                + package_info["originator"]
-            )
+            if package_info["originator_type"] != "UNKNOWN":
+                component["originator"] = (
+                    package_info["originator_type"]
+                    + ": "
+                    + package_info["originator"]
+                )
+            else:
+                component["originator"] = "NOASSERTION"
         component["downloadLocation"] = package_info.get(
             "downloadlocation", "NOASSERTION"
         )
