@@ -234,7 +234,7 @@ class SPDXGenerator:
         else:
             self.generateTag("PackageCopyrightText", "NOASSERTION")
         if "description" in package_info:
-            self.generateTag("PackageDescription", package_info["description"])
+            self.generateTag("PackageDescription", f'<text>{package_info["description"]}</text>')
         if "comment" in package_info:
             self.generateTag("PackageComment", package_info["comment"])
         if "summary" in package_info:
@@ -318,7 +318,7 @@ class SPDXGenerator:
                         component["licenseInfoInFiles"] = [self.license_ident(info)]
         component["copyrightText"] = package_info.get("copyrightText", "NOASSERTION")
         if "description" in package_info:
-            component["description"] = package_info["description"]
+            component["description"] = f'<text>{package_info["description"]}</text>'
         if "comment" in package_info:
             component["comment"] = package_info["comment"]
         if "summary" in package_info:
