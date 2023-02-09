@@ -164,17 +164,15 @@ class CycloneDXGenerator:
         if "supplier" in package:
             # Depends on supplier type
             if package["supplier_type"] == "Person":
-                # Supplier name mustn't have spaces in. Covert spaces to '_'
-                component["author"] = package["supplier"].replace(" ", "_")
+                component["author"] = package["supplier"]
             elif package["supplier_type"] != "UNKNOWN":
                 # Organisation is supplier
                 supplier = dict()
-                # Supplier name mustn't have spaces in. Covert spaces to '_'
-                supplier["name"] = package["supplier"].replace(" ", "_")
+                supplier["name"] = package["supplier"]
                 component["supplier"] = supplier
                 if "version" in package:
-                    component["cpe"] = f'cpe:/a:{supplier["name"]}:{name}:{version}'
-                # Alternative is it is within external reference
+                    component["cpe"] = f'cpe:/a:{supplier["name"].replace(" ", "_")}:{name}:{version}'
+                # Alternative is it within external reference
         if "description" in package:
             component["description"] = package["description"]
         if "checksum" in package:
@@ -189,7 +187,7 @@ class CycloneDXGenerator:
         if "licenseconcluded" in package:
             license_id = self.license.find_license(package["licenseconcluded"])
             # Only include if valid license
-            if license_id != "UNKNOWN":
+            if license_id not in ["UNKNOWN", "NOASSERTION"]:
                 license = dict()
                 license["id"] = license_id
                 license_url = self.license.get_license_url(license["id"])
@@ -235,7 +233,7 @@ class CycloneDXGenerator:
         if "licenseconcluded" in package:
             license_id = self.license.find_license(package["licenseconcluded"])
             # Only include if valid license
-            if license_id != "UNKNOWN":
+            if license_id not in ["UNKNOWN", "NOASSERTION"]:
                 self.store("<licenses>")
                 self.store("<license>")
                 self.store(f'<id>"{license_id}"</id>')

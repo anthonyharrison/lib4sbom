@@ -177,22 +177,20 @@ class SPDXGenerator:
             print(f"[WARNING] **** version missing for {package}")
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
-                # Supplier name mustn't have spaces in. Covert spaces to '_'
                 self.generateTag(
                     "PackageSupplier",
                     package_info["supplier_type"]
                     + ": "
-                    + package_info["supplier"].replace(" ", "_"),
+                    + package_info["supplier"],
                 )
             else:
                 self.generateTag("PackageSupplier", "NOASSERTION")
         if "originator" in package_info:
-            # Originator mustn't have spaces in. Covert spaces to '_'
             self.generateTag(
                 "PackageOriginator",
                 package_info["originator_type"]
                 + ": "
-                + package_info["originator"].replace(" ", "_"),
+                + package_info["originator"],
             )
         self.generateTag(
             "PackageDownloadLocation",
@@ -266,20 +264,18 @@ class SPDXGenerator:
             print(f"[WARNING] **** version missing for {package}")
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
-                # Supplier name mustn't have spaces in. Covert spaces to '_'
                 component["supplier"] = (
                     package_info["supplier_type"]
                     + ": "
-                    + package_info["supplier"].replace(" ", "_")
+                    + package_info["supplier"]
                 )
             else:
                 component["supplier"] = "NOASSERTION"
         if "originator" in package_info:
-            # Originator mustn't have spaces in. Covert spaces to '_'
             component["originator"] = (
                 package_info["originator_type"]
                 + ": "
-                + package_info["originator"].replace(" ", "_")
+                + package_info["originator"]
             )
         component["downloadLocation"] = package_info.get(
             "downloadlocation", "NOASSERTION"
