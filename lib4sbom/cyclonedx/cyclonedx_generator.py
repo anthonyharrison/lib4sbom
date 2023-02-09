@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import uuid
+import re
 from datetime import datetime
 
 from lib4sbom.license import LicenseScanner
@@ -150,6 +151,19 @@ class CycloneDXGenerator:
         else:
             self.generateJSONComponent(id, type, package)
 
+    def _process_supplier_info(self, supplier_info):
+        # Get names
+        names = re.findall(r"[a-zA-Z\.\]+ [A-Za-z]+ ", supplier_info)
+        # Get email addresses
+        # Use RFC-5322 compliant regex (https://regex101.com/library/6EL6YF)
+        emails = re.findall(
+            r"((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))",
+            supplier_info,
+        )
+        supplier = " ".join(n for n in names)
+        email_address = emails[-1] if len(emails) > 0 else ""
+        return supplier.strip(), email_address
+
     def generateJSONComponent(self, id, type, package):
         component = dict()
         if "type" in package:
@@ -163,19 +177,27 @@ class CycloneDXGenerator:
             version = package["version"]
             component["version"] = version
         if "supplier" in package:
+            # If email address in supplier, separate from names
+            supplier_name, supplier_email = self._process_supplier_info(package["supplier"])
             # Depends on supplier type
-            if package["supplier_type"] == "Person":
-                component["author"] = package["supplier"]
-            elif package["supplier_type"] != "UNKNOWN":
-                # Organisation is supplier
+            # if package["supplier_type"] == "Person":
+            #     component["author"] = supplier_name
+            if package["supplier_type"] != "UNKNOWN":
+                # Either a person or orgonisation
                 supplier = dict()
-                supplier["name"] = package["supplier"]
+                supplier["name"] = supplier_name
+                contact = dict()
+                if len(supplier_email) > 0:
+                    contact["email"] = supplier_email
+                supplier["contact"] = [contact]
                 component["supplier"] = supplier
                 if "version" in package:
-                    component["cpe"] = f'cpe:/a:{supplier["name"].replace(" ", "_")}:{name}:{version}'
+                    component["cpe"] = f'cpe:/a:{supplier_name.replace(" ", "_")}:{name}:{version}'
                 # Alternative is it within external reference
         if "description" in package:
             component["description"] = package["description"]
+        elif "summary" in package:
+            component["description"] = package["summary"]
         if "checksum" in package:
             for checksum in package["checksum"]:
                 checksum_entry = dict()
@@ -199,6 +221,12 @@ class CycloneDXGenerator:
                 component["licenses"] = [item]
         if "copyrighttext" in package:
             component["copyright"] = package["copyrighttext"]
+        if "homepage" in package:
+            externalReference = dict()
+            externalReference["url"] = package["homepage"]
+            externalReference["type"] = "other"
+            externalReference["comment"] = "Home page for project"
+            component["externalReferences"] = [externalReference]
         if "externalreference" in package:
             # Potentially multiple entries
             for reference in package["externalreference"]:
