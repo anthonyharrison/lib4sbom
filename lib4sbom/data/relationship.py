@@ -13,6 +13,8 @@ class SBOMRelationship:
         self.relationship["source"] = source
         self.relationship["type"] = type.strip()
         self.relationship["target"] = target
+        self.relationship["source_id"] = None
+        self.relationship["target_id"] = None
 
     def set_relationship_id(self, id_s, id_t):
         self.relationship["source_id"] = id_s
