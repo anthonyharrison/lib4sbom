@@ -181,7 +181,7 @@ class SPDXGenerator:
                     "PackageSupplier",
                     package_info["supplier_type"]
                     + ": "
-                    + package_info["supplier"],
+                    + package_info["supplier"]
                 )
             else:
                 self.generateTag("PackageSupplier", "NOASSERTION")
@@ -190,7 +190,7 @@ class SPDXGenerator:
                 "PackageOriginator",
                 package_info["originator_type"]
                 + ": "
-                + package_info["originator"],
+                + package_info["originator"]
             )
         self.generateTag(
             "PackageDownloadLocation",
