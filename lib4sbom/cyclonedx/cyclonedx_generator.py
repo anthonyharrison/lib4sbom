@@ -153,7 +153,7 @@ class CycloneDXGenerator:
 
     def _process_supplier_info(self, supplier_info):
         # Get names
-        names = re.findall(r"[a-zA-Z\.\]+ [A-Za-z]+ ", supplier_info)
+        names = re.findall(r"[a-zA-Z\.\]+ [A-Za-z]+", supplier_info)
         # Get email addresses
         # Use RFC-5322 compliant regex (https://regex101.com/library/6EL6YF)
         emails = re.findall(
@@ -177,7 +177,7 @@ class CycloneDXGenerator:
             version = package["version"]
             component["version"] = version
         if "supplier" in package:
-            # If email address in supplier, separate from names
+            # If email address in supplier, separate from name
             supplier_name, supplier_email = self._process_supplier_info(package["supplier"])
             # Depends on supplier type
             # if package["supplier_type"] == "Person":
@@ -186,10 +186,10 @@ class CycloneDXGenerator:
                 # Either a person or orgonisation
                 supplier = dict()
                 supplier["name"] = supplier_name
-                contact = dict()
                 if len(supplier_email) > 0:
+                    contact = dict()
                     contact["email"] = supplier_email
-                supplier["contact"] = [contact]
+                    supplier["contact"] = [contact]
                 component["supplier"] = supplier
                 if "version" in package:
                     component["cpe"] = f'cpe:/a:{supplier_name.replace(" ", "_")}:{name}:{version}'
