@@ -253,7 +253,7 @@ class SBOMGenerator:
                 id = 1
                 for file in sbom_files:
                     self.bom.generateComponent(file["name"], "file", file)
-                    self.bom.generateRelationship(project_id, file["name"])
+                    # self.bom.generateRelationship(project_id, file["name"])
                     self._save_element(file["name"], file["name"])
                     id = id + 1
         # Process list of packages

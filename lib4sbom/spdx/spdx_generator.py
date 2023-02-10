@@ -377,7 +377,7 @@ class SPDXGenerator:
         if "contributor" in file_info:
             for contributor in file_info["contributor"]:
                 self.generateTag("FileContributor", contributor)
-        self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
+        #self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
 
     def generateJSONFileDetails(self, file, id, file_info, parent_id, relationship):
         component = dict()
@@ -425,7 +425,7 @@ class SPDXGenerator:
                 else:
                     component["fileContributor"] = [contributor]
         self.file_component.append(component)
-        self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
+        #self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
 
     def generatePackageDetails(
         self, package, id, package_info, parent_id, relationship
