@@ -456,6 +456,8 @@ class SPDXGenerator:
 
     def showRelationship(self):
         self.relationship.sort()
+        if self.format == "tag":
+            self.generateComment("\n")
         for r in self.relationship:
             if self.format == "tag":
                 self.generateTag("Relationship", f"{r[0]} {r[2].strip()} {r[1]}")
