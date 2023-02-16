@@ -20,6 +20,12 @@ class SBOMRelationship:
         self.relationship["source_id"] = id_s
         self.relationship["target_id"] = id_t
 
+    def set_source_type(self, source_type):
+        self.relationship["source_type"] = source_type
+
+    def set_target_type(self, target_type):
+        self.relationship["target_type"] = target_type
+
     def get_relationship(self):
         return self.relationship
 
@@ -31,6 +37,12 @@ class SBOMRelationship:
 
     def get_target(self):
         return self.relationship["target"]
+
+    def get_source_type(self):
+        return self.relationship.get("source_type", None)
+
+    def get_target_type(self):
+        return self.relationship.get("target_type", None)
 
     def show_relationship(self):
         for key in self.relationship:
