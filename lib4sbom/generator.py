@@ -100,16 +100,15 @@ class SBOMGenerator:
                 id = 1
                 relationship = "CONTAINS"
                 for file in sbom_files:
+                    file_id = file.get("id", None)
                     self.bom.generateFileDetails(
                         file["name"],
-                        str(id) + "-" + file["name"].replace("/", "-"),
+                        file_id,
                         file,
                         project_id,
                         relationship,
                     )
-                    self._save_element(
-                        file["name"], str(id) + "-" + file["name"].replace("/", "-")
-                    )
+                    self._save_element(file["name"], file_id)
                     id = id + 1
         # Process list of packages
         if "packages" in sbom_data:
@@ -160,17 +159,27 @@ class SBOMGenerator:
                     relationship["source"] in self.element_set
                     and relationship["target"] in self.element_set
                 ):
-                    self.bom.generateRelationship(
-                        self.bom.package_ident(
+                    source_ident = self.bom.package_ident(
                             self._get_element(
                                 relationship["source"], relationship["source_id"]
                             )
-                        ),
-                        self.bom.package_ident(
-                            self._get_element(
-                                relationship["target"], relationship["target_id"]
+                        )
+                    if relationship.get("target_type") == "file":
+                        target_ident = self.bom.file_ident(
+                                self._get_element(
+                                    relationship["target"], relationship["target_id"]
+                                )
                             )
-                        ),
+                    else:
+                        target_ident = self.bom.package_ident(
+                                self._get_element(
+                                    relationship["target"], relationship["target_id"]
+                                )
+                            )
+
+                    self.bom.generateRelationship(
+                        source_ident,
+                        target_ident,
                         " " + relationship["type"] + " ",
                     )
                 else:
