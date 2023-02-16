@@ -133,10 +133,10 @@ class CycloneDXGenerator:
         element_found = False
         for element in self.relationship:
             if element["ref"] == parent_id:
-                # Update list of dependencies
+                element_found = True
+                # Update list of dependencies if necessary
                 if package_id not in element["dependsOn"]:
                     element["dependsOn"].append(package_id)
-                    element_found = True
                     break
         if not element_found:
             # New item found
@@ -152,14 +152,17 @@ class CycloneDXGenerator:
             self.generateJSONComponent(id, type, package)
 
     def _process_supplier_info(self, supplier_info):
-        # Get names
-        names = re.findall(r"[a-zA-Z\.\]+ [A-Za-z]+", supplier_info)
+
         # Get email addresses
         # Use RFC-5322 compliant regex (https://regex101.com/library/6EL6YF)
         emails = re.findall(
             r"((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))",
             supplier_info,
         )
+        # If email found, remove from string
+        supplier_name = supplier_info.replace(emails[-1],"") if len(emails) > 0 else supplier_info
+        # Get names
+        names = re.findall(r"[a-zA-Z\.\]+ [A-Za-z]+", supplier_name)
         supplier = " ".join(n for n in names)
         email_address = emails[-1] if len(emails) > 0 else ""
         return supplier.strip(), email_address
@@ -209,13 +212,20 @@ class CycloneDXGenerator:
                     component["hashes"] = [checksum_entry]
         if "licenseconcluded" in package:
             license_id = self.license.find_license(package["licenseconcluded"])
-            # Only include if valid license
-            if license_id not in ["UNKNOWN", "NOASSERTION"]:
+            if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
+                # A valid SPDX license
                 license = dict()
                 license["id"] = license_id
                 license_url = self.license.get_license_url(license["id"])
                 if license_url is not None:
                     license["url"] = license_url
+                item = dict()
+                item["license"] = license
+                component["licenses"] = [item]
+            elif package["licenseconcluded"] not in ["UNKNOWN", "NOASSERTION", "NONE"]:
+                # Not a valid SPDX license
+                license = dict()
+                license["name"] = package["licenseconcluded"]
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
