@@ -147,11 +147,13 @@ class SPDXGenerator:
         return str(id)
 
     def license_ident(self, license):
-        if self.validate_license:
+        if self.validate_license and len(license) > 0:
             if license != "UNKNOWN":
                 derived_license = self.license.find_license(license)
                 if derived_license != "UNKNOWN":
                     return derived_license
+                # Not an SPDX License id
+                return license
         return "NOASSERTION"
 
     def _file_name(self, name):
