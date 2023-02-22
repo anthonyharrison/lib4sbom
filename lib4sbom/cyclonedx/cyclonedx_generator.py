@@ -245,7 +245,7 @@ class CycloneDXGenerator:
                 ref_value = reference[2]
                 if ref_category == "SECURITY" and ref_type == "cpe23Type":
                     component["cpe"] = ref_value
-                if ref_category == "PACKAGE-MANAGER" and ref_type == "purl":
+                if ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"] and ref_type == "purl":
                     component["purl"] = ref_value
         if "property" in package:
             for property in package["property"]:
@@ -289,6 +289,6 @@ class CycloneDXGenerator:
                 ref_value = reference[2]
                 if ref_category == "SECURITY" and ref_type == "cpe23Type":
                     self.store(f"<cpe>{ref_value}</cpe>")
-                if ref_category == "PACKAGE-MANAGER" and ref_type == "purl":
+                if ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"] and ref_type == "purl":
                     self.store(f"<purl>{ref_value}</purl>")
         self.store("</component>")
