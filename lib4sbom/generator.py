@@ -218,7 +218,12 @@ class SBOMGenerator:
             version_spec = version + ".0"
         else:
             version_spec = version + ".0.0"
-        return semantic_version.Version(version_spec)
+        try:
+            sem_version = semantic_version.Version(version_spec)
+        except ValueError:
+            # Version string does not follow semantic version specification
+            sem_version = version_spec
+        return sem_version
 
     def _get_element(self, name, id=None):
         check = self.element_set.get(name)
