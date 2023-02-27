@@ -16,7 +16,7 @@ class LicenseScanner:
         "Apache 2",
     ]
     DEFAULT_LICENSE = "UNKNOWN"
-    SPDX_LICENSE_VERSION = "3.18"
+    SPDX_LICENSE_VERSION = "3.20"
 
     def __init__(self):
         # Load licenses
