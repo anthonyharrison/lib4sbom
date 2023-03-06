@@ -55,14 +55,12 @@ class SBOM:
     def get_files(self) -> List:
         file_data = self.sbom.get("files", [])
         if len(file_data) > 0:
-            # return self.sbom['files'
             return [x for x in self.sbom["files"].values()]
         return file_data
 
     def get_packages(self) -> List:
         package_data = self.sbom.get("packages", [])
         if len(package_data) > 0:
-            # return self.sbom['packages']
             return [x for x in self.sbom["packages"].values()]
         return package_data
 

@@ -183,8 +183,6 @@ class CycloneDXGenerator:
             # If email address in supplier, separate from name
             supplier_name, supplier_email = self._process_supplier_info(package["supplier"])
             # Depends on supplier type
-            # if package["supplier_type"] == "Person":
-            #     component["author"] = supplier_name
             if package["supplier_type"] != "UNKNOWN":
                 # Either a person or orgonisation
                 supplier = dict()

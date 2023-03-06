@@ -121,7 +121,6 @@ class SPDXGenerator:
             + "-"
             + str(uuid.uuid4())
         )
-        # self.doc["documentDescribes"]=[self.SPDX_PROJECT_ID]
         return self.SPDX_PROJECT_ID
 
     def generateDocumentHeader(self, project_name):
@@ -340,9 +339,6 @@ class SPDXGenerator:
                 else:
                     component["externalRefs"] = [reference_data]
         self.component.append(component)
-        # self.generateRelationship(
-        #     self.package_ident(parent_id), package_id, relationship
-        # )
 
     def generateTagFileDetails(self, file, id, file_info, parent_id, relationship):
         self.generateComment("\n")
@@ -357,7 +353,6 @@ class SPDXGenerator:
             for type in file_info["filetype"]:
                 self.generateTag("FileType", type)
         if "licenseconcluded" in file_info:
-            # self.generateComment("Reported license " + file_info["licenseconcluded"])
             self.generateTag(
                 "LicenseConcluded", self.license_ident(file_info["licenseconcluded"])
             )
@@ -375,7 +370,6 @@ class SPDXGenerator:
         if "contributor" in file_info:
             for contributor in file_info["contributor"]:
                 self.generateTag("FileContributor", contributor)
-        # self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
 
     def generateJSONFileDetails(self, file, id, file_info, parent_id, relationship):
         component = dict()
@@ -423,7 +417,6 @@ class SPDXGenerator:
                 else:
                     component["fileContributor"] = [contributor]
         self.file_component.append(component)
-        # self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
 
     def generatePackageDetails(
         self, package, id, package_info, parent_id, relationship

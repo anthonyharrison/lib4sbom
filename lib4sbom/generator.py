@@ -126,7 +126,6 @@ class SBOMGenerator:
                 product = package["name"]
                 my_id = package.get("id", None)
                 parent = "-"
-                # if product not in self.element_set:
                 self._save_element(product, str(id) + "-" + product, my_id)
                 if parent == "-":
                     parent_id = project_id
@@ -143,21 +142,6 @@ class SBOMGenerator:
                     relationship,
                 )
                 id = id + 1
-                # else:
-                # if parent == "-":
-                #     parent_id = project_id
-                #     relationship = "DESCRIBES"
-                # elif parent in self.element_set:
-                #     relationship = "DEPENDS_ON"
-                #     parent_id = self._get_element(parent)
-                # else:
-                #     parent_id = None
-                # if parent_id is not None:
-                #     self.bom.generateRelationship(
-                #         self.bom.package_ident(parent_id),
-                #         self.bom.package_ident(self._get_element(product)),
-                #         relationship,
-                #     )
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
                 if (
@@ -272,7 +256,6 @@ class SBOMGenerator:
                 id = 1
                 for file in sbom_files:
                     self.bom.generateComponent(file["name"], "file", file)
-                    # self.bom.generateRelationship(project_id, file["name"])
                     self._save_element(file["name"], file["name"])
                     id = id + 1
         # Process list of packages
@@ -290,10 +273,6 @@ class SBOMGenerator:
                 self.bom.generateComponent(
                     self._get_element(product, my_id), type, package
                 )
-                # if parent != "-":
-                # self.bom.generateRelationship(
-                #     self._get_element(parent), self._get_element(product, my_id)
-                # )
                 id = id + 1
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
@@ -303,5 +282,4 @@ class SBOMGenerator:
                     ),
                     self._get_element(
                         relationship["target"], relationship["target_id"]
-                    ),
-                )
+                                         
