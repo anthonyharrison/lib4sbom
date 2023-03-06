@@ -1,6 +1,7 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import uuid
 from datetime import datetime
 
@@ -44,6 +45,7 @@ class SPDXGenerator:
             self.file_component = []
             self.relationships = []
         self.include_purl = False
+        self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
 
     def show(self, message):
         self.doc.append(message)
@@ -63,7 +65,7 @@ class SPDXGenerator:
     def generateTag(self, tag, value):
         if value is not None:
             self.show(tag + ": " + value)
-        else:
+        elif self.debug:
             print(f"[ERROR] with value for {tag}")
 
     def generateComment(self, comment):
@@ -175,15 +177,13 @@ class SPDXGenerator:
         if "version" in package_info:
             version = package_info["version"]
             self.generateTag("PackageVersion", version)
-        else:
+        elif self.debug:
             print(f"[WARNING] **** version missing for {package}")
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
                 self.generateTag(
                     "PackageSupplier",
-                    package_info["supplier_type"]
-                    + ": "
-                    + package_info["supplier"]
+                    package_info["supplier_type"] + ": " + package_info["supplier"],
                 )
             else:
                 self.generateTag("PackageSupplier", "NOASSERTION")
@@ -191,9 +191,7 @@ class SPDXGenerator:
             if package_info["originator_type"] != "UNKNOWN":
                 self.generateTag(
                     "PackageOriginator",
-                    package_info["originator_type"]
-                    + ": "
-                    + package_info["originator"]
+                    package_info["originator_type"] + ": " + package_info["originator"],
                 )
             else:
                 self.generateTag("PackageOriginator", "NOASSERTION")
@@ -239,7 +237,9 @@ class SPDXGenerator:
         else:
             self.generateTag("PackageCopyrightText", "NOASSERTION")
         if "description" in package_info:
-            self.generateTag("PackageDescription", f'<text>{package_info["description"]}</text>')
+            self.generateTag(
+                "PackageDescription", f'<text>{package_info["description"]}</text>'
+            )
         if "comment" in package_info:
             self.generateTag("PackageComment", package_info["comment"])
         if "summary" in package_info:
@@ -265,23 +265,19 @@ class SPDXGenerator:
         if "version" in package_info:
             version = package_info["version"]
             component["versionInfo"] = version
-        else:
+        elif self.debug:
             print(f"[WARNING] **** version missing for {package}")
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
                 component["supplier"] = (
-                    package_info["supplier_type"]
-                    + ": "
-                    + package_info["supplier"]
+                    package_info["supplier_type"] + ": " + package_info["supplier"]
                 )
             else:
                 component["supplier"] = "NOASSERTION"
         if "originator" in package_info:
             if package_info["originator_type"] != "UNKNOWN":
                 component["originator"] = (
-                    package_info["originator_type"]
-                    + ": "
-                    + package_info["originator"]
+                    package_info["originator_type"] + ": " + package_info["originator"]
                 )
             else:
                 component["originator"] = "NOASSERTION"
@@ -379,7 +375,7 @@ class SPDXGenerator:
         if "contributor" in file_info:
             for contributor in file_info["contributor"]:
                 self.generateTag("FileContributor", contributor)
-        #self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
+        # self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
 
     def generateJSONFileDetails(self, file, id, file_info, parent_id, relationship):
         component = dict()
@@ -427,7 +423,7 @@ class SPDXGenerator:
                 else:
                     component["fileContributor"] = [contributor]
         self.file_component.append(component)
-        #self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
+        # self.generateRelationship(self.package_ident(parent_id), file_id, relationship)
 
     def generatePackageDetails(
         self, package, id, package_info, parent_id, relationship

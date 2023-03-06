@@ -1,6 +1,8 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 import semantic_version
 
 from lib4sbom.cyclonedx.cyclonedx_generator import CycloneDXGenerator
@@ -52,6 +54,7 @@ class SBOMGenerator:
         self.sbom_complete = False
         self.element_set = {}
         self.sbom = None
+        self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
 
     def get_format(self) -> str:
         return self.format
@@ -72,7 +75,8 @@ class SBOMGenerator:
         if len(sbom_data) > 0:
             self.element_set = {}
             if project_name == "":
-                print("[ERROR] Project name missing")
+                if self.debug:
+                    print("[ERROR] Project name missing")
                 project_name = "Default_project"
             if self.sbom_type == "spdx":
                 self._generate_spdx(project_name, sbom_data)
@@ -116,7 +120,8 @@ class SBOMGenerator:
             sbom_packages = [x for x in sbom_data["packages"].values()]
             for package in sbom_packages:
                 if "name" not in package:
-                    print(f"[ERROR] Name missing in {package}")
+                    if self.debug:
+                        print(f"[ERROR] Name missing in {package}")
                     continue
                 product = package["name"]
                 my_id = package.get("id", None)
@@ -160,29 +165,29 @@ class SBOMGenerator:
                     and relationship["target"] in self.element_set
                 ):
                     source_ident = self.bom.package_ident(
-                            self._get_element(
-                                relationship["source"], relationship["source_id"]
-                            )
+                        self._get_element(
+                            relationship["source"], relationship["source_id"]
                         )
+                    )
                     if relationship.get("target_type") == "file":
                         target_ident = self.bom.file_ident(
-                                self._get_element(
-                                    relationship["target"], relationship["target_id"]
-                                )
+                            self._get_element(
+                                relationship["target"], relationship["target_id"]
                             )
+                        )
                     else:
                         target_ident = self.bom.package_ident(
-                                self._get_element(
-                                    relationship["target"], relationship["target_id"]
-                                )
+                            self._get_element(
+                                relationship["target"], relationship["target_id"]
                             )
+                        )
 
                     self.bom.generateRelationship(
                         source_ident,
                         target_ident,
                         " " + relationship["type"] + " ",
                     )
-                else:
+                elif self.debug:
                     print(
                         "[ERROR] Relationship not copied between",
                         relationship["source"],
