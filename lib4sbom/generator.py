@@ -29,18 +29,14 @@ class SBOMGenerator:
         self.format = format.lower()
         self.sbom_type = sbom_type.lower()
         # Ensure specified format is supported
-        if self.format not in ["tag", "json", "xml", "yaml"]:
+        if self.format not in ["tag", "json", "yaml"]:
             # Set a default format
             self.format = "json"
         if self.sbom_type not in ["spdx", "cyclonedx"]:
             # Set a default SBOM type
             self.sbom_type = "spdx"
         # Ensure format is compatible with SBOM type
-        if self.sbom_type == "spdx":
-            # XML not valid for SPDX
-            if self.format == "xml":
-                self.format = "tag"
-        else:
+        if self.sbom_type == "cyclonedx":
             # Tag and YAML not valid for CycloneDX
             if self.format in ["tag", "yaml"]:
                 self.format = "json"

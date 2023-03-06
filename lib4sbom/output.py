@@ -46,10 +46,9 @@ class SBOMOutput:
         self.format_process = {
             "tag": self.format_tag_data,
             "json": self.format_json_data,
-            "xml": self.format_tag_data,
             "yaml": self.format_yaml_data,
         }
-        if self.output_format not in ["tag", "json", "xml", "yaml"]:
+        if self.output_format not in ["tag", "json", "yaml"]:
             # Assume a default format
             self.output_format = "tag"
         self.type = "console"

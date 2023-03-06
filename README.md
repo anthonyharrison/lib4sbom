@@ -8,9 +8,9 @@ It has been developed on the assumption that having a generic abstraction of SBO
 The following facilities are provided:
 
 - Generate SPDX SBOM in TagValue, JSON and YAML formats
-- Generate CycloneDX SBOM in JSON and XML formats
+- Generate CycloneDX SBOM in JSON format
 - Parse SPDX SBOM in TagValue, JSON and YAML formats
-- Parse CycloneDX SBOM in JSON and XML formats
+- Parse CycloneDX SBOM in JSON format
 - Create and manipulate a SBOM file object
 - Create and manipulate a SBOM package object
 - Create and manipulate a SBOM dependency relationship object
@@ -88,7 +88,7 @@ Returns the type of SBOM (either spdx or cyclonedx)
 
 A test SBOM file (test_sbom.spdx) is used in the following example.
 
-```
+```bash
 SPDXVersion: SPDX-2.2
 DataLicense: CC0-1.0
 SPDXID: SPDXRef-DOCUMENT
@@ -155,7 +155,7 @@ Relationship: SPDXRef-Package-1-virtualenv CONTAINS SPDXRef-Package-4-platformdi
 
 The following code sample shows the use of the SBOMParser module.
 
-```
+```python
 >>> from lib4sbom.parser import SBOMParser
 >>> test_parser = SBOMParser()
 >>> print (f"SBOM type {test_parser.get_type()}")                                                                                                                                             
@@ -179,7 +179,6 @@ SBOM type spdx
 >>> sbom_relationships[2]
 {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'filelock', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-3-filelock'}
 >>> 
-
 ```
 
 ### SBOMGenerator
@@ -195,7 +194,6 @@ SBOMs can be generated in the following formats
 | SPDX      | 2.3     | Tag       |
 | SPDX      | 2.3     | JSON      |
 | SPDX      | 2.3     | YAML      |
-| CycloneDX | 1.4     | XML       |
 | CycloneDX | 1.4     | JSON      |
 
 _class_ **SBOMGenerator**(_validate_license: True, sbom_type="spdx", format="tag", application="lib4sbom", version="0.1"_)
@@ -207,7 +205,7 @@ as this is mandatory for CycloneDX SBOMs.
 
 _sbom_type_ indicates the type of SBOM to be generated. Valid options are spdx or cyclonedx
 
-_format_ indicates the format that the SBOM is to be generated in. Valid options are Tag, JSON, XML or YAML. If an invalid format is specified,
+_format_ indicates the format that the SBOM is to be generated in. Valid options are Tag, JSON or YAML. If an invalid format is specified,
 a default format of JSON will be assumed. If an unsupported format is specified for the type of SBOM (e.g. Tag or YAML for CycloneDX), a default
 format is assumed (Tag for SPDX, JSON for CycloneDX)
 
@@ -234,14 +232,14 @@ get_type()
 Returns the type of the generated SBOM (either spdx or cyclonedx)
 
 get_format()
-Returns the format of the generated SBOM (one of tag, json, xml or yaml)
+Returns the format of the generated SBOM (one of tag, json or yaml)
 
 **Example**
 
 The following code sample shows the use of the SBOMGenerator module being used
 in the conversion of a SBOM from the Tag Value format to YAML format. The output is sent ot the console.
 
-```
+```python
 >>> from lib4sbom.parser import SBOMParser
 >>> test_parser = SBOMParser()
 >>> test_parser.parse_file("test_sbom.spdx")
@@ -290,7 +288,7 @@ This creates a simple SBOM Output object. The following optional parameters can 
 _filename_ indicates the output destination of the SBOM to be generated. If a valid filename path is provided, then the output will be to a file otherwise
 it will be output to the console.
 
-_output_format_ indicates the format that the SBOM is to be generated in. Valid options are Tag, JSON, XML or YAML. If an invalid format is specified,
+_output_format_ indicates the format that the SBOM is to be generated in. Valid options are Tag, JSON or YAML. If an invalid format is specified,
 a default format of JSON will be assumed.
 
 **Methods**
@@ -303,13 +301,13 @@ get_type()
 Return the destination of the generated SBOM. Either file or console
 
 get_format()
-Return the format of the generated SBOM. One of Tag, JSON, XML or YAML.
+Return the format of the generated SBOM. One of Tag, JSON or YAML.
 
 **Example**
 
 The following code sample shows the use of the SBOMOutput module.
 
-```
+```python
 >>> from lib4sbom.parser import SBOMParser
 >>> test_parser = SBOMParser()
 >>> test_parser.parse_file("test_sbom.spdx")
@@ -368,7 +366,7 @@ Returns the value of the attribute. A default value is returned if the attribute
 
 **Example**
 
-```
+```python
 >>> from lib4sbom.data.document import SBOMDocument
 >>> sbom_document = SBOMDocument()
 >>> sbom_document.set_name("test_file.c")
@@ -439,7 +437,7 @@ initialise() Reinitialises a SBOMFile Object. All data associated with the objec
 
 **Example**
 
-```
+```python
 >>> from lib4sbom.data.file import SBOMFile
 >>> sbom_file = SBOMFile()
 >>> sbom_files = {}
@@ -525,7 +523,7 @@ initialise() Reinitialises a SBOMPackage Object. All data associated with the ob
 
 **Example**
 
-```
+```python
 >>> from lib4sbom.data.package import SBOMPackage
 >>> sbom_packages = {}
 >>> my_package = SBOMPackage()
@@ -568,7 +566,7 @@ Returns the SBOMRelationship object as a dictionary.
 
 **Example**
 
-```
+```python
 >>> from lib4sbom.data.relationship import SBOMRelationship
 >>> sbom_relationships = {}
 >>> my_relationship = SBOMRelationship()
@@ -593,8 +591,6 @@ The following design decisions have been made in processing the SBOM files:
 
 3. In SPDX format, the current implementation does not currently handle multi-line elements.
 
-4. The SPDX parsing of RDF and XML formats is limited to extracting package name, version and license information.
-
 ## Future Development
 
 1. Support later versions of SPDX (3.0) and CycloneDX.
@@ -607,7 +603,9 @@ The following design decisions have been made in processing the SBOM files:
 
 5. Utilise third-party SPDX and CycloneDX parsers and generators
 
-6. Implement test suite.
+6. Add support for XML and RDF formats
+
+7. Implement test suite.
 
 ## License
 
