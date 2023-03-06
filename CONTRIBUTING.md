@@ -76,10 +76,15 @@ To run a local copy, the recommended way is to install it locally. From the main
 python3 -m pip install --user -e .
 ```
 
-You should then be able to type `sbom4python --help` on the command line, and it should show the help information. If this does not
-work, then double check that you have setup the local environment correctly, have downloaded and installed the code correctly,
-that you are in your virtual environment and that the latest versions of
-any dependent components have been installed.
+You should then be able to launch Python on the command line and attempt to import the library
+
+```python
+>>> import lib4sbom
+>>>
+```
+
+If this does not work, then double check that you have setup the local environment correctly, have downloaded and installed the code correctly,
+that you are in your virtual environment and that the latest versions of any dependent components have been installed.
 
 ## Running linters
 
