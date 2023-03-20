@@ -154,7 +154,6 @@ class SPDXGenerator:
                 if derived_license != "UNKNOWN":
                     return derived_license
                 # Not an SPDX License id
-                return license
         return "NOASSERTION"
 
     def _file_name(self, name):
@@ -210,19 +209,18 @@ class SPDXGenerator:
                 self.generateTag("PackageChecksum", checksum[0] + ": " + checksum[1])
         if "sourceinfo" in package_info:
             self.generateTag("PackageSourceInfo", package_info["sourceinfo"])
-        if "licenseconcluded" in package_info:
-            # self.generateComment("Reported license " + package_info["licenseconcluded"])
-            self.generateTag(
-                "PackageLicenseConcluded",
-                self.license_ident(package_info["licenseconcluded"]),
-            )
         if "licensedeclared" in package_info:
             self.generateTag(
                 "PackageLicenseDeclared",
-                self.license_ident(package_info["licensedeclared"]),
+                package_info["licensedeclared"],
+            )
+        if "licenseconcluded" in package_info:
+            self.generateTag(
+                "PackageLicenseConcluded",
+                package_info["licenseconcluded"]
             )
         if "licensecomments" in package_info:
-            self.generateTag("PackageLicenseComments", package_info["licensecomments"])
+            self.generateTag("PackageLicenseComments", f'<text>{package_info["licensecomments"]}</text>')
         if files_analysed:
             # Only if files have been analysed
             if "licenseinfoinfiles" in package_info:
@@ -240,7 +238,7 @@ class SPDXGenerator:
                 "PackageDescription", f'<text>{package_info["description"]}</text>'
             )
         if "comment" in package_info:
-            self.generateTag("PackageComment", package_info["comment"])
+            self.generateTag("PackageComment", f'<text>{package_info["comment"]}</text>')
         if "summary" in package_info:
             self.generateTag("PackageSummary", package_info["summary"])
         if "externalreference" in package_info:
@@ -250,9 +248,6 @@ class SPDXGenerator:
                     "ExternalRef",
                     reference[0] + " " + reference[1] + " " + reference[2],
                 )
-        # self.generateRelationship(
-        #     self.package_ident(parent_id), package_id, relationship
-        # )
 
     def generateJSONPackageDetails(
         self, package, id, package_info, parent_id, relationship
@@ -302,13 +297,9 @@ class SPDXGenerator:
         if "sourceinfo" in package_info:
             component["sourceInfo"] = package_info["sourceinfo"]
         if "licenseconcluded" in package_info:
-            component["licenseConcluded"] = self.license_ident(
-                package_info["licenseconcluded"]
-            )
+            component["licenseConcluded"] = package_info["licenseconcluded"]
         if "licensedeclared" in package_info:
-            component["licenseDeclared"] = self.license_ident(
-                package_info["licensedeclared"]
-            )
+            component["licenseDeclared"] = package_info["licensedeclared"]
         if "licensecomments" in package_info:
             component["licenseComments"] = package_info["licensecomments"]
         if files_analysed:
@@ -360,11 +351,11 @@ class SPDXGenerator:
             for info in file_info["licenseinfoinfile"]:
                 self.generateTag("LicenseInfoInFile", self.license_ident(info))
         if "licensecomment" in file_info:
-            self.generateTag("LicenseComments", file_info["licensecomment"])
+            self.generateTag("LicenseComments", f'<text>{file_info["licensecomment"]}</text>')
         if "copyrighttext" in file_info:
             self.generateTag("FileCopyrightText", file_info["copyrighttext"])
         if "comment" in file_info:
-            self.generateTag("FileComment", file_info["comment"])
+            self.generateTag("FileComment", f'<text>{file_info["comment"]}</text>')
         if "notice" in file_info:
             self.generateTag("FileNotice", file_info["notice"])
         if "contributor" in file_info:
