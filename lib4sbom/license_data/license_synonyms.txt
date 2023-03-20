@@ -1,0 +1,24 @@
+# LIB4SBOM license synonyms
+[Apache-2.0]
+Apache Software License
+Apache License, Version 2.0
+Apache 2.0
+Apache_2.0
+Apache 2
+Apache-2
+ASL 2
+ASL 2.0
+Apache
+[Artistic-1.0-Perl]
+Artistic License
+[BSD-3-Clause]
+BSD
+BSD License
+[LGPL-2.0-or-later]
+LGPL
+[LGPL-3.0-or-later]
+LGPLv3+
+[MIT]
+MIT/X
+[PSF-2.0]
+PSFL

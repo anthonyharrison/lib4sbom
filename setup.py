@@ -43,7 +43,7 @@ setup_kwargs = dict(
     packages=find_packages(),
     package_data={
         "lib4sbom": [
-            "license_data/*.json",
+            "license_data/*.*",
         ],
     },
 )
