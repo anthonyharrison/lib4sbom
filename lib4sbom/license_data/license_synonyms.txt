@@ -11,14 +11,29 @@ ASL 2.0
 Apache
 [Artistic-1.0-Perl]
 Artistic License
+[Bitstream-Vera]
+Bitstream Vera
 [BSD-3-Clause]
 BSD
 BSD License
+[BSL-1.0]
+Boost
+[GPL-2.0-or-later]
+GPLv2+
+[GPL-3.0-or-later]
+GPLv3+
 [LGPL-2.0-or-later]
 LGPL
+LGPLv2+
 [LGPL-3.0-or-later]
 LGPLv3+
 [MIT]
 MIT/X
+[MPL-1.1]
+MPLv1.1
+[MPL-2.0]
+MPLv2.0
 [PSF-2.0]
 PSFL
+[Python-2.0]
+Python
