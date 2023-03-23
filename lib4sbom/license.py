@@ -42,13 +42,19 @@ class LicenseScanner:
         # Look for synonyms. Check is done in uppercase to handle mixed case license identifiers
         return self.license_synonym.get(license.upper(),None)
 
-    def find_license(self, license):
-        # Search list of licenses to find match
-        # Ignore non-SPDX licenses
-        if license.upper() in ["NOASSERTION", "NONE"]:
-            return license
-        # Don't process SPDX user defined licenses which start with LicenseRef.
-        if license.startswith("LicenseRef"):
+    def find_license_id(self, license):
+        # Search list of SPDX licenses to find match
+        # Handle special cases
+        if len(license) == 0:
+            return self.DEFAULT_LICENSE
+        elif license.upper() in ["NOASSERTION", self.DEFAULT_LICENSE]:
+            # Ignore non-SPDX licenses
+            return self.DEFAULT_LICENSE
+        elif license.upper() == "NONE":
+            # Maintain value
+            return license.upper()
+        elif license.startswith("LicenseRef"):
+            # Don't process SPDX user defined licenses
             return license
         for lic in self.licenses["licenses"]:
             # Comparisons ignore case of provided license text
@@ -58,7 +64,6 @@ class LicenseScanner:
                 return lic["licenseId"]
         # Look for synonyms
         license_id = self.check_synonym(license)
-        
         return license_id if license_id is not None else self.DEFAULT_LICENSE
 
     def get_license_url(self, license_id):
@@ -69,4 +74,48 @@ class LicenseScanner:
                 # If multiple entries, just return first one
                 if lic["licenseId"] == license_id:
                     return lic["seeAlso"][0]
-        return None  # License n
+        return None  # License not found
+
+    # License expression processing
+
+    def _expression_split(self, expression):
+        # Split expression into a list using words in keyword list as separators
+        boolean_operator = ["AND", "OR"]
+        result = []
+        working = expression.replace("(","").replace(")","").split(' ')
+        word = ""
+        for item in working:
+            if item.upper() in boolean_operator:
+                # Store word in list
+                result.append(word)
+                word = ""
+            elif len(word) > 0:
+                word = word + " " + item
+            else:
+                word = item
+        # Store last word if available
+        if len(word) > 0:
+            result.append(word)
+        return result
+
+    def find_license(self, license_expression):
+        # Multiple liceneses can be specified and connected using boolean logic.
+        # This will preserve any brackets and boolean operators included in the expression
+        updated_expression = license_expression
+        # Remove brackets and split into elements (separated by boolean operators)
+        license_information = self._expression_split(license_expression)
+        # Now process license information and build up list of valid licenses
+        license_data = []
+        for license in license_information:
+            # Assume we have a license!
+            validated_license = self.find_license_id(license)
+            license_data.append(validated_license)
+            # Update expression if necessary if valid license found
+            if validated_license not in [self.DEFAULT_LICENSE, "NONE"]:
+                updated_expression = updated_expression.replace(license, validated_license, 1)
+        # Return expression if all licenses are valid
+        return "NOASSERTION" if len(updated_expression) == 0 or self.DEFAULT_LICENSE in license_data else updated_expression
+
+    def license_expression(self, expression):
+        # Determine if license expression contains multiple elements
+        return len(self._expression_split(expression)) > 1
