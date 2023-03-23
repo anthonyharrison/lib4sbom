@@ -213,10 +213,14 @@ class CycloneDXGenerator:
             if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # A valid SPDX license
                 license = dict()
-                license["id"] = license_id
-                license_url = self.license.get_license_url(license["id"])
-                if license_url is not None:
-                    license["url"] = license_url
+                # SPDX license expression handled separately to single license
+                if self.license.license_expression(license_id):
+                    license["expression"] = license_id
+                else:
+                    license["id"] = license_id
+                    license_url = self.license.get_license_url(license["id"])
+                    if license_url is not None:
+                        license["url"] = license_url
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
