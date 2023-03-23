@@ -78,17 +78,21 @@ class CycloneDXParser:
                     elif "evidence" in d and len(d["evidence"]["licenses"]) > 0:
                         license_data = d["evidence"]["licenses"][0]
                     if license_data is not None:
-                        # license_data = d["licenses"][0]
+                        # Multiple ways of defining licenses
+                        license = None
                         if "license" in license_data:
                             if "id" in license_data["license"]:
                                 license = license_data["license"]["id"]
                             elif "name" in license_data["license"]:
                                 license = license_data["license"]["name"]
+                            elif "expression" in license_data["license"]:
+                                license = license_data["license"]["expression"]
                         elif "expression" in license_data:
                             license = license_data["expression"]
-                        # Assume License concluded is same as lincense declared
-                        cyclonedx_package.set_licenseconcluded(license)
-                        cyclonedx_package.set_licensedeclared(license)
+                        if license is not None:
+                            # Assume License concluded is same as license declared
+                            cyclonedx_package.set_licenseconcluded(license)
+                            cyclonedx_package.set_licensedeclared(license)
                     if "copyright" in d:
                         cyclonedx_package.set_copyrighttext(d["copyright"])
                     if "cpe" in d:
