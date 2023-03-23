@@ -1,8 +1,8 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
-import uuid
 import re
+import uuid
 from datetime import datetime
 
 from lib4sbom.license import LicenseScanner
@@ -98,9 +98,11 @@ class CycloneDXGenerator:
                         "version": self.application_version,
                     }
                 ],
-                "component":
-                    {"type": "application", "bom-ref": project_id, "name": project_name}
-                ,
+                "component": {
+                    "type": "application",
+                    "bom-ref": project_id,
+                    "name": project_name,
+                },
             },
         }
         return project_id
@@ -160,7 +162,9 @@ class CycloneDXGenerator:
             supplier_info,
         )
         # If email found, remove from string
-        supplier_name = supplier_info.replace(emails[-1],"") if len(emails) > 0 else supplier_info
+        supplier_name = (
+            supplier_info.replace(emails[-1], "") if len(emails) > 0 else supplier_info
+        )
         # Get names
         names = re.findall(r"[a-zA-Z\.\]+ [A-Za-z]+", supplier_name)
         supplier = " ".join(n for n in names)
@@ -181,7 +185,9 @@ class CycloneDXGenerator:
             component["version"] = version
         if "supplier" in package:
             # If email address in supplier, separate from name
-            supplier_name, supplier_email = self._process_supplier_info(package["supplier"])
+            supplier_name, supplier_email = self._process_supplier_info(
+                package["supplier"]
+            )
             # Depends on supplier type
             if package["supplier_type"] != "UNKNOWN":
                 # Either a person or orgonisation
@@ -193,7 +199,9 @@ class CycloneDXGenerator:
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
                 if "version" in package:
-                    component["cpe"] = f'cpe:/a:{supplier_name.replace(" ", "_")}:{name}:{version}'
+                    component[
+                        "cpe"
+                    ] = f'cpe:/a:{supplier_name.replace(" ", "_")}:{name}:{version}'
                 # Alternative is it within external reference
         if "description" in package:
             component["description"] = package["description"]
@@ -247,7 +255,10 @@ class CycloneDXGenerator:
                 ref_value = reference[2]
                 if ref_category == "SECURITY" and ref_type == "cpe23Type":
                     component["cpe"] = ref_value
-                if ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"] and ref_type == "purl":
+                if (
+                    ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
+                    and ref_type == "purl"
+                ):
                     component["purl"] = ref_value
         if "property" in package:
             for property in package["property"]:
@@ -291,6 +302,9 @@ class CycloneDXGenerator:
                 ref_value = reference[2]
                 if ref_category == "SECURITY" and ref_type == "cpe23Type":
                     self.store(f"<cpe>{ref_value}</cpe>")
-                if ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"] and ref_type == "purl":
+                if (
+                    ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
+                    and ref_type == "purl"
+                ):
                     self.store(f"<purl>{ref_value}</purl>")
         self.store("</component>")

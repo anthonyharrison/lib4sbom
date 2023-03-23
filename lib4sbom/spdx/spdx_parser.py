@@ -4,6 +4,7 @@
 import json
 
 import yaml
+
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.file import SBOMFile
 from lib4sbom.data.package import SBOMPackage

@@ -39,8 +39,8 @@ class LicenseScanner:
         return self.SPDX_LICENSE_VERSION
 
     def check_synonym(self, license):
-        # Look for synonyms. Check is done in uppercase to handle mixed case license identifiers
-        return self.license_synonym.get(license.upper(),None)
+        # Look for synonyms. Check done in uppercase to handle mixed case license identifiers
+        return self.license_synonym.get(license.upper(), None)
 
     def find_license_id(self, license):
         # Search list of SPDX licenses to find match
@@ -82,7 +82,7 @@ class LicenseScanner:
         # Split expression into a list using words in keyword list as separators
         boolean_operator = ["AND", "OR"]
         result = []
-        working = expression.replace("(","").replace(")","").split(' ')
+        working = expression.replace("(", "").replace(")", "").split(" ")
         word = ""
         for item in working:
             if item.upper() in boolean_operator:
@@ -112,9 +112,15 @@ class LicenseScanner:
             license_data.append(validated_license)
             # Update expression if necessary if valid license found
             if validated_license not in [self.DEFAULT_LICENSE, "NONE"]:
-                updated_expression = updated_expression.replace(license, validated_license, 1)
+                updated_expression = updated_expression.replace(
+                    license, validated_license, 1
+                )
         # Return expression if all licenses are valid
-        return "NOASSERTION" if len(updated_expression) == 0 or self.DEFAULT_LICENSE in license_data else updated_expression
+        return (
+            "NOASSERTION"
+            if len(updated_expression) == 0 or self.DEFAULT_LICENSE in license_data
+            else updated_expression
+        )
 
     def license_expression(self, expression):
         # Determine if license expression contains multiple elements

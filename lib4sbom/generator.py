@@ -278,6 +278,8 @@ class SBOMGenerator:
                     ),
                     self._get_element(
                         relationship["target"], relationship["target_id"]
-                    )
+                    ),
                 )
+
+
 # End of file

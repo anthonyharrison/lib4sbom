@@ -216,11 +216,13 @@ class SPDXGenerator:
             )
         if "licenseconcluded" in package_info:
             self.generateTag(
-                "PackageLicenseConcluded",
-                package_info["licenseconcluded"]
+                "PackageLicenseConcluded", package_info["licenseconcluded"]
             )
         if "licensecomments" in package_info:
-            self.generateTag("PackageLicenseComments", f'<text>{package_info["licensecomments"]}</text>')
+            self.generateTag(
+                "PackageLicenseComments",
+                f'<text>{package_info["licensecomments"]}</text>',
+            )
         if files_analysed:
             # Only if files have been analysed
             if "licenseinfoinfiles" in package_info:
@@ -238,7 +240,9 @@ class SPDXGenerator:
                 "PackageDescription", f'<text>{package_info["description"]}</text>'
             )
         if "comment" in package_info:
-            self.generateTag("PackageComment", f'<text>{package_info["comment"]}</text>')
+            self.generateTag(
+                "PackageComment", f'<text>{package_info["comment"]}</text>'
+            )
         if "summary" in package_info:
             self.generateTag("PackageSummary", package_info["summary"])
         if "externalreference" in package_info:
@@ -351,7 +355,9 @@ class SPDXGenerator:
             for info in file_info["licenseinfoinfile"]:
                 self.generateTag("LicenseInfoInFile", self.license_ident(info))
         if "licensecomment" in file_info:
-            self.generateTag("LicenseComments", f'<text>{file_info["licensecomment"]}</text>')
+            self.generateTag(
+                "LicenseComments", f'<text>{file_info["licensecomment"]}</text>'
+            )
         if "copyrighttext" in file_info:
             self.generateTag("FileCopyrightText", file_info["copyrighttext"])
         if "comment" in file_info:
