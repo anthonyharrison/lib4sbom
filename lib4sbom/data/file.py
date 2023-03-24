@@ -64,11 +64,10 @@ class SBOMFile:
         # Validate license
         license_id = self.license.find_license(license_info)
         # Only include if valid license
-        if license_id != "UNKNOWN":
-            if "licenseinfoinfile" in self.file:
-                self.file["licenseinfoinfile"].append(license_info)
-            else:
-                self.file["licenseinfoinfile"] = [license_info]
+        if "licenseinfoinfile" in self.file:
+            self.file["licenseinfoinfile"].append(license_id)
+        else:
+            self.file["licenseinfoinfile"] = [license_id]
 
     def set_licensecomment(self, comment):
         self.file["licensecomment"] = comment

@@ -45,9 +45,9 @@ class TestFile:
 		test_item = test_module()
 		test_item.set_licenseinfoinfile('test_licenseinfoinfile')
 		# Invalid license
-		assert test_item.get_value('licenseinfoinfile') == None
+		assert test_item.get_value('licenseinfoinfile') == ['NOASSERTION']
 		test_item.set_licenseinfoinfile('MIT')
-		assert test_item.get_value('licenseinfoinfile') == ['MIT']
+		assert test_item.get_value('licenseinfoinfile') == ['NOASSERTION', 'MIT']
 
 	def test_set_licensecomment(self):
 		test_item = test_module()
