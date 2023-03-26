@@ -310,6 +310,10 @@ class SPDXParser:
                                 spdx_file.set_checksum(
                                     checksum["algorithm"], checksum["checkumValue"]
                                 )
+                        if "fileTypes" in d:
+                            # Potentially multiple entries
+                            for filetype in d["fileTypes"]:
+                                spdx_file.set_filetype(filetype)
                         if "licenseConcluded" in d:
                             spdx_file.set_licenseconcluded(d["licenseConcluded"])
                         if "copyrightText" in d:
