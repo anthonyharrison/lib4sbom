@@ -48,7 +48,7 @@ class CycloneDXParser:
                     cyclonedx_document.set_name(data["metadata"]["component"]["name"])
             for d in data["components"]:
                 cyclonedx_package.initialise()
-                if d["type"] in ["library", "application", "operating-system"]:
+                if d["type"] in ["file", "library", "application", "operating-system"]:
                     package = d["name"]
                     cyclonedx_package.set_name(package)
                     if "version" in d:
