@@ -51,8 +51,9 @@ class CycloneDXParser:
                 if d["type"] in ["library", "application", "operating-system"]:
                     package = d["name"]
                     cyclonedx_package.set_name(package)
-                    version = d["version"]
-                    cyclonedx_package.set_version(version)
+                    if "version" in d:
+                        version = d["version"]
+                        cyclonedx_package.set_version(version)
                     # Record type of component
                     cyclonedx_package.set_type(d["type"])
                     if "supplier" in d:
