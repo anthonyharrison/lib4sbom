@@ -22,6 +22,7 @@ Bitstream Vera
 [BSD-3-Clause]
 BSD
 BSD License
+3-Clause BSD
 [BSL-1.0]
 Boost
 [GFDL-1.1-only]
