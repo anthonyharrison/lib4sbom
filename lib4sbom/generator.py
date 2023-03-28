@@ -211,6 +211,7 @@ class SBOMGenerator:
         return sem_version
 
     def _get_element(self, name, id=None):
+        default_version = semantic_version.Version("0.0.0")
         check = self.element_set.get(name)
         if check is not None:
             if len(check) > 1:
@@ -218,11 +219,15 @@ class SBOMGenerator:
                 # If no version specified, select component with the latest
                 # version based on semantic version ordering
                 # Each element entry is <package id> <version id of form name_version>
-                if id is None:
+                latest_version = default_version
+                if id is None and check[0][1] is not None:
                     latest_version = self._semantic_version(check[0][1].split("_")[-1])
                 index = i = 0
                 for c in check:
                     if id is None:
+                        current_version = default_version
+                        if c[1] is not None:
+                            current_version = self._semantic_version(c[1].split("_")[-1])
                         current_version = self._semantic_version(c[1].split("_")[-1])
                         if current_version > latest_version:
                             latest_version = current_version
