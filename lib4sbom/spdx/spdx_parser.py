@@ -19,7 +19,7 @@ class SPDXParser:
         """parses SPDX SBOM file"""
         if sbom_file.endswith(".spdx"):
             return self.parse_spdx_tag(sbom_file)
-        elif sbom_file.endswith(()".spdx.json", ".json")):
+        elif sbom_file.endswith((".spdx.json", ".json")):
             # Convention for SPDX is to use .spdx.json extension but
             # check any json file just in case. Attempts to parse a CycloneDX JSON
             # file will result in no data being returned.
