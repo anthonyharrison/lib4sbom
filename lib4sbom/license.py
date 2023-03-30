@@ -76,6 +76,14 @@ class LicenseScanner:
                     return lic["seeAlso"][0]
         return None  # License not found
 
+    def osi_approved(self, license_id):
+        # Assume that license_id is a valid SPDX id
+        if license_id != self.DEFAULT_LICENSE:
+            for lic in self.licenses["licenses"]:
+                if lic["licenseId"] == license_id:
+                    return lic["isOsiApproved"]
+        return False  # License not found
+
     # License expression processing
 
     def _expression_split(self, expression):
