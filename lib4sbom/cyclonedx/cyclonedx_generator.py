@@ -247,6 +247,15 @@ class CycloneDXGenerator:
             externalReference["type"] = "other"
             externalReference["comment"] = "Home page for project"
             component["externalReferences"] = [externalReference]
+        if "downloadlocation" in package:
+            externalReference = dict()
+            externalReference["url"] = package["downloadlocation"]
+            externalReference["type"] = "distribution"
+            externalReference["comment"] = "Download location for component"
+            if "externalReferences" in component:
+                component["externalReferences"].append(externalReference)
+            else:
+                component["externalReferences"] = [externalReference]
         if "externalreference" in package:
             # Potentially multiple entries
             for reference in package["externalreference"]:
