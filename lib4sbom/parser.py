@@ -24,16 +24,7 @@ class SBOMParser:
     """
 
     def __init__(self, sbom_type: str = "auto"):
-        if sbom_type == "spdx":
-            self.parser = SPDXParser()
-            self.sbom_type = "spdx"
-        elif sbom_type == "cyclonedx":
-            self.parser = CycloneDXParser()
-            self.sbom_type = "cyclonedx"
-        else:
-            # Default parser is SPDX
-            self.parser = SPDXParser()
-            self.sbom_type = "auto"
+        self.sbom_type = sbom_type
         self.document = None
         self.files = None
         self.packages = None
@@ -60,6 +51,13 @@ class SBOMParser:
 
         if invalid_file:
             raise FileNotFoundError
+
+        # Set up parser
+        if self.sbom_type == "cyclonedx":
+            self.parser = CycloneDXParser()
+        else:
+            # Default parser is SPDX
+            self.parser = SPDXParser()
 
         if self.sbom_type == "auto":
             # Work out the SBOM type for file
@@ -94,6 +92,9 @@ class SBOMParser:
         if len(self.document) > 0:
             self.sbom.add_document(self.document.get_document())
         self.sbom.set_type(self.sbom_type)
+
+    def set_type(self, sbom_type: str = "auto") -> None:
+        self.sbom_type = sbom_type
 
     def get_sbom(self) -> SBOMData:
         """Return the constituent components of SBOM
