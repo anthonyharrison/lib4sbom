@@ -321,7 +321,6 @@ class SPDXGenerator:
             component["comment"] = package_info["comment"]
         if "summary" in package_info:
             component["summary"] = package_info["summary"]
-        component["downloadLocation"] = package_info.get("downloadLocation", "NONE")
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
