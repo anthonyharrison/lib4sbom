@@ -285,7 +285,7 @@ _class_ **SBOMOutput**(_filename="", output_format="tag"_)
 
 This creates a simple SBOM Output object. The following optional parameters can be specified:
 
-_filename_ indicates the output destination of the SBOM to be generated. If a valid filename path is provided, then the output will be to a file otherwise
+_filename_ indicates the output destination of the SBOM to be generated. If a valid filename path is provided and a file can be created, then the output will be to a file otherwise
 it will be output to the console.
 
 _output_format_ indicates the format that the SBOM is to be generated in. Valid options are Tag, JSON or YAML. If an invalid format is specified,

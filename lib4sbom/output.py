@@ -15,7 +15,12 @@ class _OutputManager:
         self.out_type = out_type
         self.filename = filename
         if self.out_type == "file" and self.filename != "":
-            self.file_handle = open(filename, "w")
+            try:
+                self.file_handle = open(filename, "w")
+            except FileNotFoundError:
+                # Unable to create file, so send output to console
+                self.out_type = "console"
+                self.file_handle = None
         else:
             self.out_type = "console"
             self.file_handle = None
