@@ -232,7 +232,7 @@ class SPDXGenerator:
                         self.license_ident(info),
                     )
         if "copyrighttext" in package_info:
-            self.generateTag("PackageCopyrightText", package_info["copyrighttext"])
+            self.generateTag("PackageCopyrightText", f'<text>{package_info["copyrighttext"]}</text>')
         else:
             self.generateTag("PackageCopyrightText", "NOASSERTION")
         if "description" in package_info:
