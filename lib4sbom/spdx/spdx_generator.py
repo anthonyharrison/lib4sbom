@@ -358,7 +358,7 @@ class SPDXGenerator:
                 "LicenseComments", f'<text>{file_info["licensecomment"]}</text>'
             )
         if "copyrighttext" in file_info:
-            self.generateTag("FileCopyrightText", file_info["copyrighttext"])
+            self.generateTag("FileCopyrightText", f'<text>{file_info["copyrighttext"]}</text>')
         if "comment" in file_info:
             self.generateTag("FileComment", f'<text>{file_info["comment"]}</text>')
         if "notice" in file_info:
