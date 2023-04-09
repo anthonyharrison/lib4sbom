@@ -591,6 +591,9 @@ The following design decisions have been made in processing the SBOM files:
 
 3. In SPDX format, the current implementation does not currently handle multi-line elements.
 
+4. When processing and validating licenses, the application will use a set of synonyms to attempt to map some license identifiers to the correct [SPDX License Identifiers](https://spdx.org/licenses/). However, the
+user of the tool is reminded that they should assert the quality of any data which is provided by the tool particularly where the license identifier has been modified.
+
 ## Future Development
 
 1. Support later versions of SPDX (3.0) and CycloneDX.
