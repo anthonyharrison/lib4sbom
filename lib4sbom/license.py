@@ -56,15 +56,17 @@ class LicenseScanner:
         elif license.startswith("LicenseRef"):
             # Don't process SPDX user defined licenses
             return license
+        # Look for synonyms
+        license_id = self.check_synonym(license)
+        if license_id is not None:
+            return license_id
         for lic in self.licenses["licenses"]:
             # Comparisons ignore case of provided license text
             if lic["licenseId"].lower() == license.lower():
                 return lic["licenseId"]
             elif lic["name"].lower() == license.lower():
                 return lic["licenseId"]
-        # Look for synonyms
-        license_id = self.check_synonym(license)
-        return license_id if license_id is not None else self.DEFAULT_LICENSE
+        return self.DEFAULT_LICENSE
 
     def get_license_url(self, license_id):
         # Assume that license_id is a valid SPDX id
@@ -95,7 +97,8 @@ class LicenseScanner:
         for item in working:
             if item.upper() in boolean_operator:
                 # Store word in list
-                result.append(word)
+                if word not in result:
+                    result.append(word)
                 word = ""
             elif len(word) > 0:
                 word = word + " " + item
@@ -103,7 +106,8 @@ class LicenseScanner:
                 word = item
         # Store last word if available
         if len(word) > 0:
-            result.append(word)
+            if word not in result:
+                result.append(word)
         return result
 
     def find_license(self, license_expression):
@@ -122,7 +126,7 @@ class LicenseScanner:
             # Update expression if necessary if valid license found
             if validated_license not in [self.DEFAULT_LICENSE, "NONE"]:
                 updated_expression = updated_expression.replace(
-                    license, validated_license, 1
+                    license, validated_license
                 )
         # Return expression if all licenses are valid
         return (
