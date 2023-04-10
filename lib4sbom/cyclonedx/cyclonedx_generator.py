@@ -131,6 +131,9 @@ class CycloneDXGenerator:
         # Check we have valid ids
         if parent_id is None or package_id is None:
             return
+        # Avoid self->self relationship
+        if parent_id == package_id:
+            return
         # Check if entry exists. If so, update list of dependencies
         element_found = False
         for element in self.relationship:
@@ -278,6 +281,23 @@ class CycloneDXGenerator:
                     component["properties"].append(property_entry)
                 else:
                     component["properties"] = [property_entry]
+        # SPDX items with no corresponding entry are created as properties
+        if "licensecomments" in package:
+            property_entry = dict()
+            property_entry["name"] = "License Comments"
+            property_entry["value"] = package["licensecomments"]
+            if "properties" in component:
+                component["properties"].append(property_entry)
+            else:
+                component["properties"] = [property_entry]
+        if "comments" in package:
+            property_entry = dict()
+            property_entry["name"] = "Component Comments"
+            property_entry["value"] = package["comments"]
+            if "properties" in component:
+                component["properties"].append(property_entry)
+            else:
+                component["properties"] = [property_entry]
         self.component.append(component)
 
     def generateXMLComponent(self, id, type, package):
