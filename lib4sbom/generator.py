@@ -227,7 +227,9 @@ class SBOMGenerator:
                     if id is None:
                         current_version = default_version
                         if c[1] is not None:
-                            current_version = self._semantic_version(c[1].split("_")[-1])
+                            current_version = self._semantic_version(
+                                c[1].split("_")[-1]
+                            )
                         current_version = self._semantic_version(c[1].split("_")[-1])
                         if current_version > latest_version:
                             latest_version = current_version

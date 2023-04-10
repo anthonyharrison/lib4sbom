@@ -232,7 +232,9 @@ class SPDXGenerator:
                         self.license_ident(info),
                     )
         if "copyrighttext" in package_info:
-            self.generateTag("PackageCopyrightText", f'<text>{package_info["copyrighttext"]}</text>')
+            self.generateTag(
+                "PackageCopyrightText", f'<text>{package_info["copyrighttext"]}</text>'
+            )
         else:
             self.generateTag("PackageCopyrightText", "NOASSERTION")
         if "description" in package_info:
@@ -358,7 +360,9 @@ class SPDXGenerator:
                 "LicenseComments", f'<text>{file_info["licensecomment"]}</text>'
             )
         if "copyrighttext" in file_info:
-            self.generateTag("FileCopyrightText", f'<text>{file_info["copyrighttext"]}</text>')
+            self.generateTag(
+                "FileCopyrightText", f'<text>{file_info["copyrighttext"]}</text>'
+            )
         if "comment" in file_info:
             self.generateTag("FileComment", f'<text>{file_info["comment"]}</text>')
         if "notice" in file_info:

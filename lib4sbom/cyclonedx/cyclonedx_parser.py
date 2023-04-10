@@ -63,7 +63,9 @@ class CycloneDXParser:
                         if "contact" in d["supplier"]:
                             for contact in d["supplier"]["contact"]:
                                 if "email" in contact:
-                                    supplier_name = f'{supplier_name} ({contact["email"]})'
+                                    supplier_name = (
+                                        f'{supplier_name} ({contact["email"]})'
+                                    )
                         cyclonedx_package.set_supplier("Organisation", supplier_name)
                     if "author" in d:
                         # Assume that this refers to an individual
