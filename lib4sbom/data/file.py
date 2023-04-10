@@ -18,10 +18,7 @@ class SBOMFile:
         self.set_id("NOT_DEFINED")
 
     def set_name(self, name):
-        if name.startswith("./"):
-            self.file["name"] = name[2:]
-        else:
-            self.file["name"] = name
+        self.file["name"] = name
 
     def set_id(self, id):
         self.file["id"] = id
