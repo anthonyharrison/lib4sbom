@@ -82,11 +82,12 @@ class SBOMFile:
         self.file["notice"] = self._text(notice)
 
     def set_contributor(self, name):
-        # Allow multiple entries
-        if "contributor" in self.file:
-            self.file["contributor"].append(name)
-        else:
-            self.file["contributor"] = [name]
+        if len(name) > 0:
+            # Allow multiple entries
+            if "contributor" in self.file:
+                self.file["contributor"].append(name)
+            else:
+                self.file["contributor"] = [name]
 
     def set_attribution(self, attribution):
         self.file["attribution"] = attribution

@@ -24,14 +24,15 @@ class SBOMPackage:
         self.package["id"] = id
 
     def set_type(self, type):
-        package_type = type.upper()
+        # Handle all types as upper case. Handle mismatch of _ and - in SPDX
+        package_type = type.upper().replace("_","-")
         # Subset of SPDX and CycloneDX types/purpose
         if package_type in [
             "APPLICATION",
             "FRAMEWORK",
             "LIBRARY",
             "CONTAINER",
-            "OPERATING_SYSTEM",
+            "OPERATING-SYSTEM",
             "DEVICE",
             "FIRMWARE",
             "FILE"
@@ -49,12 +50,14 @@ class SBOMPackage:
             self.set_id(self.get_name() + "_" + str(self.package["version"]))
 
     def set_supplier(self, type, name):
-        self.package["supplier_type"] = type.strip()
-        self.package["supplier"] = name
+        if len(name) > 0:
+            self.package["supplier_type"] = type.strip()
+            self.package["supplier"] = name
 
     def set_originator(self, type, name):
-        self.package["originator_type"] = type.strip()
-        self.package["originator"] = name
+        if len(name) > 0:
+            self.package["originator_type"] = type.strip()
+            self.package["originator"] = name
 
     def set_downloadlocation(self, location):
         self.package["downloadlocation"] = location
