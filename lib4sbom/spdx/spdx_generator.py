@@ -177,6 +177,8 @@ class SPDXGenerator:
             self.generateTag("PackageVersion", version)
         elif self.debug:
             print(f"[WARNING] **** version missing for {package}")
+        if "type" in package_info:
+            self.generateTag("PrimaryPackagePurpose", package_info["type"].upper())
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
                 self.generateTag(
@@ -267,6 +269,8 @@ class SPDXGenerator:
             component["versionInfo"] = version
         elif self.debug:
             print(f"[WARNING] **** version missing for {package}")
+        if "type" in package_info:
+            component["primaryPackagePurpose"] = package_info["type"].upper()
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
                 component["supplier"] = (

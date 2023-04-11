@@ -21,7 +21,22 @@ class SBOMPackage:
         self.package["id"] = id
 
     def set_type(self, type):
-        self.package["type"] = type
+        package_type = type.upper()
+        # Subset of SPDX and CycloneDX types/purpose
+        if package_type in [
+            "APPLICATION",
+            "FRAMEWORK",
+            "LIBRARY",
+            "CONTAINER",
+            "OPERATING_SYSTEM",
+            "DEVICE",
+            "FIRMWARE",
+            "FILE"
+        ]:
+            self.package["type"] = package_type
+        else:
+            # SPDX purpose of OTHER, INSTALL, ARCHIVE, SOURCE not supported by CycloneDX
+            self.package["type"] = "FILE"
 
     def set_version(self, version):
         self.package["version"] = self._semantic_version(version)
