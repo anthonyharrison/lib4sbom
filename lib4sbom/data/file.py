@@ -11,6 +11,9 @@ class SBOMFile:
         self.file = {}
         self.license = LicenseScanner()
 
+    def _text(self, text_item):
+        return text_item.replace("<text>","").replace("</text>","")
+
     def initialise(self):
         self.file = {}
         # Set defaults for mandatory items
@@ -67,16 +70,16 @@ class SBOMFile:
             self.file["licenseinfoinfile"] = [license_id]
 
     def set_licensecomment(self, comment):
-        self.file["licensecomment"] = comment
+        self.file["licensecomment"] = self._text(comment)
 
     def set_copyrighttext(self, text):
-        self.file["copyrighttext"] = text
+        self.file["copyrighttext"] = self._text(text)
 
     def set_comment(self, comment):
-        self.file["comment"] = comment
+        self.file["comment"] = self._text(comment)
 
     def set_notice(self, notice):
-        self.file["notice"] = notice
+        self.file["notice"] = self._text(notice)
 
     def set_contributor(self, name):
         # Allow multiple entries

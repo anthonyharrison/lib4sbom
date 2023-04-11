@@ -96,7 +96,7 @@ class SPDXGenerator:
         self.generateTag("Created", self.generateTime())
         self.generateTag(
             "CreatorComment",
-            "<text>This document has been automatically generated.</text>",
+            self._text("This document has been automatically generated."),
         )
         return self.SPDX_PROJECT_ID
 
@@ -156,6 +156,9 @@ class SPDXGenerator:
                 # Not an SPDX License id
         return "NOASSERTION"
 
+    def _text(file, text_item):
+        return f'<text>{text_item}</text>'
+
     def _file_name(self, name):
         # ensure name is a relative filename
         if name.startswith("/"):
@@ -179,6 +182,8 @@ class SPDXGenerator:
             print(f"[WARNING] **** version missing for {package}")
         if "type" in package_info:
             self.generateTag("PrimaryPackagePurpose", package_info["type"].upper())
+        else:
+            self.generateTag("PrimaryPackagePurpose", "LIBRARY")
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
                 self.generateTag(
@@ -210,7 +215,7 @@ class SPDXGenerator:
             for checksum in package_info["checksum"]:
                 self.generateTag("PackageChecksum", checksum[0] + ": " + checksum[1])
         if "sourceinfo" in package_info:
-            self.generateTag("PackageSourceInfo", package_info["sourceinfo"])
+            self.generateTag("PackageSourceInfo", self._text(package_info["sourceinfo"]))
         if "licensedeclared" in package_info:
             self.generateTag(
                 "PackageLicenseDeclared",
@@ -223,7 +228,7 @@ class SPDXGenerator:
         if "licensecomments" in package_info:
             self.generateTag(
                 "PackageLicenseComments",
-                f'<text>{package_info["licensecomments"]}</text>',
+                self._text(package_info["licensecomments"]),
             )
         if files_analysed:
             # Only if files have been analysed
@@ -235,20 +240,20 @@ class SPDXGenerator:
                     )
         if "copyrighttext" in package_info:
             self.generateTag(
-                "PackageCopyrightText", f'<text>{package_info["copyrighttext"]}</text>'
+                "PackageCopyrightText", self._text(package_info["copyrighttext"])
             )
         else:
             self.generateTag("PackageCopyrightText", "NOASSERTION")
         if "description" in package_info:
             self.generateTag(
-                "PackageDescription", f'<text>{package_info["description"]}</text>'
+                "PackageDescription", self._text(package_info["description"])
             )
         if "comment" in package_info:
             self.generateTag(
-                "PackageComment", f'<text>{package_info["comment"]}</text>'
+                "PackageComment", self._text(package_info["comment"])
             )
         if "summary" in package_info:
-            self.generateTag("PackageSummary", package_info["summary"])
+            self.generateTag("PackageSummary", self._text(package_info["summary"]))
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
@@ -271,6 +276,8 @@ class SPDXGenerator:
             print(f"[WARNING] **** version missing for {package}")
         if "type" in package_info:
             component["primaryPackagePurpose"] = package_info["type"].upper()
+        else:
+            component["primaryPackagePurpose"] =  "LIBRARY"
         if "supplier" in package_info:
             if package_info["supplier_type"] != "UNKNOWN":
                 component["supplier"] = (
@@ -322,7 +329,7 @@ class SPDXGenerator:
                         component["licenseInfoInFiles"] = [self.license_ident(info)]
         component["copyrightText"] = package_info.get("copyrightText", "NOASSERTION")
         if "description" in package_info:
-            component["description"] = f'<text>{package_info["description"]}</text>'
+            component["description"] = fpackage_info["description"]
         if "comment" in package_info:
             component["comment"] = package_info["comment"]
         if "summary" in package_info:
@@ -361,16 +368,16 @@ class SPDXGenerator:
                 self.generateTag("LicenseInfoInFile", self.license_ident(info))
         if "licensecomment" in file_info:
             self.generateTag(
-                "LicenseComments", f'<text>{file_info["licensecomment"]}</text>'
+                "LicenseComments", self._text(file_info["licensecomment"])
             )
         if "copyrighttext" in file_info:
             self.generateTag(
-                "FileCopyrightText", f'<text>{file_info["copyrighttext"]}</text>'
+                "FileCopyrightText", self._text(file_info["copyrighttext"])
             )
         if "comment" in file_info:
-            self.generateTag("FileComment", f'<text>{file_info["comment"]}</text>')
+            self.generateTag("FileComment", self._text(file_info["comment"]))
         if "notice" in file_info:
-            self.generateTag("FileNotice", file_info["notice"])
+            self.generateTag("FileNotice", self._text(file_info["notice"]))
         if "contributor" in file_info:
             for contributor in file_info["contributor"]:
                 self.generateTag("FileContributor", contributor)

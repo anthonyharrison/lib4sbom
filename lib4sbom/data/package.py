@@ -11,6 +11,9 @@ class SBOMPackage:
         self.package = {}
         self.license = LicenseScanner()
 
+    def _text(self, text_item):
+        return text_item.replace("<text>","").replace("</text>","")
+
     def initialise(self):
         self.package = {}
 
@@ -63,7 +66,7 @@ class SBOMPackage:
         self.package["homepage"] = page
 
     def set_sourceinfo(self, info):
-        self.package["sourceinfo"] = info
+        self.package["sourceinfo"] = self._text(info)
 
     def set_filesanalysis(self, analysis):
         self.package["filesanalysis"] = analysis
@@ -93,7 +96,7 @@ class SBOMPackage:
         self.package["licensedeclared"] = license
 
     def set_licensecomments(self, comment):
-        self.package["licensecomments"] = comment
+        self.package["licensecomments"] = self._text(comment)
 
     def set_licenseinfoinfiles(self, license_info):
         # Validate license
@@ -116,16 +119,16 @@ class SBOMPackage:
             self.package["externalreference"] = [reference_entry]
 
     def set_copyrighttext(self, text):
-        self.package["copyrighttext"] = text
+        self.package["copyrighttext"] = self._text(text)
 
     def set_comment(self, comment):
-        self.package["comment"] = comment
+        self.package["comment"] = self._text(comment)
 
     def set_summary(self, summary):
-        self.package["summary"] = summary
+        self.package["summary"] = self._text(summary)
 
     def set_description(self, description):
-        self.package["description"] = description
+        self.package["description"] = self._text(description)
 
     def set_value(self, key, value):
         self.package[key] = value
