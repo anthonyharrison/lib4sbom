@@ -157,7 +157,9 @@ class SPDXGenerator:
         return "NOASSERTION"
 
     def _text(file, text_item):
-        return f'<text>{text_item}</text>'
+        if text_item not in ["NONE", "NOASSERTION"]:
+            return f'<text>{text_item}</text>'
+        return text_item
 
     def _file_name(self, name):
         # ensure name is a relative filename
