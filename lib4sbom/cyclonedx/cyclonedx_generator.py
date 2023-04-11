@@ -177,9 +177,9 @@ class CycloneDXGenerator:
     def generateJSONComponent(self, id, type, package):
         component = dict()
         if "type" in package:
-            component["type"] = package["type"]
+            component["type"] = package["type"].lower()
         else:
-            component["type"] = type
+            component["type"] = type.lower()
         component["bom-ref"] = id
         name = package["name"]
         component["name"] = name
@@ -247,7 +247,7 @@ class CycloneDXGenerator:
         if "homepage" in package:
             externalReference = dict()
             externalReference["url"] = package["homepage"]
-            externalReference["type"] = "other"
+            externalReference["type"] = "website"
             externalReference["comment"] = "Home page for project"
             component["externalReferences"] = [externalReference]
         if "downloadlocation" in package:
