@@ -183,7 +183,8 @@ class SPDXGenerator:
         elif self.debug:
             print(f"[WARNING] **** version missing for {package}")
         if "type" in package_info:
-            self.generateTag("PrimaryPackagePurpose", package_info["type"].upper())
+            # Handle SPDX mismatch of - and _ in OPERATING-SYSTEM
+            self.generateTag("PrimaryPackagePurpose", package_info["type"].upper().replace("-","_"))
         else:
             self.generateTag("PrimaryPackagePurpose", "LIBRARY")
         if "supplier" in package_info:
@@ -277,7 +278,7 @@ class SPDXGenerator:
         elif self.debug:
             print(f"[WARNING] **** version missing for {package}")
         if "type" in package_info:
-            component["primaryPackagePurpose"] = package_info["type"].upper()
+            component["primaryPackagePurpose"] = package_info["type"].upper().replace("-","_")
         else:
             component["primaryPackagePurpose"] =  "LIBRARY"
         if "supplier" in package_info:
