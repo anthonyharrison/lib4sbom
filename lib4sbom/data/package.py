@@ -1,6 +1,7 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import re
 import string
 
 from lib4sbom.license import LicenseScanner
@@ -13,6 +14,21 @@ class SBOMPackage:
 
     def _text(self, text_item):
         return text_item.replace("<text>","").replace("</text>","")
+
+    def _url_valid(self, url):
+        url_pattern = (
+        "(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/|ssh:\\/\\/|git:\\/\\/|svn:\\/\\/|sftp:"
+        "\\/\\/|ftp:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+){0,100}\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?"
+        )
+        # Simple check to catch multiple URLs 
+        if " " in url:
+            return False
+        check_url = re.match (url_pattern, url)
+        if check_url is None:
+            # No match
+            return False
+        # Check URL is fully matched
+        return (check_url.group(0) == url)
 
     def initialise(self):
         self.package = {}
@@ -60,13 +76,15 @@ class SBOMPackage:
             self.package["originator"] = name
 
     def set_downloadlocation(self, location):
-        self.package["downloadlocation"] = location
+        if self._url_valid(location):
+            self.package["downloadlocation"] = location
 
     def set_filename(self, filename):
         self.package["filename"] = filename
 
     def set_homepage(self, page):
-        self.package["homepage"] = page
+        if self._url_valid(page):
+            self.package["homepage"] = page
 
     def set_sourceinfo(self, info):
         self.package["sourceinfo"] = self._text(info)
