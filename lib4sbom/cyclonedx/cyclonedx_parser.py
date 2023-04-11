@@ -25,6 +25,7 @@ class CycloneDXParser:
         files = {}
         packages = {}
         relationships = []
+        id = {}
         cyclonedx_package = SBOMPackage()
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
@@ -46,6 +47,7 @@ class CycloneDXParser:
                     )
                 if "component" in data["metadata"]:
                     cyclonedx_document.set_name(data["metadata"]["component"]["name"])
+                    id[data["metadata"]["component"]['bom-ref']] = data["metadata"]["component"]["name"]
             for d in data["components"]:
                 cyclonedx_package.initialise()
                 if d["type"] in ["file", "library", "application", "operating-system"]:
@@ -116,19 +118,34 @@ class CycloneDXParser:
                             cyclonedx_package.set_property(
                                 property["name"], property["value"]
                             )
+                    if "externalReferences" in d:
+                        # Potentially multiple entries
+                        for reference in d["externalReferences"]:
+                            ref_type = reference["type"]
+                            ref_url = reference["url"]
+                            # Try to map type to package element
+                            if ref_type == "website":
+                                cyclonedx_package.set_homepage(ref_url)
+                            elif ref_type == "distribution":
+                                cyclonedx_package.set_downloadlocation(ref_url)
                     if package not in packages:
                         # Save package metadata
                         packages[package] = cyclonedx_package.get_package()
+                        id[d['bom-ref']] = package
             if "dependencies" in data:
                 # First relationship is assumed to be the root element
                 relationship_type = " DESCRIBES "
                 for d in data["dependencies"]:
-                    source = d["ref"]
-                    for target in d["dependsOn"]:
+                    source_id = d["ref"]
+                    # Get source name
+                    source = id[source_id]
+                    for target_id in d["dependsOn"]:
+                        target = id[target_id]
                         cyclonedx_relationship.initialise()
                         cyclonedx_relationship.set_relationship(
                             source, relationship_type, target
                         )
+                        cyclonedx_relationship.set_relationship_id(source_id, target_id)
                         relationships.append(cyclonedx_relationship.get_relationship())
                     relationship_type = " DEPENDS_ON "
         return cyclonedx_document, files, packages, relationships
