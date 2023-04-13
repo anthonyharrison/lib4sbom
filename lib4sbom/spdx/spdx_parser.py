@@ -192,6 +192,9 @@ class SPDXParser:
                     originator_type = "UNKNOWN"
                     originator = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_originator(originator_type, originator)
+            elif line_elements[0] == "PrimaryPackagePurpose":
+                package_type = line_elements[1]
+                spdx_package.set_type(package_type)
             elif line_elements[0] == "PackageDownloadLocation":
                 downloadlocation = line[24:].strip().rstrip("\n")
                 spdx_package.set_downloadlocation(downloadlocation)
@@ -359,6 +362,8 @@ class SPDXParser:
                             spdx_package.set_fileName(d["filename"])
                         if "homepage" in d:
                             spdx_package.set_homepage(d["homepage"])
+                        if "primaryPackagePurpose" in d:
+                            spdx_package.set_type(d["primaryPackagePurpose"])
                         if "checksum" in d:
                             # Potentially multiple entries
                             for checksum in d["checksum"]:
