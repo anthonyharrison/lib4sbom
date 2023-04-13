@@ -223,7 +223,7 @@ class SPDXParser:
             elif line_elements[0] == "PackageLicenseInfoFromFiles":
                 license_info = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_licenseinfoinfiles(license_info)
-            elif line_elements[0] == "PackageLicenseCopyrightTest":
+            elif line_elements[0] == "PackageCopyrightText":
                 copyright_text = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_copyrighttext(copyright_text)
             elif line_elements[0] == "PackageComment":
