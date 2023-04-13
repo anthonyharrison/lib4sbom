@@ -161,7 +161,8 @@ class SPDXParser:
                 file_element = False
                 element_name = package
             elif line_elements[0] == "PackageVersion":
-                version = line_elements[1].strip().rstrip("\n")
+                # Version may have ':' in version specifier
+                version = line[16:].strip().rstrip("\n")
                 version = version.split("-")[0]
                 version = version.split("+")[0]
                 spdx_package.set_version(version)
@@ -224,7 +225,7 @@ class SPDXParser:
                 license_info = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_licenseinfoinfiles(license_info)
             elif line_elements[0] == "PackageCopyrightText":
-                copyright_text = line_elements[1].strip().rstrip("\n")
+                copyright_text = line[21:].strip().rstrip("\n")
                 spdx_package.set_copyrighttext(copyright_text)
             elif line_elements[0] == "PackageComment":
                 comments = line_elements[1].strip().rstrip("\n")
