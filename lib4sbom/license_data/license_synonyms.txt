@@ -3,10 +3,12 @@
 AGPL3
 AGPL-3
 AGPLv3
+AGPL-3.0
 [AGPL-3.0-or-later]
 AGPL3+
 AGPL-3+
 AGPLv3+
+AGPL-3.0+
 [Apache-2.0]
 Apache Software License
 Apache License, Version 2.0
@@ -62,30 +64,36 @@ GFDLv1.3+
 GPL1
 GPL-1
 GPLv1
+GPL-1.0
 [GPL-1.0-or-later]
 GPL+
 GPL1+
 GPL-1+
 GPLv1+
+GPL-1.0+
 [GPL-2.0-only]
 GPL
 GPL2
 GPL-2
 GPLv2
+GPL-2.0
 [GPL-2.0-or-later]
 GPL2+
 GPL-2+
 GPLv2+
 GPL v2 or later
 GNU General Public License GPL, version 2 or later
+GPL-2.0+
 [GPL-3.0-only]
 GPL3
 GPL-3
 GPLv3
+GPL-3.0
 [GPL-3.0-or-later]
 GPL3+
 GPL-3+
 GPLv3+
+GPL-3.0+
 [LGPL-2.0-only]
 LGPL2
 LGPL-2
@@ -109,10 +117,12 @@ LGPLv2.1+
 LGPL3
 LGPL-3
 LGPLv3
+LGPL-3.0
 [LGPL-3.0-or-later]
 LGPL3+
 LGPL-3+
 LGPLv3+
+LGPL-3.0+
 [LPPL-1.3c]
 LPPL
 [MIT]
