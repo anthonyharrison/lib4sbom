@@ -61,11 +61,13 @@ class LicenseScanner:
         if license_id is not None:
             return license_id
         for lic in self.licenses["licenses"]:
-            # Comparisons ignore case of provided license text
-            if lic["licenseId"].lower() == license.lower():
-                return lic["licenseId"]
-            elif lic["name"].lower() == license.lower():
-                return lic["licenseId"]
+            # Ignore deprecated ids
+            if not lic["isDeprecatedLicenseId"]:
+                # Comparisons ignore case of provided license text
+                if lic["licenseId"].lower() == license.lower():
+                    return lic["licenseId"]
+                elif lic["name"].lower() == license.lower():
+                    return lic["licenseId"]
         return self.DEFAULT_LICENSE
 
     def get_license_url(self, license_id):
