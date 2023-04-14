@@ -477,7 +477,8 @@ indicated, the method just takes a single parameter for the value. Where indicat
 |-------------------|----------|------|
 | Name              | No       |      |
 | Id                | No       |      |
-| Checksum          | Yes      | (1)  |
+| Type              | No       | (1)  |
+| Checksum          | Yes      | (2)  |
 | LicenseConcluded  | No       |      |
 | LicenseDeclared   | No       |      |
 | LicenceInfoInFile | Yes      |      |
@@ -499,7 +500,9 @@ indicated, the method just takes a single parameter for the value. Where indicat
 
 **Note**
 
-1 The set_checksum method takes two parameters, the checksum algorithm (e.g. SHA256) and the actual checksum value (as a string)
+1 The set_type method is used to indicate the purpose of the package (e.g. Application, Library, Operating-System).
+
+2 The set_checksum method takes two parameters, the checksum algorithm (e.g. SHA256) and the actual checksum value (as a string)
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
