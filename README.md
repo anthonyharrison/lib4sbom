@@ -316,7 +316,7 @@ The following code sample shows the use of the SBOMOutput module.
 >>> test_generator.generate("TestApp",test_parser.get_sbom())
 >>> from lib4sbom.output import SBOMOutput
 >>> sbom_output = SBOMOutput(filename="testapp.json", output_format="json")
->>> sbom_output.generate_output(my_generator.get_sbom())
+>>> sbom_output.generate_output(test_generator.get_sbom())
 >>> 
 ```
 
