@@ -32,15 +32,22 @@ class CycloneDXParser:
         # Check valid CycloneDX JSON file (and not SPDX)
         cyclonedx_json_file = data.get("bomFormat", False)
         if cyclonedx_json_file:
-            cyclonedx_document.set_version(data["specVersion"])
+            cyclonedx_version = data["specVersion"]
+            cyclonedx_document.set_version(cyclonedx_version)
             cyclonedx_document.set_type("cyclonedx")
             if "metadata" in data:
                 if "timestamp" in data["metadata"]:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])
                 if "tools" in data["metadata"]:
-                    cyclonedx_document.set_creator(
-                        "tool", data["metadata"]["tools"][0]["name"]
-                    )
+                    if cyclonedx_version == "1.5":
+                        cyclonedx_document.set_creator(
+                            "tool", data["metadata"]["tools"]["components"]["name"]
+                        )
+                    else:
+                        cyclonedx_document.set_creator(
+                            "tool", data["metadata"]["tools"][0]["name"]
+                        )
+                    
                 if "authors" in data["metadata"]:
                     cyclonedx_document.set_creator(
                         "person", data["metadata"]["authors"][0]["name"]

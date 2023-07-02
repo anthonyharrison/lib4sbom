@@ -1,6 +1,7 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import re
 import uuid
 from datetime import datetime
@@ -14,7 +15,7 @@ class CycloneDXGenerator:
     Generate CycloneDX SBOM.
     """
 
-    CYCLONEDX_VERSION = "1.4"
+    CYCLONEDX_VERSION = "1.5"
     DATA_LICENCE = "CC0-1.0"
     PROJECT_ID = "CDXRef-DOCUMENT"
     PACKAGE_PREAMBLE = "CDXRef-Package-"
@@ -40,6 +41,10 @@ class CycloneDXGenerator:
         self.relationship = []
         self.sbom_complete = False
         self.include_purl = False
+        # Can specify version of CycloneDX through environment variable
+        self.cyclonedx_version = os.getenv("LIB4SBOM_CYCLONEDX_VERSION")
+        if self.cyclonedx_version is None or self.cyclonedx_version not in ["1.3", "1.4"]:
+            self.cyclonedx_version = self.CYCLONEDX_VERSION
 
     def store(self, message):
         self.doc.append(message)
@@ -84,27 +89,55 @@ class CycloneDXGenerator:
     def generateJSONDocumentHeader(self, project_name):
         urn = "urn:uuid" + str(uuid.uuid4())
         project_id = self.PROJECT_ID
-        self.doc = {
-            "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
-            "bomFormat": "CycloneDX",
-            "specVersion": self.CYCLONEDX_VERSION,
-            "serialNumber": urn,
-            "version": 1,
-            "metadata": {
-                "timestamp": self.generateTime(),
-                "tools": [
-                    {
-                        "name": self.application,
-                        "version": self.application_version,
-                    }
-                ],
-                "component": {
-                    "type": "application",
-                    "bom-ref": project_id,
-                    "name": project_name,
+        if self.cyclonedx_version == self.CYCLONEDX_VERSION:
+            # 1.5 version
+            self.doc = {
+                "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+                "bomFormat": "CycloneDX",
+                "specVersion": self.CYCLONEDX_VERSION,
+                "serialNumber": urn,
+                "version": 1,
+                "metadata": {
+                    "timestamp": self.generateTime(),
+                    "tools": {
+                        "components": [
+                            {
+                                "name": self.application,
+                                "version": self.application_version,
+                                "type": "application",
+                            },
+                        ]
+                    },
+                    "component": {
+                        "type": "application",
+                        "bom-ref": project_id,
+                        "name": project_name,
+                    },
                 },
-            },
-        }
+            }
+        else:
+            # Legacy version
+            self.doc = {
+                "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+                "bomFormat": "CycloneDX",
+                "specVersion": self.CYCLONEDX_VERSION,
+                "serialNumber": urn,
+                "version": 1,
+                "metadata": {
+                    "timestamp": self.generateTime(),
+                    "tools": [
+                        {
+                            "name": self.application,
+                            "version": self.application_version,
+                        }
+                    ],
+                    "component": {
+                        "type": "application",
+                        "bom-ref": project_id,
+                        "name": project_name,
+                    },
+                },
+            }
         return project_id
 
     def generateXMLDocumentHeader(self, project_name):
