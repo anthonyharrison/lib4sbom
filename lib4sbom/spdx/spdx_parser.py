@@ -398,7 +398,7 @@ class SPDXParser:
                             # Potentially multiple entries
                             for attribution in d["attribution"]:
                                 spdx_package.set_attribution(
-                                    attribution["value"]]
+                                    attribution["value"]
                                 )
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
