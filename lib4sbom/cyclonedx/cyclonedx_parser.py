@@ -40,9 +40,10 @@ class CycloneDXParser:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])
                 if "tools" in data["metadata"]:
                     if cyclonedx_version == "1.5":
-                        cyclonedx_document.set_creator(
-                            "tool", data["metadata"]["tools"]["components"]["name"]
-                        )
+                        for component in data["metadata"]["tools"]["components"]:
+                            cyclonedx_document.set_creator(
+                                "tool", component["name"]
+                            )
                     else:
                         cyclonedx_document.set_creator(
                             "tool", data["metadata"]["tools"][0]["name"]
