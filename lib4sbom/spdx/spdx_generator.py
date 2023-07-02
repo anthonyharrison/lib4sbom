@@ -257,6 +257,10 @@ class SPDXGenerator:
             )
         if "summary" in package_info:
             self.generateTag("PackageSummary", self._text(package_info["summary"]))
+        if "attribution" in package_info:
+            # Potentially multiple entries
+            for attribution in package_info["attribution"]:
+                self.generateTag("PackageAttributionText", self._text(attribution))
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
@@ -337,6 +341,16 @@ class SPDXGenerator:
             component["comment"] = package_info["comment"]
         if "summary" in package_info:
             component["summary"] = package_info["summary"]
+        if "attribution" in package_info:
+            # Potentially multiple entries
+            for attribution in package_info["attribution"]:
+                attribution_data = dict()
+                # Unclear what field should be from SPDX specification
+                attribution_data["value"] = attribution
+                if "attribution" in component:
+                    component["attribution"].append(attribution_data)
+                else:
+                    component["attribution"] = [attribution_data]
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:

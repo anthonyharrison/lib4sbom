@@ -236,6 +236,9 @@ class SPDXParser:
             elif line_elements[0] == "PackageDescription":
                 description = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_description(description)
+            elif line_elements[0] == "PackageAttributionText":
+                attribute_value = line[23:].strip().rstrip("\n")
+                spdx_package.set_attribution(attribute_value)
             elif line_elements[0] == "ExternalRef":
                 # Format is TAG CATEGORY TYPE LOCATOR
                 # Need all data after type which may contain ':'
@@ -391,6 +394,12 @@ class SPDXParser:
                             spdx_package.set_summary(d["summary"])
                         if "downloadlocation" in d:
                             spdx_package.set_downloadlocation(d["downloadlocation"])
+                        if "attribution" in d:
+                            # Potentially multiple entries
+                            for attribution in d["attribution"]:
+                                spdx_package.set_attribution(
+                                    attribution["value"]]
+                                )
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
                                 spdx_package.set_externalreference(

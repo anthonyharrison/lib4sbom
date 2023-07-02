@@ -131,6 +131,14 @@ class SBOMPackage:
 
         self.package["licenseinfoinfiles"] = license_info
 
+    def set_attribution(self, value):
+        # Allow multiple entries
+        attribution_entry = [value]
+        if "attribution" in self.package:
+            self.package["attribution"].append(attribution_entry)
+        else:
+            self.package["attribution"] = [attribution_entry]
+
     def set_externalreference(self, category, type, locator):
         # Allow multiple entries
         reference_entry = [category, type.strip(), locator]
