@@ -359,7 +359,15 @@ class SPDXParser:
                             spdx_package.set_supplier(supplier_type, supplier_name)
                         if "originator" in d:
                             originator = d["originator"].split(":")
-                            spdx_package.set_originator(originator[0], originator[1])
+                            # Type not always specified
+                            if len(originator) == 2:
+                                originator_type = originator[0]
+                                originator_name = originator[1].strip().rstrip("\n")
+                            else:
+                                # No type specified
+                                originator_type = "UNKNOWN"
+                                originator_name = originator[0].strip().rstrip("\n")
+                            spdx_package.set_originator(originator_type, originator_name)
                         if "filesAnaylzed" in d:
                             spdx_package.set_filesAnalyzed(d["filesAnaylzed"])
                         if "filename" in d:
