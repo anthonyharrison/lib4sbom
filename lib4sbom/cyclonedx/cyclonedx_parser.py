@@ -41,21 +41,21 @@ class CycloneDXParser:
                 if "tools" in data["metadata"]:
                     if cyclonedx_version == "1.5":
                         for component in data["metadata"]["tools"]["components"]:
-                            cyclonedx_document.set_creator(
-                                "tool", component["name"]
-                            )
+                            cyclonedx_document.set_creator("tool", component["name"])
                     else:
                         cyclonedx_document.set_creator(
                             "tool", data["metadata"]["tools"][0]["name"]
                         )
-                    
+
                 if "authors" in data["metadata"]:
                     cyclonedx_document.set_creator(
                         "person", data["metadata"]["authors"][0]["name"]
                     )
                 if "component" in data["metadata"]:
                     cyclonedx_document.set_name(data["metadata"]["component"]["name"])
-                    id[data["metadata"]["component"]['bom-ref']] = data["metadata"]["component"]["name"]
+                    id[data["metadata"]["component"]["bom-ref"]] = data["metadata"][
+                        "component"
+                    ]["name"]
             for d in data["components"]:
                 cyclonedx_package.initialise()
                 if d["type"] in ["file", "library", "application", "operating-system"]:
@@ -138,7 +138,7 @@ class CycloneDXParser:
                                 cyclonedx_package.set_downloadlocation(ref_url)
                     # Save package metadata
                     packages[(package, version)] = cyclonedx_package.get_package()
-                    id[d['bom-ref']] = package
+                    id[d["bom-ref"]] = package
             if "dependencies" in data:
                 # First relationship is assumed to be the root element
                 relationship_type = " DESCRIBES "

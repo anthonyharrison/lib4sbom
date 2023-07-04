@@ -367,7 +367,9 @@ class SPDXParser:
                                 # No type specified
                                 originator_type = "UNKNOWN"
                                 originator_name = originator[0].strip().rstrip("\n")
-                            spdx_package.set_originator(originator_type, originator_name)
+                            spdx_package.set_originator(
+                                originator_type, originator_name
+                            )
                         if "filesAnaylzed" in d:
                             spdx_package.set_filesAnalyzed(d["filesAnaylzed"])
                         if "filename" in d:
@@ -405,9 +407,7 @@ class SPDXParser:
                         if "attribution" in d:
                             # Potentially multiple entries
                             for attribution in d["attribution"]:
-                                spdx_package.set_attribution(
-                                    attribution["value"]
-                                )
+                                spdx_package.set_attribution(attribution["value"])
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
                                 spdx_package.set_externalreference(

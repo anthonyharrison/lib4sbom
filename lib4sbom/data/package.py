@@ -13,22 +13,22 @@ class SBOMPackage:
         self.license = LicenseScanner()
 
     def _text(self, text_item):
-        return text_item.replace("<text>","").replace("</text>","")
+        return text_item.replace("<text>", "").replace("</text>", "")
 
     def _url_valid(self, url):
         url_pattern = (
-        "(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/|ssh:\\/\\/|git:\\/\\/|svn:\\/\\/|sftp:"
-        "\\/\\/|ftp:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+){0,100}\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?"
+            "(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/|ssh:\\/\\/|git:\\/\\/|svn:\\/\\/|sftp:"
+            "\\/\\/|ftp:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+){0,100}\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?"
         )
-        # Simple check to catch multiple URLs 
+        # Simple check to catch multiple URLs
         if " " in url:
             return False
-        check_url = re.match (url_pattern, url)
+        check_url = re.match(url_pattern, url)
         if check_url is None:
             # No match
             return False
         # Check URL is fully matched
-        return (check_url.group(0) == url)
+        return check_url.group(0) == url
 
     def initialise(self):
         self.package = {}
@@ -41,7 +41,7 @@ class SBOMPackage:
 
     def set_type(self, type):
         # Handle all types as upper case. Handle mismatch of _ and - in SPDX
-        package_type = type.upper().replace("_","-")
+        package_type = type.upper().replace("_", "-")
         # Subset of SPDX and CycloneDX types/purpose
         if package_type in [
             "APPLICATION",
@@ -51,7 +51,7 @@ class SBOMPackage:
             "OPERATING-SYSTEM",
             "DEVICE",
             "FIRMWARE",
-            "FILE"
+            "FILE",
         ]:
             self.package["type"] = package_type
         else:

@@ -12,7 +12,7 @@ class SBOMFile:
         self.license = LicenseScanner()
 
     def _text(self, text_item):
-        return text_item.replace("<text>","").replace("</text>","")
+        return text_item.replace("<text>", "").replace("</text>", "")
 
     def initialise(self):
         self.file = {}
