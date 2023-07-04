@@ -136,10 +136,9 @@ class CycloneDXParser:
                                 cyclonedx_package.set_homepage(ref_url)
                             elif ref_type == "distribution":
                                 cyclonedx_package.set_downloadlocation(ref_url)
-                    if package not in packages:
-                        # Save package metadata
-                        packages[package] = cyclonedx_package.get_package()
-                        id[d['bom-ref']] = package
+                    # Save package metadata
+                    packages[(package, version)] = cyclonedx_package.get_package()
+                    id[d['bom-ref']] = package
             if "dependencies" in data:
                 # First relationship is assumed to be the root element
                 relationship_type = " DESCRIBES "
