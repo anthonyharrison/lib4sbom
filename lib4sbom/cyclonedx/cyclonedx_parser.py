@@ -92,8 +92,10 @@ class CycloneDXParser:
                     # Multiple ways of defining license data
                     if "licenses" in d and len(d["licenses"]) > 0:
                         license_data = d["licenses"][0]
-                    elif "evidence" in d and len(d["evidence"]["licenses"]) > 0:
-                        license_data = d["evidence"]["licenses"][0]
+                    elif "evidence" in d:
+                        if "licenses" in d["evidence"]:
+                            if len(d["evidence"]["licenses"]) > 0:
+                                license_data = d["evidence"]["licenses"][0]
                     if license_data is not None:
                         # Multiple ways of defining licenses
                         license = None
