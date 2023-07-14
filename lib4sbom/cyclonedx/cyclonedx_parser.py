@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
 
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.package import SBOMPackage
@@ -10,7 +11,7 @@ from lib4sbom.data.relationship import SBOMRelationship
 
 class CycloneDXParser:
     def __init__(self):
-        pass
+        self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
 
     def parse(self, sbom_file):
         """parses CycloneDX BOM file extracting package name, version and license"""
@@ -147,14 +148,22 @@ class CycloneDXParser:
                 for d in data["dependencies"]:
                     source_id = d["ref"]
                     # Get source name
-                    source = id[source_id]
-                    for target_id in d["dependsOn"]:
-                        target = id[target_id]
-                        cyclonedx_relationship.initialise()
-                        cyclonedx_relationship.set_relationship(
-                            source, relationship_type, target
-                        )
-                        cyclonedx_relationship.set_relationship_id(source_id, target_id)
-                        relationships.append(cyclonedx_relationship.get_relationship())
+                    source = None
+                    if source_id in id:
+                        source = id[source_id]
+                    elif self.debug:
+                        print(f"[ERROR] Unable to find {source_id}")
+                    if source is not None:
+                        for target_id in d["dependsOn"]:
+                            if target_id in id:
+                                target = id[target_id]
+                                cyclonedx_relationship.initialise()
+                                cyclonedx_relationship.set_relationship(
+                                    source, relationship_type, target
+                                )
+                                cyclonedx_relationship.set_relationship_id(source_id, target_id)
+                                relationships.append(cyclonedx_relationship.get_relationship())
+                            elif self.debug:
+                                print(f"[ERROR] Unable to find {target_id}")
                     relationship_type = " DEPENDS_ON "
         return cyclonedx_document, files, packages, relationships
