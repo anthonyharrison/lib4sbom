@@ -9,7 +9,7 @@ import os
 class LicenseScanner:
 
     DEFAULT_LICENSE = "UNKNOWN"
-    SPDX_LICENSE_VERSION = "3.20"
+    SPDX_LICENSE_VERSION = "3.21"
 
     def __init__(self):
         # Load licenses
