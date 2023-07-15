@@ -56,18 +56,19 @@ class LicenseScanner:
         elif license.startswith("LicenseRef"):
             # Don't process SPDX user defined licenses
             return license
+        # Deprecated license ids are still valid
+        if self.deprecated(license):
+            return license
         # Look for synonyms
         license_id = self.check_synonym(license)
         if license_id is not None:
             return license_id
         for lic in self.licenses["licenses"]:
-            # Ignore deprecated ids
-            if not lic["isDeprecatedLicenseId"]:
-                # Comparisons ignore case of provided license text
-                if lic["licenseId"].lower() == license.lower():
-                    return lic["licenseId"]
-                elif lic["name"].lower() == license.lower():
-                    return lic["licenseId"]
+            # Comparisons ignore case of provided license text
+            if lic["licenseId"].lower() == license.lower():
+                return lic["licenseId"]
+            elif lic["name"].lower() == license.lower():
+                return lic["licenseId"]
         return self.DEFAULT_LICENSE
 
     def get_license_url(self, license_id):
@@ -86,6 +87,14 @@ class LicenseScanner:
             for lic in self.licenses["licenses"]:
                 if lic["licenseId"] == license_id:
                     return lic["isOsiApproved"]
+        return False  # License not found
+
+    def deprecated(self, license_id):
+        # Assume that license_id is a valid SPDX id
+        if license_id != self.DEFAULT_LICENSE:
+            for lic in self.licenses["licenses"]:
+                if lic["licenseId"] == license_id and lic["isDeprecatedLicenseId"]:
+                    return True
         return False  # License not found
 
     # License expression processing
