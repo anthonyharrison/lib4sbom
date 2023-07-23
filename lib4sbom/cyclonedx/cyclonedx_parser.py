@@ -161,8 +161,12 @@ class CycloneDXParser:
                                 cyclonedx_relationship.set_relationship(
                                     source, relationship_type, target
                                 )
-                                cyclonedx_relationship.set_relationship_id(source_id, target_id)
-                                relationships.append(cyclonedx_relationship.get_relationship())
+                                cyclonedx_relationship.set_relationship_id(
+                                    source_id, target_id
+                                )
+                                relationships.append(
+                                    cyclonedx_relationship.get_relationship()
+                                )
                             elif self.debug:
                                 print(f"[ERROR] Unable to find {target_id}")
                     relationship_type = " DEPENDS_ON "
