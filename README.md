@@ -48,6 +48,7 @@ SBOMs are supported in the following formats
 | SPDX      | 2.3     | JSON           |
 | SPDX      | 2.3     | YAML           |
 | CycloneDX | 1.4     | JSON           |
+| CycloneDX | 1.5     | JSON           |
 
 _class_ **SBOMParser**(_sbom_type='auto_')
 
