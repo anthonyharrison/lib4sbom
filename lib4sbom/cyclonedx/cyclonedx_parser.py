@@ -65,6 +65,10 @@ class CycloneDXParser:
                     if "version" in d:
                         version = d["version"]
                         cyclonedx_package.set_version(version)
+                    else:
+                        if self.debug:
+                            print(f"[ERROR] Version not specified for {package}")
+                        version = "MISSING"
                     # Record type of component
                     cyclonedx_package.set_type(d["type"])
                     if "supplier" in d:
