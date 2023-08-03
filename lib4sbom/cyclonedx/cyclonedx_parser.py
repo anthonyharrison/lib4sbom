@@ -153,7 +153,7 @@ class CycloneDXParser:
                         source = id[source_id]
                     elif self.debug:
                         print(f"[ERROR] Unable to find {source_id}")
-                    if source is not None:
+                    if source is not None and d.get("dependsOn") is not None:
                         for target_id in d["dependsOn"]:
                             if target_id in id:
                                 target = id[target_id]
