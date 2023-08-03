@@ -120,7 +120,7 @@ class CycloneDXGenerator:
             self.doc = {
                 "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
                 "bomFormat": "CycloneDX",
-                "specVersion": self.CYCLONEDX_VERSION,
+                "specVersion": self.cyclonedx_version,
                 "serialNumber": urn,
                 "version": 1,
                 "metadata": {
