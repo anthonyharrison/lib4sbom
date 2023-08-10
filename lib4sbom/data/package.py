@@ -41,7 +41,7 @@ class SBOMPackage:
 
     def set_type(self, type):
         # Handle all types as upper case. Handle mismatch of _ and - in SPDX
-        package_type = type.upper().replace("_", "-")
+        package_type = type.upper().replace("_", "-").strip()
         # Subset of SPDX and CycloneDX types/purpose
         if package_type in [
             "APPLICATION",
