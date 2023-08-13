@@ -87,7 +87,7 @@ class CycloneDXGenerator:
             return self.generateJSONDocumentHeader(project_name)
 
     def _generate_urn(self):
-        return "urn:uuid" + str(uuid.uuid4())
+        return "urn:uuid:" + str(uuid.uuid4())
 
     def generateJSONDocumentHeader(self, project_name):
         urn = self._generate_urn()
