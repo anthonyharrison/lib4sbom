@@ -74,6 +74,10 @@ class CycloneDXGenerator:
         # Generate data/time label in format YYYY-MM-DDThh:mm:ssZ
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    def spec_version(self, version):
+        if version in ["1.3", "1.4", "1.5"]:
+            self.cyclonedx_version = version
+
     def generateDocumentHeader(self, project_name):
         # Assume a new document being created
         self.relationship = []
@@ -95,7 +99,7 @@ class CycloneDXGenerator:
         if self.cyclonedx_version == self.CYCLONEDX_VERSION:
             # 1.5 version
             self.doc = {
-                "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+                "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
                 "bomFormat": "CycloneDX",
                 "specVersion": self.CYCLONEDX_VERSION,
                 "serialNumber": urn,
@@ -121,7 +125,7 @@ class CycloneDXGenerator:
         else:
             # Legacy version
             self.doc = {
-                "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+                "$schema": f"http://cyclonedx.org/schema/bom-{self.cyclonedx_version}.schema.json",
                 "bomFormat": "CycloneDX",
                 "specVersion": self.cyclonedx_version,
                 "serialNumber": urn,

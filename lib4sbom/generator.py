@@ -243,6 +243,9 @@ class SBOMGenerator:
         return check
 
     def _generate_cyclonedx(self, project_name: str, sbom_data: SBOMData) -> None:
+        # Set spec version if explicitly specified
+        if "version" in sbom_data:
+            self.bom.spec_version(sbom_data["version"])
         if "document" in sbom_data and "name" in sbom_data["document"]:
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(sbom_data["document"]["name"])

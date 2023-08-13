@@ -39,11 +39,13 @@ my_package.set_licensedeclared("GPL3")
 sbom_packages[(my_package.get_name(), my_package.get_value('version'))] = my_package.get_package()
 # Generate SBOM
 my_sbom = SBOM()
+my_sbom.set_type(sbom_type='cyclonedx')
+my_sbom.set_version("1.4")
 my_sbom.add_packages(sbom_packages)
 #print(my_sbom.get_sbom())
 #
 #
-my_generator = SBOMGenerator(False, sbom_type="spdx", format="json")
+my_generator = SBOMGenerator(False, sbom_type="cyclonedx", format="json")
 # Will be displayed on console
 my_generator.generate("TestApp", my_sbom.get_sbom())
 
