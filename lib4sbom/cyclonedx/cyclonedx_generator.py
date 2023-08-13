@@ -87,7 +87,7 @@ class CycloneDXGenerator:
             return self.generateJSONDocumentHeader(project_name)
 
     def generateJSONDocumentHeader(self, project_name):
-        urn = "urn:uuid" + str(uuid.uuid4())
+        urn = "urn:uuid:" + str(uuid.uuid4())
         project_id = self.PROJECT_ID
         if self.cyclonedx_version == self.CYCLONEDX_VERSION:
             # 1.5 version
@@ -141,7 +141,7 @@ class CycloneDXGenerator:
         return project_id
 
     def generateXMLDocumentHeader(self, project_name):
-        urn = "urn:uuid" + str(uuid.uuid4())
+        urn = "urn:uuid:" + str(uuid.uuid4())
         project_id = self.PROJECT_ID
         self.store("<?xml version='1.0' encoding='UTF-8'?>")
         self.store("<bom xmlns='http://cyclonedx.org/schema/bom/1.4'")
