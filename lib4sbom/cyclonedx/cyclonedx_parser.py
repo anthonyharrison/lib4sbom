@@ -54,11 +54,15 @@ class CycloneDXParser:
                     )
                 if "component" in data["metadata"]:
                     cyclonedx_document.set_name(data["metadata"]["component"]["name"])
-                    id[data["metadata"]["component"]["bom-ref"]] = data["metadata"][
-                        "component"
-                    ]["name"]
+                    if "bom-ref" in data["metadata"]["component"]:
+                        bom_ref = data["metadata"]["component"]["bom-ref"]
+                    else:
+                        bom_ref = "CylconeDX-Component-0000"
+                    id[bom_ref] = data["metadata"]["component"]["name"]
+            component_id = 0
             for d in data["components"]:
                 cyclonedx_package.initialise()
+                component_id = component_id + 1
                 if d["type"] in ["file", "library", "application", "operating-system"]:
                     package = d["name"]
                     cyclonedx_package.set_name(package)
@@ -71,6 +75,8 @@ class CycloneDXParser:
                         version = "MISSING"
                     # Record type of component
                     cyclonedx_package.set_type(d["type"])
+                    # If bom-ref not present, auto generate one
+                    bom_ref = d.get("bom-ref", f"CycloneDX-Component-{component_id}")
                     if "supplier" in d:
                         # Assume that this refers to an organisation
                         supplier_name = d["supplier"]["name"]
@@ -145,7 +151,8 @@ class CycloneDXParser:
                                 cyclonedx_package.set_downloadlocation(ref_url)
                     # Save package metadata
                     packages[(package, version)] = cyclonedx_package.get_package()
-                    id[d["bom-ref"]] = package
+                    print(f"{package} {bom_ref}")
+                    id[bom_ref] = package
             if "dependencies" in data:
                 # First relationship is assumed to be the root element
                 relationship_type = " DESCRIBES "
