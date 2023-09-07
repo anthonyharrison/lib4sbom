@@ -215,7 +215,7 @@ class CycloneDXGenerator:
             supplier_info.replace(emails[-1], "") if len(emails) > 0 else supplier_info
         )
         # Get names
-        names = re.findall(r"[a-zA-Z\.\]+ [A-Za-z]+", supplier_name)
+        names = re.findall(r"[a-zA-Z\.\-]+[ A-Za-z]*", supplier_name)
         supplier = " ".join(n for n in names)
         email_address = emails[-1] if len(emails) > 0 else ""
         return supplier.strip(), email_address
