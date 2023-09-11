@@ -113,8 +113,11 @@ class SBOMPackage:
     def set_licenseconcluded(self, license):
         self.package["licenseconcluded"] = license
 
-    def set_licensedeclared(self, license):
+    def set_licensedeclared(self, license, name=None):
         self.package["licensedeclared"] = license
+        if name is not None:
+            # Use name if not SPDX license. license is then assumed to be the license text
+            self.package["licensename"] = name
 
     def set_licensecomments(self, comment):
         self.package["licensecomments"] = self._text(comment)
