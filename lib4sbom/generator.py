@@ -6,9 +6,9 @@ import os
 import semantic_version
 
 from lib4sbom.cyclonedx.cyclonedx_generator import CycloneDXGenerator
-from lib4sbom.output import SBOMOutput
 from lib4sbom.data.document import SBOMDocument
-from lib4sbom.sbom import SBOM, SBOMData
+from lib4sbom.output import SBOMOutput
+from lib4sbom.sbom import SBOMData
 from lib4sbom.spdx.spdx_generator import SPDXGenerator
 from lib4sbom.version import VERSION
 
@@ -26,7 +26,6 @@ class SBOMGenerator:
         application: str = "lib4sbom",
         version: str = VERSION,
     ):
-
         self.format = format.lower()
         self.sbom_type = sbom_type.lower()
         # Ensure specified format is supported
@@ -95,7 +94,6 @@ class SBOMGenerator:
         else:
             uuid = None
         name = None
-        component_type = "application"
         if "document" in sbom_data:
             doc = SBOMDocument()
             doc.copy_document(sbom_data["document"])
@@ -244,7 +242,6 @@ class SBOMGenerator:
                             current_version = self._semantic_version(
                                 c[1].split("_")[-1]
                             )
-                        #current_version = self._semantic_version(c[1].split("_")[-1])
                         if current_version > latest_version:
                             latest_version = current_version
                             index = i
@@ -275,20 +272,24 @@ class SBOMGenerator:
             bom_version = sbom_data["bom_version"]
         else:
             bom_version = "1"
-        component_data = {'type': 'application', 'supplier' : None, 'version' : None}
+        component_data = {"type": "application", "supplier": None, "version": None}
         if "document" in sbom_data:
-            doc =  SBOMDocument()
+            doc = SBOMDocument()
             doc.copy_document(sbom_data["document"])
             name = doc.get_name()
-            component_data['type'] = doc.get_value("metadata_type")
-            component_data['supplier'] = doc.get_value("metadata_supplier")
-            component_data['version'] = doc.get_value("metadata_version")
+            component_data["type"] = doc.get_value("metadata_type")
+            component_data["supplier"] = doc.get_value("metadata_supplier")
+            component_data["version"] = doc.get_value("metadata_version")
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
-            project_id = self.bom.generateDocumentHeader(name, component_data, uuid, bom_version)
+            project_id = self.bom.generateDocumentHeader(
+                name, component_data, uuid, bom_version
+            )
             self._save_element(name, project_id)
         else:
-            project_id = self.bom.generateDocumentHeader(project_name, component_data, uuid, bom_version)
+            project_id = self.bom.generateDocumentHeader(
+                project_name, component_data, uuid, bom_version
+            )
             self._save_element(project_name, project_id)
         parent = project_name
         # Process list of files
@@ -329,5 +330,6 @@ class SBOMGenerator:
                 )
         if "vulnerabilities" in sbom_data:
             self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
+
 
 # End of file

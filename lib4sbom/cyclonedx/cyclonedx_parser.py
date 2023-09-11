@@ -43,11 +43,13 @@ class CycloneDXParser:
                     if cyclonedx_version == "1.5":
                         if "components" in data["metadata"]["tools"]:
                             for component in data["metadata"]["tools"]["components"]:
-                                cyclonedx_document.set_creator("tool", component["name"])
+                                cyclonedx_document.set_creator(
+                                    "tool", component["name"]
+                                )
                         else:
                             # This is the legacy interface which is deprecated.
                             if self.debug:
-                                print ("Legacy tool(s) specification still being used.")
+                                print("Legacy tool(s) specification still being used.")
                             cyclonedx_document.set_creator(
                                 "tool", data["metadata"]["tools"][0]["name"]
                             )

@@ -6,9 +6,9 @@ import re
 import uuid
 from datetime import datetime
 
+from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.license import LicenseScanner
 from lib4sbom.version import VERSION
-from lib4sbom.data.vulnerability import Vulnerability
 
 
 class CycloneDXGenerator:
@@ -84,7 +84,9 @@ class CycloneDXGenerator:
         if version in ["1.3", "1.4", "1.5"]:
             self.cyclonedx_version = version
 
-    def generateDocumentHeader(self, project_name, component_type, uuid=None, bom_version = "1"):
+    def generateDocumentHeader(
+        self, project_name, component_type, uuid=None, bom_version="1"
+    ):
         # Assume a new document being created
         self.relationship = []
         self.sbom_complete = False
@@ -94,19 +96,25 @@ class CycloneDXGenerator:
         else:
             self.doc = {}
             self.component = []
-            return self.generateJSONDocumentHeader(project_name, component_type, uuid,  bom_version)
+            return self.generateJSONDocumentHeader(
+                project_name, component_type, uuid, bom_version
+            )
 
     def _generate_urn(self):
         return "urn:uuid:" + str(uuid.uuid4())
 
-    def generateJSONDocumentHeader(self, project_name, component_type, uuid=None, bom_version = "1"):
+    def generateJSONDocumentHeader(
+        self, project_name, component_type, uuid=None, bom_version="1"
+    ):
         if uuid is None:
             urn = self._generate_urn()
         else:
             urn = uuid
         project_id = self.PROJECT_ID
         self.doc = {}
-        self.doc["$schema"] = f"http://cyclonedx.org/schema/bom-{self.cyclonedx_version}.schema.json"
+        self.doc[
+            "$schema"
+        ] = f"http://cyclonedx.org/schema/bom-{self.cyclonedx_version}.schema.json"
         self.doc["bomFormat"] = "CycloneDX"
         self.doc["specVersion"] = self.cyclonedx_version
         self.doc["serialNumber"] = urn
@@ -187,7 +195,6 @@ class CycloneDXGenerator:
             self.generateJSONComponent(id, type, package)
 
     def _process_supplier_info(self, supplier_info):
-
         # Get email addresses
         # Use RFC-5322 compliant regex (https://regex101.com/library/6EL6YF)
         emails = re.findall(
@@ -398,13 +405,17 @@ class CycloneDXGenerator:
                 # NVD Data source
                 source = {}
                 source["name"] = "NVD"
-                source["url"] = f"https://nvd.nist.gov/vuln/detail/{vulnerability['id']}"
+                source[
+                    "url"
+                ] = f"https://nvd.nist.gov/vuln/detail/{vulnerability['id']}"
                 vulnerability["source"] = source
             if "description" in vuln:
                 vulnerability["description"] = vuln_info.get_value("description")
             analysis = {}
             analysis["state"] = vuln_info.get_value("status")
-            if analysis["state"] is None or not vuln_info.validate_status(analysis["state"]):
+            if analysis["state"] is None or not vuln_info.validate_status(
+                analysis["state"]
+            ):
                 analysis["state"] = "in_triage"
             if "comment" in vuln:
                 analysis["detail"] = vuln_info.get_value("comment")

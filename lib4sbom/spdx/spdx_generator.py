@@ -29,7 +29,6 @@ class SPDXGenerator:
         application="lib4sbom",
         version=VERSION,
     ):
-
         self.package_id = 0
         self.validate_license = validate_license
         self.license = LicenseScanner()
@@ -97,7 +96,7 @@ class SPDXGenerator:
             self.SPDX_NAMESPACE
             + project_name.replace(" ", "-")
             + "-"
-            + self._uuid(uuid)
+            + self._uuid(uuid),
         )
         self.generateTag("LicenseListVersion", self.license.get_license_version())
         self.generateTag(
