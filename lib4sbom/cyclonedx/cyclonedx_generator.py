@@ -8,6 +8,7 @@ from datetime import datetime
 
 from lib4sbom.license import LicenseScanner
 from lib4sbom.version import VERSION
+from lib4sbom.data.vulnerability import Vulnerability
 
 
 class CycloneDXGenerator:
@@ -39,6 +40,7 @@ class CycloneDXGenerator:
             self.doc = {}
             self.component = []
         self.relationship = []
+        self.vulnerability = []
         self.sbom_complete = False
         self.include_purl = False
         # Can specify version of CycloneDX through environment variable
@@ -65,8 +67,12 @@ class CycloneDXGenerator:
                 self.store("</bom>")
             else:
                 # Add set of detected components to SBOM
-                self.doc["components"] = self.component
-                self.doc["dependencies"] = self.relationship
+                if len(self.component) > 0:
+                    self.doc["components"] = self.component
+                if len(self.relationship) > 0:
+                    self.doc["dependencies"] = self.relationship
+                if len(self.vulnerability) > 0:
+                    self.doc["vulnerabilities"] = self.vulnerability
             self.sbom_complete = True
         return self.doc
 
@@ -78,7 +84,7 @@ class CycloneDXGenerator:
         if version in ["1.3", "1.4", "1.5"]:
             self.cyclonedx_version = version
 
-    def generateDocumentHeader(self, project_name, uuid=None):
+    def generateDocumentHeader(self, project_name, component_type, uuid=None, bom_version = "1"):
         # Assume a new document being created
         self.relationship = []
         self.sbom_complete = False
@@ -88,66 +94,44 @@ class CycloneDXGenerator:
         else:
             self.doc = {}
             self.component = []
-            return self.generateJSONDocumentHeader(project_name, uuid)
+            return self.generateJSONDocumentHeader(project_name, component_type, uuid,  bom_version)
 
     def _generate_urn(self):
         return "urn:uuid:" + str(uuid.uuid4())
 
-    def generateJSONDocumentHeader(self, project_name, uuid=None):
+    def generateJSONDocumentHeader(self, project_name, component_type, uuid=None, bom_version = "1"):
         if uuid is None:
             urn = self._generate_urn()
         else:
             urn = uuid
         project_id = self.PROJECT_ID
+        self.doc = {}
+        self.doc["$schema"] = f"http://cyclonedx.org/schema/bom-{self.cyclonedx_version}.schema.json"
+        self.doc["bomFormat"] = "CycloneDX"
+        self.doc["specVersion"] = self.cyclonedx_version
+        self.doc["serialNumber"] = urn
+        self.doc["version"] = bom_version
+        metadata = {}
+        metadata["timestamp"] = self.generateTime()
+        tools = []
+        tool = {}
+        tool["name"] = self.application
+        tool["version"] = self.application_version
+        # More information ibcluded inversion 1.5
         if self.cyclonedx_version == self.CYCLONEDX_VERSION:
-            # 1.5 version
-            self.doc = {
-                "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
-                "bomFormat": "CycloneDX",
-                "specVersion": self.CYCLONEDX_VERSION,
-                "serialNumber": urn,
-                "version": 1,
-                "metadata": {
-                    "timestamp": self.generateTime(),
-                    "tools": {
-                        "components": [
-                            {
-                                "name": self.application,
-                                "version": self.application_version,
-                                "type": "application",
-                            },
-                        ]
-                    },
-                    "component": {
-                        "type": "application",
-                        "bom-ref": project_id,
-                        "name": project_name,
-                    },
-                },
-            }
-        else:
-            # Legacy version
-            self.doc = {
-                "$schema": f"http://cyclonedx.org/schema/bom-{self.cyclonedx_version}.schema.json",
-                "bomFormat": "CycloneDX",
-                "specVersion": self.cyclonedx_version,
-                "serialNumber": urn,
-                "version": 1,
-                "metadata": {
-                    "timestamp": self.generateTime(),
-                    "tools": [
-                        {
-                            "name": self.application,
-                            "version": self.application_version,
-                        }
-                    ],
-                    "component": {
-                        "type": "application",
-                        "bom-ref": project_id,
-                        "name": project_name,
-                    },
-                },
-            }
+            tool["type"] = "application"
+        tools.append(tool)
+        metadata["tools"] = tools
+        component = {}
+        component["type"] = component_type["type"]
+        if component_type["supplier"] is not None:
+            component["supplier"] = component_type["supplier"]
+        if component_type["version"] is not None:
+            component["version"] = component_type["version"]
+        component["bom-ref"] = project_id
+        component["name"] = project_name
+        metadata["component"] = component
+        self.doc["metadata"] = metadata
         return project_id
 
     def generateXMLDocumentHeader(self, project_name, uuid=None):
@@ -270,7 +254,6 @@ class CycloneDXGenerator:
                 license_definition = package["licenseconcluded"]
             else:
                 license_definition = package["licensedeclared"]
-            #license_id = self.license.find_license(package["licenseconcluded"])
             license_id = self.license.find_license(license_definition)
             if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # A valid SPDX license
@@ -286,11 +269,14 @@ class CycloneDXGenerator:
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
-            # elif package["licenseconcluded"] not in ["UNKNOWN", "NOASSERTION", "NONE"]:
             elif license_definition not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # Not a valid SPDX license
                 license = dict()
-                license["name"] = license_definition # package["licenseconcluded"]
+                if "licensename" in package:
+                    license["name"] = package["licensename"]
+                    license["text"] = license_definition
+                else:
+                    license["name"] = license_definition
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
@@ -399,3 +385,29 @@ class CycloneDXGenerator:
                 ):
                     self.store(f"<purl>{ref_value}</purl>")
         self.store("</component>")
+
+    def generate_vulnerability_data(self, vulnerabilities):
+        statements = []
+        for vuln in vulnerabilities:
+            vulnerability = {}
+            vuln_info = Vulnerability(validation="cyclonedx")
+            vuln_info.copy_vulnerability(vuln)
+            vulnerability["bom-ref"] = vuln_info.get_value("bom-ref")
+            vulnerability["id"] = vuln_info.get_value("id")
+            if vulnerability["id"].startswith("CVE-"):
+                # NVD Data source
+                source = {}
+                source["name"] = "NVD"
+                source["url"] = f"https://nvd.nist.gov/vuln/detail/{vulnerability['id']}"
+                vulnerability["source"] = source
+            if "description" in vuln:
+                vulnerability["description"] = vuln_info.get_value("description")
+            analysis = {}
+            analysis["state"] = vuln_info.get_value("status")
+            if analysis["state"] is None or not vuln_info.validate_status(analysis["state"]):
+                analysis["state"] = "in_triage"
+            if "comment" in vuln:
+                analysis["detail"] = vuln_info.get_value("comment")
+            vulnerability["analysis"] = analysis
+            statements.append(vulnerability)
+        self.vulnerability = statements
