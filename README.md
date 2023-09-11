@@ -14,6 +14,7 @@ The following facilities are provided:
 - Create and manipulate a SBOM file object
 - Create and manipulate a SBOM package object
 - Create and manipulate a SBOM dependency relationship object
+- Create and manipulate a Vulnerability object
 - Generated SBOM can be output to a file or to the console
 
 ## Installation
@@ -44,6 +45,9 @@ SBOMs are supported in the following formats
 
 | SBOM Type | Version | Format         |
 | --------- |---------| ---------------|
+| SPDX      | 2.2     | TagValue       |
+| SPDX      | 2.2     | JSON           |
+| SPDX      | 2.2     | YAML           |
 | SPDX      | 2.3     | TagValue       |
 | SPDX      | 2.3     | JSON           |
 | SPDX      | 2.3     | YAML           |
@@ -192,6 +196,9 @@ SBOMs can be generated in the following formats
 
 | SBOM Type | Version | Format    |
 | --------- |---------| ----------|
+| SPDX      | 2.2     | Tag       |
+| SPDX      | 2.2     | JSON      |
+| SPDX      | 2.2     | YAML      |
 | SPDX      | 2.3     | Tag       |
 | SPDX      | 2.3     | JSON      |
 | SPDX      | 2.3     | YAML      |
@@ -343,17 +350,24 @@ For the following attributes, a method **_set_attribute(value)_** is provided. N
 e.g. set_filetype(). The attribute names are aligned with the attributes of the File Object in the SPDX Specification. Unless
 indicated, the method just takes a single parameter for the value. Where indicated, multiple instances of the attribute may be defined.
 
-| Attribute      | Multiple | Note |
-|----------------|----------|------|
-| Name           | No       |      |
-| Id             | No       |      |
-| Version        | No       | (1)  |
-| DataLicense    | No       |      |
-| Type           | No       |      |
+| Attribute         | Multiple | Note |
+|-------------------|----------|------|
+| Name              | No       |      |
+| Id                | No       |      |
+| Version           | No       | (1)  |
+| DataLicense       | No       |      |
+| Type              | No       |      |
+| Uuid              | No       | (2)  |
+| Metadata_Type     | No       | (3)  |
+| Metadata_Supplier | No       |      |
+| Metadata_Version  | No       |      |
+| Bom_Version       | No       |      |
 
 **Note**
 
-1 This relates to the version of the specification of SBOM specified by the type atrribute. e.g. 1.4 for CycloneDX
+1 This relates to the version of the specification of SBOM specified by the type atrribute. e.g. 1.4 for CycloneDX, SPDX-2.3 for SPDX.
+2 This relates to the unique identifier for the SBOM.
+3 This relates to the type of component which the SBOM is describing. This is attribute is only used for CycloneDX SBOMs.
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
@@ -377,7 +391,7 @@ Returns the value of the attribute. A default value is returned if the attribute
 >>> sbom_document = SBOMDocument()
 >>> sbom_document.set_name("test_file.c")
 >>> sbom_document.set_type("spdx")
->>> sbom_document.set_version("2.3")
+>>> sbom_document.set_version("SPDX-2.3")
 >>> sbom_document.get_type()
 'spdx'
 >>> from lib4sbom.sbom import SBOM
@@ -486,7 +500,7 @@ indicated, the method just takes a single parameter for the value. Where indicat
 | Type              | No       | (1)  |
 | Checksum          | Yes      | (2)  |
 | LicenseConcluded  | No       |      |
-| LicenseDeclared   | No       |      |
+| LicenseDeclared   | No       | (3)  |
 | LicenceInfoInFile | Yes      |      |
 | LicenceComments   | No       |      |
 | FilesAnalysis     | No       |      |
@@ -509,6 +523,8 @@ indicated, the method just takes a single parameter for the value. Where indicat
 1 The set_type method is used to indicate the purpose of the package (e.g. Application, Library, Operating-System).
 
 2 The set_checksum method takes two parameters, the checksum algorithm (e.g. SHA256) and the actual checksum value (as a string)
+
+3 The set_licensedeclared method takes an optional second parameter which is the license name. In this case the first parameter, license, is assumed to be the license text rather than the license identity.
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
@@ -585,6 +601,74 @@ Returns the SBOMRelationship object as a dictionary.
 >>> my_sbom = SBOM()
 >>> my_sbom.add_relationships(sbom_relationships)
 ```
+
+### Vulnerability Object
+
+_class_ **Vulnerability**(validation = None)
+
+This creates a simple vulnerability object which is used to define the details of a vulnerability typically for a component
+specified within an SBOM. As there are multiple ways of specifying the status of a vulnerability, it is left to the
+application manipulating the Vulnerability object to apply validation as appropriate to ensure the semantics of the vulnerability are correct.
+
+The following optional parameter can be specified:
+
+_validation_ indicates that the status field is to be validated against the [OpenVEX](https://openvex.dev), [CycloneDX](https://www.cyclonedx.org) or [CSAF](https://docs.oasis-open.org/csaf/csaf/v2.0/csaf-v2.0.html) specifcaitions.
+
+**NOTE** Vulnerability objects are only included in CyclonedDX SBOMs
+
+**_Setter Methods_**
+
+For the following attributes, a method **_set_attribute(value)_** is provided. Note that the attribute name is always in _lowercase_.
+e.g. set_release(). Each method takes a single parameter for the value. Multiple instances of the attribute are not allowed.
+
+
+| Attribute         | Multiple | Note |
+|-------------------|----------|------|
+| Name              | No       |      |
+| Id                | No       | (1)  |
+| Release           | No       |      |
+| Status            | No       | (2)  |
+| Comment           | No       | (3)  |
+| Description       | No       | (4)  |
+
+
+**Note**
+
+1 The set_id method is used to indicate the identity of the vulnerability e.g. CVE-2021-44228
+
+2 The set_status is used to indicate the status of the vulnerability. Validation of the value of status may be optionally performed as determined by
+the optional parameter _validation_ specified in the creation of the Vulnerability object. An invalid status is indicated by a value of None.
+
+3 The set_comment method is used to provide additional inforamtion to support the status value e.g. a brief justification
+
+3 The set_description method is used to describe the vulnerability.
+
+There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
+
+`set_value("bom-ref", "rust@1.2.3")`
+
+**_Getter Methods_**
+
+get_vulnerability()
+Returns the vulnerability object as a dictionary.
+
+**Example**
+
+```python
+>>> from lib4sbom.data.vulnerability import Vulnerability
+>>> vulnerabilities = []
+>>> vulnerability = Vulnerability(validation="cyclonedx")
+>>> vulnerability.set_id("CVE-2023-1235")
+>>> vulnerability.set_name("rust")
+>>> vulnerability.set_release("1.2.3")
+>>> vulnerability.set_value("bom-ref", "rust@1.2.3")
+>>> vulnerability.set_status("in_triage")
+>>> vulnerabilities.append(vulnerability.get_vulnerability())
+>>> from lib4sbom.sbom import SBOM
+>>> my_sbom = SBOM()
+>>> my_sbom.add_vulnerabilities(vulnerabilities)
+```
+
 
 ## Examples
 
