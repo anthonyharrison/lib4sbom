@@ -41,6 +41,27 @@ class SBOMDocument:
         else:
             self.document["creator"] = [creator_entry]
 
+    def set_metadata_type(self, type):
+        component_type = type.upper().replace("_", "-").strip()
+        # Subset of SPDX and CycloneDX types/purpose
+        if component_type in [
+            "APPLICATION",
+            "FRAMEWORK",
+            "LIBRARY",
+            "CONTAINER",
+            "OPERATING-SYSTEM",
+            "DEVICE",
+            "FIRMWARE",
+            "FILE",
+        ]:
+            self.document["metadata_type"] = component_type.lower()
+
+    def set_metadata_supplier(self, supplier):
+        self.set_value("metadata_supplier", supplier)
+
+    def set_metadata_version(self, version):
+        self.set_value("metadata_version", version)
+
     def set_value(self, key, value):
         self.document[key] = value
 
