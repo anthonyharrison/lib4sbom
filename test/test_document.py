@@ -92,4 +92,10 @@ class TestDocument:
 		test_item.set_value('attribute','a_value')
 		assert test_item.get_value('attribute') == 'a_value'
 
+	def test_show_document(self):
+		test_item = test_module()
+		test_item.set_name("item1")
+		test_item.set_id("1234")
+		test_item.show_document()
+
 
