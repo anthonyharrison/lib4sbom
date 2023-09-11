@@ -7,7 +7,6 @@ import os
 
 
 class LicenseScanner:
-
     DEFAULT_LICENSE = "UNKNOWN"
     SPDX_LICENSE_VERSION = "3.21"
 
