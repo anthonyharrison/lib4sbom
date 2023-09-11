@@ -7,7 +7,8 @@ import semantic_version
 
 from lib4sbom.cyclonedx.cyclonedx_generator import CycloneDXGenerator
 from lib4sbom.output import SBOMOutput
-from lib4sbom.sbom import SBOMData
+from lib4sbom.data.document import SBOMDocument
+from lib4sbom.sbom import SBOM, SBOMData
 from lib4sbom.spdx.spdx_generator import SPDXGenerator
 from lib4sbom.version import VERSION
 
@@ -86,12 +87,25 @@ class SBOMGenerator:
 
     def _generate_spdx(self, project_name: str, sbom_data: SBOMData) -> None:
         self.sbom_complete = False
-        if "document" in sbom_data and "name" in sbom_data["document"]:
-            # Use existing document name
-            project_id = self.bom.generateDocumentHeader(sbom_data["document"]["name"])
-            self._save_element(sbom_data["document"]["name"], project_id)
+        # Set spec version if explicitly specified
+        if "version" in sbom_data:
+            self.bom.spec_version(sbom_data["version"])
+        if "uuid" in sbom_data:
+            uuid = sbom_data["uuid"]
         else:
-            project_id = self.bom.generateDocumentHeader(project_name)
+            uuid = None
+        name = None
+        component_type = "application"
+        if "document" in sbom_data:
+            doc = SBOMDocument()
+            doc.copy_document(sbom_data["document"])
+            name = doc.get_name()
+        if name is not None and name != "NOT DEFINED":
+            # Use existing document name
+            project_id = self.bom.generateDocumentHeader(name, uuid)
+            self._save_element(name, project_id)
+        else:
+            project_id = self.bom.generateDocumentHeader(project_name, uuid)
             self._save_element(project_name, project_id)
         if "files" in sbom_data:
             # Process list of files
@@ -230,7 +244,7 @@ class SBOMGenerator:
                             current_version = self._semantic_version(
                                 c[1].split("_")[-1]
                             )
-                        current_version = self._semantic_version(c[1].split("_")[-1])
+                        #current_version = self._semantic_version(c[1].split("_")[-1])
                         if current_version > latest_version:
                             latest_version = current_version
                             index = i
@@ -240,6 +254,8 @@ class SBOMGenerator:
                 return check[index][0]
             else:
                 # Could be two elements
+                if id is None:
+                    return check[0][0]
                 if check[0][1] == id:
                     return check[0][1]
                 return check[0][0]
@@ -253,12 +269,26 @@ class SBOMGenerator:
             uuid = sbom_data["uuid"]
         else:
             uuid = None
-        if "document" in sbom_data and "name" in sbom_data["document"]:
-            # Use existing document name
-            project_id = self.bom.generateDocumentHeader(sbom_data["document"]["name"], uuid)
-            self._save_element(sbom_data["document"]["name"], project_id)
+        name = None
+
+        if "bom_version" in sbom_data:
+            bom_version = sbom_data["bom_version"]
         else:
-            project_id = self.bom.generateDocumentHeader(project_name,uuid)
+            bom_version = "1"
+        component_data = {'type': 'application', 'supplier' : None, 'version' : None}
+        if "document" in sbom_data:
+            doc =  SBOMDocument()
+            doc.copy_document(sbom_data["document"])
+            name = doc.get_name()
+            component_data['type'] = doc.get_value("metadata_type")
+            component_data['supplier'] = doc.get_value("metadata_supplier")
+            component_data['version'] = doc.get_value("metadata_version")
+        if name is not None and name != "NOT DEFINED":
+            # Use existing document name
+            project_id = self.bom.generateDocumentHeader(name, component_data, uuid, bom_version)
+            self._save_element(name, project_id)
+        else:
+            project_id = self.bom.generateDocumentHeader(project_name, component_data, uuid, bom_version)
             self._save_element(project_name, project_id)
         parent = project_name
         # Process list of files
@@ -297,6 +327,7 @@ class SBOMGenerator:
                         relationship["target"], relationship["target_id"]
                     ),
                 )
-
+        if "vulnerabilities" in sbom_data:
+            self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
 
 # End of file
