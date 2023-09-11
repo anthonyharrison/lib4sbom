@@ -46,6 +46,7 @@ class SPDXGenerator:
             self.relationships = []
         self.include_purl = False
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
+        self.spdx_version = self.SPDX_VERSION
 
     def show(self, message):
         self.doc.append(message)
@@ -75,9 +76,18 @@ class SPDXGenerator:
         # Generate data/time label in format YYYY-MM-DDThh:mm:ssZ
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
+    def spec_version(self, version):
+        if version in ["SPDX-2.2", "SPDX-2.3"]:
+            self.spdx_version = version
+
+    def _uuid(self, id=None):
+        if id is None:
+            return str(uuid.uuid4())
+        return id
+
     def generateTagDocumentHeader(self, project_name, uuid=None):
         # Geerate SPDX Document Header
-        self.generateTag("SPDXVersion", self.SPDX_VERSION)
+        self.generateTag("SPDXVersion", self.spdx_version)
         self.generateTag("DataLicense", self.DATA_LICENSE)
         self.generateTag("SPDXID", self.SPDX_PROJECT_ID)
         # Project name mustn't have spaces in. Covert spaces to '-'
@@ -87,7 +97,7 @@ class SPDXGenerator:
             self.SPDX_NAMESPACE
             + project_name.replace(" ", "-")
             + "-"
-            + str(uuid.uuid4()),
+            + self._uuid(uuid)
         )
         self.generateTag("LicenseListVersion", self.license.get_license_version())
         self.generateTag(
@@ -103,7 +113,7 @@ class SPDXGenerator:
     def generateJSONDocumentHeader(self, project_name, uuid=None):
         # Generate SPDX Document Header
         self.doc["SPDXID"] = self.SPDX_PROJECT_ID
-        self.doc["spdxVersion"] = self.SPDX_VERSION
+        self.doc["spdxVersion"] = self.spdx_version
         creation_info = dict()
         creation_info["comment"] = "This document has been automatically generated."
         creation_info["creators"] = [
@@ -119,21 +129,21 @@ class SPDXGenerator:
             self.SPDX_NAMESPACE
             + project_name.replace(" ", "-")
             + "-"
-            + str(uuid.uuid4())
+            + self._uuid(uuid)
         )
         return self.SPDX_PROJECT_ID
 
-    def generateDocumentHeader(self, project_name):
+    def generateDocumentHeader(self, project_name, uuid=None):
         # Assume a new document being created
         if self.format == "tag":
             self.doc = []
-            return self.generateTagDocumentHeader(project_name)
+            return self.generateTagDocumentHeader(project_name, uuid)
         else:
             self.doc = {}
             self.component = []
             self.file_component = []
             self.relationships = []
-            return self.generateJSONDocumentHeader(project_name)
+            return self.generateJSONDocumentHeader(project_name, uuid)
 
     def package_ident(self, id):
         # Only add preamble if not parent document
