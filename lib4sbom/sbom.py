@@ -9,6 +9,7 @@ class SBOMData(NamedTuple):
     files: Dict
     packages: Dict
     relationships: List
+    vulnerabilities: Dict
     type: str
     version: str
 
@@ -30,15 +31,16 @@ class SBOM:
 
     def add_packages(self, packages: Dict):
         self.sbom["packages"] = packages
-        # print (f"Added package {self.sbom}")
 
     def add_relationships(self, relationships: List):
         self.sbom["relationships"] = relationships
 
+    def add_vulnerabilities(self, vulnerabilities: Dict):
+        self.sbom["vulnerabilities"] = vulnerabilities
+
     def add_data(self, sbom_data: SBOMData) -> None:
         for key, value in sbom_data.items():
             self.sbom[key] = value
-        print(f"ADD {self.sbom}")
 
     def set_type(self, sbom_type):
         self.sbom["type"] = sbom_type
@@ -48,6 +50,9 @@ class SBOM:
 
     def set_uuid(self, uuid):
         self.sbom["uuid"] = uuid
+
+    def set_bom_version(self, version):
+        self.sbom["bom_version"] = version
 
     def get_sbom(self) -> SBOMData:
         return self.sbom
