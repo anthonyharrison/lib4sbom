@@ -30,6 +30,8 @@ def generate_sbom():
     iosapp_pkg.set_supplier("Author", "RH")
     iosapp_pkg.set_type("Application")
     iosapp_pkg.set_licensedeclared("Apache-2.0")
+    parent_id = "iOSApp_Application"
+    iosapp_pkg.set_id(parent_id)
     sbom_packages[(iosapp_pkg.get_name(), iosapp_pkg.get_value('version'))] = \
         iosapp_pkg.get_package()
 
@@ -85,12 +87,14 @@ def generate_sbom():
         if package["name"] == parent_app:
             # Parent component
             sbom_relationship.set_relationship(
-                "iOSApp_Application", "DESCRIBES", parent_app
+                parent_id, "DESCRIBES", parent_app
             )
+            sbom_relationship.set_relationship_id(None, parent_id)
         else:
             sbom_relationship.set_relationship(
                     parent_app, "DEPENDS_ON", package["name"]
             )
+            sbom_relationship.set_relationship_id(parent_id, package["id"])
         relationships.append(sbom_relationship.get_relationship())
     sbom.add_relationships(relationships)
 
@@ -118,7 +122,7 @@ def generate_sbom():
 
     sbg = SBOMGenerator(format='tag', sbom_type='cyclonedx')
 
-    sbg.generate("iOSApp_Application", sbom.get_sbom())
+    sbg.generate(parent_id, sbom.get_sbom())
     # sbg.generate("iOSApp", sbom.get_sbom(), "mybomy-bom.json")
 
 generate_sbom()
