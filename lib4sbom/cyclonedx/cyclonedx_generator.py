@@ -256,7 +256,7 @@ class CycloneDXGenerator:
                     component["hashes"].append(checksum_entry)
                 else:
                     component["hashes"] = [checksum_entry]
-        if "licenseconcluded" or "licensedeclared" in package:
+        if "licenseconcluded" in package or "licensedeclared" in package:
             if "licenseconcluded" in package:
                 license_definition = package["licenseconcluded"]
             else:
