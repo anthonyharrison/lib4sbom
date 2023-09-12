@@ -277,7 +277,7 @@ class SBOMGenerator:
             doc = SBOMDocument()
             doc.copy_document(sbom_data["document"])
             name = doc.get_name()
-            component_data["type"] = doc.get_value("metadata_type")
+            component_data["type"] = doc.get_value("metadata_type","application")
             component_data["supplier"] = doc.get_value("metadata_supplier")
             component_data["version"] = doc.get_value("metadata_version")
         if name is not None and name != "NOT DEFINED":
@@ -299,8 +299,8 @@ class SBOMGenerator:
                 sbom_files = [x for x in sbom_data["files"].values()]
                 id = 1
                 for file in sbom_files:
-                    self.bom.generateComponent(file["name"], "file", file)
-                    self._save_element(file["name"], file["name"])
+                    self.bom.generateComponent(file["id"], "file", file)
+                    self._save_element(file["name"], file["id"])
                     id = id + 1
         # Process list of packages
         if "packages" in sbom_data:
