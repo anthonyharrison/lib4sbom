@@ -112,7 +112,9 @@ class SBOMGenerator:
                 id = 1
                 relationship = "CONTAINS"
                 for file in sbom_files:
-                    file_id = file.get("id", None)
+                    file_id = file["id"]
+                    if file_id == "NOT_DEFINED":
+                        file_id = str(id) + "-" + file["name"]
                     self.bom.generateFileDetails(
                         file["name"],
                         file_id,
@@ -134,7 +136,7 @@ class SBOMGenerator:
                 product = package["name"]
                 my_id = package.get("id", None)
                 parent = "-"
-                self._save_element(product, str(id) + "-" + product, my_id)
+                self._save_element(product, my_id, my_id)
                 if parent == "-":
                     parent_id = project_id
                     relationship = "DESCRIBES"
@@ -144,7 +146,7 @@ class SBOMGenerator:
                         relationship = "DEPENDS_ON"
                 self.bom.generatePackageDetails(
                     product,
-                    str(id) + "-" + product,
+                    my_id,
                     package,
                     parent_id,
                     relationship,
