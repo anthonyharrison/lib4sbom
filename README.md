@@ -593,7 +593,7 @@ Returns the SBOMRelationship object as a dictionary.
 
 ```python
 >>> from lib4sbom.data.relationship import SBOMRelationship
->>> sbom_relationships = {}
+>>> sbom_relationships = []
 >>> my_relationship = SBOMRelationship()
 >>> my_relationship.set_relationship("Package-1","CONTAINS", "Package-2")
 >>> sbom_relationships.append(my_relationship)
