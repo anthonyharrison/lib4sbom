@@ -299,8 +299,11 @@ class SBOMGenerator:
                 sbom_files = [x for x in sbom_data["files"].values()]
                 id = 1
                 for file in sbom_files:
-                    self.bom.generateComponent(file["id"], "file", file)
-                    self._save_element(file["name"], file["id"])
+                    my_id = file["id"]
+                    if my_id == "NOT_DEFINED":
+                        my_id = str(id) + "-" + file["name"]
+                    self._save_element(file["name"], my_id)
+                    self.bom.generateComponent(my_id, "file", file)
                     id = id + 1
         # Process list of packages
         if "packages" in sbom_data:
