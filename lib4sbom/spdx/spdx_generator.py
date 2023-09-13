@@ -43,9 +43,12 @@ class SPDXGenerator:
             self.component = []
             self.file_component = []
             self.relationships = []
+            self.licenses = []
         self.include_purl = False
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
         self.spdx_version = self.SPDX_VERSION
+        self.license_info = []
+        self.license_id = 1
 
     def show(self, message):
         self.doc.append(message)
@@ -53,6 +56,8 @@ class SPDXGenerator:
     def getBOM(self):
         if self.format != "tag":
             # Add subcomponents to SBOM
+            if len(self.licenses) > 0:
+                self.doc["hasExtractedLicensingInfos"] = self.licenses
             if len(self.file_component) > 0:
                 self.doc["files"] = self.file_component
             self.doc["packages"] = self.component
@@ -156,6 +161,9 @@ class SPDXGenerator:
             return self.FILE_PREAMBLE + str(id).replace(" ", "-").replace("_", "-")
         return str(id)
 
+    def license_ref(self):
+        return f"LicenseRef-{self.license_id}"
+
     def license_ident(self, license):
         if self.validate_license and len(license) > 0:
             if license != "UNKNOWN":
@@ -233,13 +241,20 @@ class SPDXGenerator:
                 "PackageSourceInfo", self._text(package_info["sourceinfo"])
             )
         if "licensedeclared" in package_info:
-            self.generateTag(
-                "PackageLicenseDeclared",
-                package_info["licensedeclared"],
-            )
+            if "licensename" in package_info:
+                # User defined license
+                self.generateTag(
+                    "PackageLicenseDeclared",self.license_ref()
+                )
+                self.license_info.append({"id":self.license_ref(), "name": package_info["licensename"], "text": package_info["licensedeclared"] })
+                self.license_id = self.license_id + 1
+            else:
+                self.generateTag(
+                    "PackageLicenseDeclared",self.license_ident(package_info["licensedeclared"])
+                )
         if "licenseconcluded" in package_info:
             self.generateTag(
-                "PackageLicenseConcluded", package_info["licenseconcluded"]
+                "PackageLicenseConcluded", self.license_ident(package_info["licenseconcluded"])
             )
         if "licensecomments" in package_info:
             self.generateTag(
@@ -334,9 +349,15 @@ class SPDXGenerator:
         if "sourceinfo" in package_info:
             component["sourceInfo"] = package_info["sourceinfo"]
         if "licenseconcluded" in package_info:
-            component["licenseConcluded"] = package_info["licenseconcluded"]
+            component["licenseConcluded"] = self.license_ident(package_info["licenseconcluded"])
         if "licensedeclared" in package_info:
-            component["licenseDeclared"] = package_info["licensedeclared"]
+            if "licensename" in package_info:
+                # User defined license
+                component["licenseDeclared"] = self.license_ref()
+                self.license_info.append({"id":self.license_ref(), "name": package_info["licensename"], "text": package_info["licensedeclared"] })
+                self.license_id = self.license_id + 1
+            else:
+                component["licenseDeclared"] = self.license_ident(package_info["licensedeclared"])
         if "licensecomments" in package_info:
             component["licenseComments"] = package_info["licensecomments"]
         if files_analysed:
@@ -457,6 +478,18 @@ class SPDXGenerator:
                     component["fileContributor"] = [contributor]
         self.file_component.append(component)
 
+    def generateTagLicenseDetails(self, id, name, license_text):
+        self.generateTag("LicenseID", id)
+        self.generateTag("LicenseName",name)
+        self.generateTag("ExtractedText", self._text(license_text))
+
+    def generateJSONLicenseDetails(self, id, name, license_text):
+        extractedlicense = {}
+        extractedlicense["licenseId"] = id
+        extractedlicense["name"] = name
+        extractedlicense["extractedText"] = license_text
+        self.licenses.append(extractedlicense)
+
     def generatePackageDetails(
         self, package, id, package_info, parent_id, relationship
     ):
@@ -474,6 +507,13 @@ class SPDXGenerator:
             self.generateTagFileDetails(file, id, file_info, parent_id, relationship)
         else:
             self.generateJSONFileDetails(file, id, file_info, parent_id, relationship)
+
+    def generateLicenseDetails(self):
+        for license_info in self.license_info:
+            if self.format == "tag":
+                self.generateTagLicenseDetails(license_info["id"], license_info["name"],license_info["text"])
+            else:
+                self.generateJSONLicenseDetails(license_info["id"], license_info["name"],license_info["text"])
 
     def generateRelationship(self, from_id, to_id, relationship_type):
         if (

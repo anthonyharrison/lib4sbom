@@ -157,6 +157,8 @@ class SBOMGenerator:
                     relationship,
                 )
                 id = id + 1
+        # If user defined licenses defined, generate details
+        self.bom.generateLicenseDetails()
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
                 if (
