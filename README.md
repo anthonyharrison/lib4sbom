@@ -351,15 +351,15 @@ e.g. set_type(). Unless indicated, the method just takes a single parameter for 
 | Attribute         | Multiple | Note |
 |-------------------|----------|------|
 | Version           | No       | (1)  |
-| DataLicense       | No       |      |
-| Type              | No       |      |
-| Uuid              | No       | (2)  |
+| Type              | No       | (2)  |
+| Uuid              | No       | (3)  |
 | Bom_Version       | No       |      |
 
 **Note**
 
 1 This relates to the version of the specification of SBOM specified by the type atrribute. e.g. 1.4 for CycloneDX, SPDX-2.3 for SPDX.
-2 This relates to the unique identifier for the SBOM.
+2 This refers to the type of SBOM either SPDX or CycloneDX.
+3 This relates to the unique identifier for the SBOM.
 
 **_Getter Methods_**
 
@@ -404,20 +404,15 @@ indicated, the method just takes a single parameter for the value. Where indicat
 |-------------------|----------|------|
 | Name              | No       |      |
 | Id                | No       |      |
-| Version           | No       | (1)  |
 | DataLicense       | No       |      |
-| Type              | No       |      |
-| Uuid              | No       | (2)  |
-| Metadata_Type     | No       | (3)  |
+| Metadata_Type     | No       | (1)  |
 | Metadata_Supplier | No       |      |
 | Metadata_Version  | No       |      |
 | Bom_Version       | No       |      |
 
 **Note**
 
-1 This relates to the version of the specification of SBOM specified by the type atrribute. e.g. 1.4 for CycloneDX, SPDX-2.3 for SPDX.
-2 This relates to the unique identifier for the SBOM.
-3 This relates to the type of component which the SBOM is describing. This is attribute is only used for CycloneDX SBOMs.
+1 This relates to the type of component which the SBOM is describing. This is attribute is only used for CycloneDX SBOMs.
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
@@ -439,11 +434,10 @@ Returns the value of the attribute. A default value is returned if the attribute
 ```python
 >>> from lib4sbom.data.document import SBOMDocument
 >>> sbom_document = SBOMDocument()
->>> sbom_document.set_name("test_file.c")
->>> sbom_document.set_type("spdx")
->>> sbom_document.set_version("SPDX-2.3")
->>> sbom_document.get_type()
-'spdx'
+>>> sbom_document.set_name("test_file")
+>>> sbom_document.set_metadata_type("firmware")
+>>> sbom_document.get_name()
+'test_file'
 >>> from lib4sbom.sbom import SBOM
 >>> my_sbom = SBOM()
 >>> my_sbom.add_document(sbom_document)
