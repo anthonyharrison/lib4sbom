@@ -49,7 +49,8 @@ class SBOM:
         self.sbom["version"] = version
 
     def set_uuid(self, uuid):
-        self.sbom["uuid"] = uuid
+        if uuid.startswith("urn:uuid"):
+            self.sbom["uuid"] = uuid
 
     def set_bom_version(self, version):
         self.sbom["bom_version"] = version
