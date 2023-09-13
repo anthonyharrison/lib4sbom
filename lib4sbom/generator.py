@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-
+import re
 import semantic_version
 
 from lib4sbom.cyclonedx.cyclonedx_generator import CycloneDXGenerator
@@ -84,6 +84,9 @@ class SBOMGenerator:
                 sbom_out = SBOMOutput(filename, output_format=self.format)
                 sbom_out.generate_output(self.sbom)
 
+    def _validate_id(self, id):
+        return len(re.findall(r"([0-9a-zA-Z\.\-\+]+)$", id)) == len(id)
+
     def _generate_spdx(self, project_name: str, sbom_data: SBOMData) -> None:
         self.sbom_complete = False
         # Set spec version if explicitly specified
@@ -113,7 +116,7 @@ class SBOMGenerator:
                 relationship = "CONTAINS"
                 for file in sbom_files:
                     file_id = file["id"]
-                    if file_id == "NOT_DEFINED":
+                    if file_id == "NOT_DEFINED" or not self._validate_id(file_id):
                         file_id = str(id) + "-" + file["name"]
                     self.bom.generateFileDetails(
                         file["name"],
@@ -135,6 +138,8 @@ class SBOMGenerator:
                     continue
                 product = package["name"]
                 my_id = package.get("id", None)
+                if not self._validate_id(my_id):
+                    my_id = f"{id}-{product}"
                 parent = "-"
                 self._save_element(product, my_id, my_id)
                 if parent == "-":
