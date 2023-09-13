@@ -65,14 +65,25 @@ class SBOMPackage:
         if my_id is None and my_name is not None:
             self.set_id(self.get_name() + "_" + str(self.package["version"]))
 
+    def _validate_supplier_type(self, type):
+        supplier_type = type.lower().strip()
+        if supplier_type in [
+            "person",
+            "organization",
+        ]:
+            return supplier_type.capitalize()
+        if supplier_type == "author":
+            return "Person"
+        return "Organization"
+
     def set_supplier(self, type, name):
         if len(name) > 0:
-            self.package["supplier_type"] = type.strip()
+            self.package["supplier_type"] = self._validate_supplier_type(type.strip())
             self.package["supplier"] = name
 
     def set_originator(self, type, name):
         if len(name) > 0:
-            self.package["originator_type"] = type.strip()
+            self.package["originator_type"] = self._validate_supplier_type(type.strip())
             self.package["originator"] = name
 
     def set_downloadlocation(self, location):
