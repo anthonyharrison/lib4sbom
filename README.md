@@ -333,12 +333,62 @@ The following code sample shows the use of the SBOMOutput module.
 >>> 
 ```
 
+### SBOM Object 
+
+_class_ **SBOM**()
+
+This creates a simple SBOM object. This object contains all the items to be contained within the SBOM including
+components and relationships. It is left to the application manipulating the SBOM object to apply validation as appropriate
+for the presence of each attribute.
+
+**Methods**
+
+**_Setter Methods_**
+
+For the following attributes, a method **_set_attribute(value)_** is provided. Note that the attribute name is always in _lowercase_.
+e.g. set_type(). Unless indicated, the method just takes a single parameter for the value. Where indicated, multiple instances of the attribute may be defined.
+
+| Attribute         | Multiple | Note |
+|-------------------|----------|------|
+| Version           | No       | (1)  |
+| DataLicense       | No       |      |
+| Type              | No       |      |
+| Uuid              | No       | (2)  |
+| Bom_Version       | No       |      |
+
+**Note**
+
+1 This relates to the version of the specification of SBOM specified by the type atrribute. e.g. 1.4 for CycloneDX, SPDX-2.3 for SPDX.
+2 This relates to the unique identifier for the SBOM.
+
+**_Getter Methods_**
+
+get_sbom()
+Returns the SBOM object as a dictionary.
+
+**Example**
+
+```python
+>>> from lib4sbom.sbom import SBOM
+>>> sbom = SBOM()
+>>> sbom.set_type(sbom_type='cyclonedx')
+>>> sbom.set_version("1.4")
+>>> sbom.set_uuid("urn:uuid:My_uuid_1234")
+>>> sbom.set_bom_version("2")
+>>> sbom.get_type()
+'cyclonedx'
+>>> from lib4sbom.data.document import SBOMDocument
+>>> my_doc = SBOMDocument()
+>>> my_doc.set_metadata_type("firmware")
+>>> sbom.add_document(my_doc)
+```
+
 ### SBOMDocument Object 
 
 _class_ **SBOMDocument**()
 
 This creates a simple SBOMDocument object. This object contains the values of the attributes
-that can be associated with a file artefact within an SBOM. This includes attributes such as name, identifier, type of file,
+that can be associated with a SBOM. This includes attributes such as name, identifier, type of file,
 checksum and licence information. As each of the attributes are optional, it is left to the application manipulating the
 SBOMFile object to apply validation as appropriate for the presence of each attribute.
 
@@ -668,6 +718,8 @@ Returns the vulnerability object as a dictionary.
 >>> my_sbom = SBOM()
 >>> my_sbom.add_vulnerabilities(vulnerabilities)
 ```
+
+
 
 
 ## Examples
