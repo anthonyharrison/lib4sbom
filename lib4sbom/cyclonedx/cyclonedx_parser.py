@@ -161,7 +161,6 @@ class CycloneDXParser:
                                 cyclonedx_package.set_downloadlocation(ref_url)
                     # Save package metadata
                     packages[(package, version)] = cyclonedx_package.get_package()
-                    print(f"{package} {bom_ref}")
                     id[bom_ref] = package
             if "dependencies" in data:
                 # First relationship is assumed to be the root element
