@@ -118,7 +118,7 @@ class CycloneDXGenerator:
         self.doc["bomFormat"] = "CycloneDX"
         self.doc["specVersion"] = self.cyclonedx_version
         self.doc["serialNumber"] = urn
-        self.doc["version"] = bom_version
+        self.doc["version"] = int(bom_version)
         metadata = {}
         metadata["timestamp"] = self.generateTime()
         tools = []
@@ -133,7 +133,9 @@ class CycloneDXGenerator:
         component = {}
         component["type"] = component_type["type"]
         if component_type["supplier"] is not None:
-            component["supplier"] = component_type["supplier"]
+            supplier = {}
+            supplier["name"] = component_type["supplier"]
+            component["supplier"] = supplier
         if component_type["version"] is not None:
             component["version"] = component_type["version"]
         component["bom-ref"] = project_id
@@ -281,7 +283,9 @@ class CycloneDXGenerator:
                 license = dict()
                 if "licensename" in package:
                     license["name"] = package["licensename"]
-                    license["text"] = license_definition
+                    text = {}
+                    text["content"] = license_definition
+                    license["text"] = text
                 else:
                     license["name"] = license_definition
                 item = dict()
