@@ -11,7 +11,7 @@ def generate_sbom():
     sbom = SBOM()
     sbom.set_type(sbom_type='cyclonedx')
     sbom.set_version("1.4")
-    sbom.set_uuid("My_uuid_1234")
+    sbom.set_uuid("urn:uuid:My_uuid_1234")
     sbom.set_bom_version("2")
 
     sbom_doc = SBOMDocument()
