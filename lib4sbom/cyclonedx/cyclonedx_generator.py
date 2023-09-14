@@ -232,7 +232,7 @@ class CycloneDXGenerator:
             )
             # Depends on supplier type
             if package["supplier_type"] != "UNKNOWN":
-                # Either a person or orgonisation
+                # Either a person or organisation
                 supplier = dict()
                 supplier["name"] = supplier_name
                 if len(supplier_email) > 0:
