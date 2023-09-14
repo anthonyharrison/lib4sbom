@@ -3,6 +3,7 @@
 
 import os
 import re
+import sqlite3
 import uuid
 from datetime import datetime
 
@@ -47,6 +48,8 @@ class CycloneDXGenerator:
         self.cyclonedx_version = os.getenv("LIB4SBOM_CYCLONEDX_VERSION")
         if self.cyclonedx_version is None or self.cyclonedx_version not in ["1.4"]:
             self.cyclonedx_version = self.CYCLONEDX_VERSION
+        self.connection = sqlite3.connect("purl2cpe.db")
+        self.cursor = self.connection.cursor()
 
     def store(self, message):
         self.doc.append(message)
@@ -213,6 +216,24 @@ class CycloneDXGenerator:
         email_address = emails[-1] if len(emails) > 0 else ""
         return supplier.strip(), email_address
 
+    def guessPurlEntry(self, vendor, product, version):
+        query = """
+        SELECT
+            distinct purl
+        FROM purl2cpe
+        WHERE cpe like ?
+        """
+        self.cursor.execute(query, ["%" + vendor + ":" + product + "%"])
+
+        # Prefer upstream purl (e.g., github, gitlab, sourceforge)
+        # over distribution specific purl (e.g. debian, ubuntu, fedora)
+        purl_entries = [x[0] for x in self.cursor.fetchall()]
+        preferred_upstream = ["github", "gitlab", "sourceforge", ""]
+        for subs in preferred_upstream:
+            res = [i for i in purl_entries if subs in i]
+            if res:
+                return res[0] + "@" + version
+
     def generateJSONComponent(self, id, type, package):
         component = dict()
         if "type" in package:
@@ -241,9 +262,11 @@ class CycloneDXGenerator:
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
                 if "version" in package:
-                    component[
-                        "cpe"
-                    ] = f'cpe:/a:{supplier_name.replace(" ", "_")}:{name}:{version}'
+                    vendor = supplier_name.replace(" ", "_")
+                    component["cpe"] = f"cpe:/a:{vendor}:{name}:{version}"
+                    purl = self.guessPurlEntry(vendor, name, version)
+                    if purl:
+                        component["purl"] = purl
                 # Alternative is it within external reference
         if "description" in package:
             component["description"] = package["description"]
