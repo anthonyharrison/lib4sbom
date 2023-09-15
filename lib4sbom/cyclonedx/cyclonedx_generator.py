@@ -121,14 +121,19 @@ class CycloneDXGenerator:
         self.doc["version"] = int(bom_version)
         metadata = {}
         metadata["timestamp"] = self.generateTime()
-        tools = []
         tool = {}
         tool["name"] = self.application
         tool["version"] = self.application_version
-        # More information ibcluded inversion 1.5
+        # Tools format changed in version 1.5
         if self.cyclonedx_version == self.CYCLONEDX_VERSION:
+            tools = {}
             tool["type"] = "application"
-        tools.append(tool)
+            components = []
+            components.append(tool)
+            tools["components"] = components
+        else:
+            tools = []
+            tools.append(tool)
         metadata["tools"] = tools
         component = {}
         component["type"] = component_type["type"]
