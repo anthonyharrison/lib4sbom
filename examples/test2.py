@@ -86,7 +86,6 @@ def generate_clinician_sbom():
 
     sbom.add_files(sbom_files)
     sbom.add_packages(sbom_packages)
-    print(sbom_packages)
 
     relationships = []
     sbom_relationship = SBOMRelationship()
@@ -107,7 +106,6 @@ def generate_clinician_sbom():
             sbom_relationship.set_relationship_id(parent_id, package["id"])
         relationships.append(sbom_relationship.get_relationship())
     sbom.add_relationships(relationships)
-    print(relationships)
 
     sbg = SBOMGenerator(format='tag', sbom_type='cyclonedx')
 
