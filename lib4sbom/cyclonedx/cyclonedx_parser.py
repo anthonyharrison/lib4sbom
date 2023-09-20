@@ -166,7 +166,6 @@ class CycloneDXParser:
                         bom_ref = data["metadata"]["component"]["bom-ref"]
                     else:
                         bom_ref = "CylconeDX-Component-0000"
-                    # self.id[bom_ref] = data["metadata"]["component"]["name"]
                     self.id[bom_ref] = component_name
             for d in data["components"]:
                 self._cyclondex_component(d)
