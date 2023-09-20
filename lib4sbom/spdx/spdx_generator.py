@@ -243,18 +243,24 @@ class SPDXGenerator:
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                self.generateTag(
-                    "PackageLicenseDeclared",self.license_ref()
+                self.generateTag("PackageLicenseDeclared", self.license_ref())
+                self.license_info.append(
+                    {
+                        "id": self.license_ref(),
+                        "name": package_info["licensename"],
+                        "text": package_info["licensedeclared"],
+                    }
                 )
-                self.license_info.append({"id":self.license_ref(), "name": package_info["licensename"], "text": package_info["licensedeclared"] })
                 self.license_id = self.license_id + 1
             else:
                 self.generateTag(
-                    "PackageLicenseDeclared",self.license_ident(package_info["licensedeclared"])
+                    "PackageLicenseDeclared",
+                    self.license_ident(package_info["licensedeclared"]),
                 )
         if "licenseconcluded" in package_info:
             self.generateTag(
-                "PackageLicenseConcluded", self.license_ident(package_info["licenseconcluded"])
+                "PackageLicenseConcluded",
+                self.license_ident(package_info["licenseconcluded"]),
             )
         if "licensecomments" in package_info:
             self.generateTag(
@@ -349,15 +355,25 @@ class SPDXGenerator:
         if "sourceinfo" in package_info:
             component["sourceInfo"] = package_info["sourceinfo"]
         if "licenseconcluded" in package_info:
-            component["licenseConcluded"] = self.license_ident(package_info["licenseconcluded"])
+            component["licenseConcluded"] = self.license_ident(
+                package_info["licenseconcluded"]
+            )
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
                 component["licenseDeclared"] = self.license_ref()
-                self.license_info.append({"id":self.license_ref(), "name": package_info["licensename"], "text": package_info["licensedeclared"] })
+                self.license_info.append(
+                    {
+                        "id": self.license_ref(),
+                        "name": package_info["licensename"],
+                        "text": package_info["licensedeclared"],
+                    }
+                )
                 self.license_id = self.license_id + 1
             else:
-                component["licenseDeclared"] = self.license_ident(package_info["licensedeclared"])
+                component["licenseDeclared"] = self.license_ident(
+                    package_info["licensedeclared"]
+                )
         if "licensecomments" in package_info:
             component["licenseComments"] = package_info["licensecomments"]
         if files_analysed:
@@ -480,7 +496,7 @@ class SPDXGenerator:
 
     def generateTagLicenseDetails(self, id, name, license_text):
         self.generateTag("LicenseID", id)
-        self.generateTag("LicenseName",name)
+        self.generateTag("LicenseName", name)
         self.generateTag("ExtractedText", self._text(license_text))
 
     def generateJSONLicenseDetails(self, id, name, license_text):
@@ -511,9 +527,13 @@ class SPDXGenerator:
     def generateLicenseDetails(self):
         for license_info in self.license_info:
             if self.format == "tag":
-                self.generateTagLicenseDetails(license_info["id"], license_info["name"],license_info["text"])
+                self.generateTagLicenseDetails(
+                    license_info["id"], license_info["name"], license_info["text"]
+                )
             else:
-                self.generateJSONLicenseDetails(license_info["id"], license_info["name"],license_info["text"])
+                self.generateJSONLicenseDetails(
+                    license_info["id"], license_info["name"], license_info["text"]
+                )
 
     def generateRelationship(self, from_id, to_id, relationship_type):
         if (

@@ -287,7 +287,7 @@ class SBOMGenerator:
             doc = SBOMDocument()
             doc.copy_document(sbom_data["document"])
             name = doc.get_name()
-            component_data["type"] = doc.get_value("metadata_type","application")
+            component_data["type"] = doc.get_value("metadata_type", "application")
             component_data["supplier"] = doc.get_value("metadata_supplier")
             component_data["version"] = doc.get_value("metadata_version")
         if name is not None and name != "NOT DEFINED":

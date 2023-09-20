@@ -48,9 +48,7 @@ class CycloneDXParser:
                 if "contact" in d["supplier"]:
                     for contact in d["supplier"]["contact"]:
                         if "email" in contact:
-                            supplier_name = (
-                                f'{supplier_name} ({contact["email"]})'
-                            )
+                            supplier_name = f'{supplier_name} ({contact["email"]})'
                 self.cyclonedx_package.set_supplier("Organisation", supplier_name)
             if "author" in d:
                 # Assume that this refers to an individual
@@ -119,7 +117,7 @@ class CycloneDXParser:
             # Handle component assemblies
             if "components" in d:
                 for component in d["components"]:
-                   self._cyclondex_component(component)
+                    self._cyclondex_component(component)
 
     def parse_cyclonedx_json(self, sbom_file):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
@@ -168,7 +166,7 @@ class CycloneDXParser:
                         bom_ref = data["metadata"]["component"]["bom-ref"]
                     else:
                         bom_ref = "CylconeDX-Component-0000"
-                    #self.id[bom_ref] = data["metadata"]["component"]["name"]
+                    # self.id[bom_ref] = data["metadata"]["component"]["name"]
                     self.id[bom_ref] = component_name
             for d in data["components"]:
                 self._cyclondex_component(d)
