@@ -3,6 +3,7 @@
 
 import os
 import re
+
 import semantic_version
 
 from lib4sbom.cyclonedx.cyclonedx_generator import CycloneDXGenerator
