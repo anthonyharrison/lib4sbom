@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import re
 
+import defusedxml.ElementTree as ET
 import yaml
 
 from lib4sbom.data.document import SBOMDocument
@@ -26,6 +28,10 @@ class SPDXParser:
             return self.parse_spdx_json(sbom_file)
         elif sbom_file.endswith((".spdx.yaml", "spdx.yml")):
             return self.parse_spdx_yaml(sbom_file)
+        elif sbom_file.endswith(".spdx.rdf"):
+            return self.parse_spdx_rdf(sbom_file)
+        elif sbom_file.endswith(".spdx.xml"):
+            return self.parse_spdx_xml(sbom_file)
         else:
             return {}, {}, {}, []
 
@@ -459,3 +465,57 @@ class SPDXParser:
                 spdx_relationship.set_relationship_id(rel["source"], rel["target"])
                 relationships.append(spdx_relationship.get_relationship())
         return relationships
+
+    def parse_spdx_rdf(self, sbom_file):
+        # parses SPDX RDF BOM file extracting package name and version ONLY
+        with open(sbom_file) as f:
+            lines = f.readlines()
+        packages = {}
+        package = ""
+        for line in lines:
+            if line.strip().startswith("<spdx:name>"):
+                stripped_line = line.strip().rstrip("\n")
+                package_match = re.search("<spdx:name>(.+?)</spdx:name>", stripped_line)
+                if not package_match:
+                    continue
+                package = package_match.group(1)
+                version = None
+            elif line.strip().startswith("<spdx:versionInfo>"):
+                stripped_line = line.strip().rstrip("\n")
+                version_match = re.search(
+                    "<spdx:versionInfo>(.+?)</spdx:versionInfo>", stripped_line
+                )
+                if not version_match:
+                    continue
+                version = version_match.group(1)
+                packages[(package, version)] = {"name": package, "version": version}
+        return ({}, {}, packages, [])
+
+    def parse_spdx_xml(self, sbom_file):
+        # parses SPDX XML BOM file extracting package name and version ONLY
+        # XML is experimental in SPDX 2.2
+        packages = {}
+        tree = ET.parse(sbom_file)
+        # Find root element
+        root = tree.getroot()
+        # Extract schema
+        schema = root.tag[: root.tag.find("}") + 1]
+        print(f"XML Processing {sbom_file}")
+        # Extract package information
+        for component in root.findall(schema + "packages"):
+            print (f"Process {component}")
+            package_match = component.find(schema + "name")
+            if package_match is None:
+                continue
+            package = package_match.text
+            if package is None:
+                continue
+            version_match = component.find(schema + "versionInfo")
+            if version_match is None:
+                continue
+            version = version_match.text
+            if version is None:
+                continue
+            print (f"Add {package} {version}")
+            packages[(package, version)] = {"name": package, "version": version}
+        return ({}, {}, packages, [])
