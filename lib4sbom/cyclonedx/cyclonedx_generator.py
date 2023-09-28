@@ -120,10 +120,24 @@ class CycloneDXGenerator:
         self.doc["serialNumber"] = urn
         self.doc["version"] = int(bom_version)
         metadata = {}
-        metadata["timestamp"] = self.generateTime()
+        if component_type["timestamp"] is None:
+            metadata["timestamp"] = self.generateTime()
+        else:
+            metadata["timestamp"] = component_type["timestamp"]
         tool = {}
-        tool["name"] = self.application
-        tool["version"] = self.application_version
+        author = {}
+        if component_type["creator"] is not None:
+            for creator in component_type["creator"]:
+                type, param = creator
+                if type == "tool":
+                    tool["name"] = param.split('#')[0]
+                    tool["version"] = param.split('#')[1]
+                elif type == "person":
+                    author["name"] = param.split('#')[0]
+                    author["email"] = param.split('#')[1]
+        if len(tool) == 0:
+            tool["name"] = self.application
+            tool["version"] = self.application_version
         # Tools format changed in version 1.5
         if self.cyclonedx_version == self.CYCLONEDX_VERSION:
             tools = {}
@@ -135,6 +149,8 @@ class CycloneDXGenerator:
             tools = []
             tools.append(tool)
         metadata["tools"] = tools
+        if len(author) > 0:
+            metadata["authors"] = author
         component = {}
         component["type"] = component_type["type"]
         if component_type["supplier"] is not None:
@@ -143,11 +159,14 @@ class CycloneDXGenerator:
             component["supplier"] = supplier
         if component_type["version"] is not None:
             component["version"] = component_type["version"]
-        component["bom-ref"] = project_id
+        if component_type["bom-ref"] is not None:
+            component["bom-ref"] = component_type["bom-ref"]
+        else:
+            component["bom-ref"] = project_id
         component["name"] = project_name
         metadata["component"] = component
         self.doc["metadata"] = metadata
-        return project_id
+        return component["bom-ref"]
 
     def generateXMLDocumentHeader(self, project_name, uuid=None):
         if uuid is None:
@@ -224,7 +243,10 @@ class CycloneDXGenerator:
             component["type"] = package["type"].lower()
         else:
             component["type"] = type.lower()
-        component["bom-ref"] = id
+        if package.get("bom-ref") is None:
+            component["bom-ref"] = id
+        else:
+            component["bom-ref"] = package.get("bom-ref")
         name = package["name"]
         component["name"] = name
         if "version" in package:
@@ -250,6 +272,8 @@ class CycloneDXGenerator:
                         "cpe"
                     ] = f'cpe:/a:{supplier_name.replace(" ", "_")}:{name}:{version}'
                 # Alternative is it within external reference
+        if "originator" in package:
+            component["author"] = package["originator"]
         if "description" in package:
             component["description"] = package["description"]
         elif "summary" in package:
@@ -335,7 +359,6 @@ class CycloneDXGenerator:
                         component["externalReferences"].append(externalReference)
                     else:
                         component["externalReferences"] = [externalReference]
-
         if "property" in package:
             for property in package["property"]:
                 property_entry = dict()
