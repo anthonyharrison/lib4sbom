@@ -336,7 +336,9 @@ class SBOMGenerator:
                 id = id + 1
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
-                self.bom.generateRelationship(relationship["source_id"],relationship["target_id"] )
+                self.bom.generateRelationship(
+                    relationship["source_id"], relationship["target_id"]
+                )
 
         if "vulnerabilities" in sbom_data:
             self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])

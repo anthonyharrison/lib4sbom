@@ -493,17 +493,15 @@ class SPDXParser:
 
     def parse_spdx_xml(self, sbom_file):
         # parses SPDX XML BOM file extracting package name and version ONLY
-        # XML is experimental in SPDX 2.2
+        # XML is experimental in SPDX 2.x
         packages = {}
         tree = ET.parse(sbom_file)
         # Find root element
         root = tree.getroot()
         # Extract schema
         schema = root.tag[: root.tag.find("}") + 1]
-        print(f"XML Processing {sbom_file}")
         # Extract package information
         for component in root.findall(schema + "packages"):
-            print (f"Process {component}")
             package_match = component.find(schema + "name")
             if package_match is None:
                 continue
@@ -516,6 +514,5 @@ class SPDXParser:
             version = version_match.text
             if version is None:
                 continue
-            print (f"Add {package} {version}")
             packages[(package, version)] = {"name": package, "version": version}
         return ({}, {}, packages, [])

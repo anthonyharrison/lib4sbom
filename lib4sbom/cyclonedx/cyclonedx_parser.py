@@ -163,7 +163,9 @@ class CycloneDXParser:
                 if "component" in data["metadata"]:
                     component_name = data["metadata"]["component"]["name"]
                     cyclonedx_document.set_name(component_name)
-                    cyclonedx_document.set_metadata_type(data["metadata"]["component"]["type"])
+                    cyclonedx_document.set_metadata_type(
+                        data["metadata"]["component"]["type"]
+                    )
                     if "bom-ref" in data["metadata"]["component"]:
                         bom_ref = data["metadata"]["component"]["bom-ref"]
                     else:
@@ -221,11 +223,11 @@ class CycloneDXParser:
     def parse_document_xml(self):
         cyclonedx_document = SBOMDocument()
         # Extract CycloneDX version from schema
-        cyclonedx_version = self.schema.replace('}','').split("/")[-1]
+        cyclonedx_version = self.schema.replace("}", "").split("/")[-1]
         cyclonedx_document.set_version(cyclonedx_version)
         cyclonedx_document.set_type("cyclonedx")
-        component_name=None
-        bom_ref=None
+        component_name = None
+        bom_ref = None
 
         for metadata in self.root.findall(self.schema + "metadata"):
             timestamp = self._xml_component(metadata, "timestamp")
@@ -238,8 +240,8 @@ class CycloneDXParser:
                     cyclonedx_document.set_creator("tool", f"{name}#{version}")
             for authors in metadata.findall(self.schema + "authors"):
                 for author in authors.findall(self.schema + "author"):
-                    name=self._xml_component(author, "name")
-                    email=self._xml_component(author, "email")
+                    name = self._xml_component(author, "name")
+                    email = self._xml_component(author, "email")
                     if email != "":
                         name = f"{name}#{email}"
                     cyclonedx_document.set_creator("person", name)
@@ -291,9 +293,7 @@ class CycloneDXParser:
             self.cyclonedx_package.set_copyrighttext(description)
         for hashes in component.findall(self.schema + "hashes"):
             for hash in hashes.findall(self.schema + "hash"):
-                self.cyclonedx_package.set_checksum(
-                    str(hash.attrib["alg"]), hash.text
-                )
+                self.cyclonedx_package.set_checksum(str(hash.attrib["alg"]), hash.text)
         for licenses in component.findall(self.schema + "licenses"):
             for license in licenses.findall(self.schema + "license"):
                 # Multiple ways of defining license data
@@ -311,9 +311,7 @@ class CycloneDXParser:
             self.cyclonedx_package.set_copyrighttext(copyright)
         cpe = self._xml_component(component, "cpe")
         if cpe != "":
-            self.cyclonedx_package.set_externalreference(
-                "SECURITY", "cpe23Type", cpe
-            )
+            self.cyclonedx_package.set_externalreference("SECURITY", "cpe23Type", cpe)
         purl = self._xml_component(component, "purl")
         if purl != "":
             self.cyclonedx_package.set_externalreference(
@@ -323,12 +321,8 @@ class CycloneDXParser:
         for properties in component.findall(self.schema + "properties"):
             for property in properties.findall(self.schema + "property"):
                 params = property.attrib
-                self.cyclonedx_package.set_property(
-                    params["name"], params["value"]
-                )
-        for references in component.findall(
-                self.schema + "externalReferences"
-        ):
+                self.cyclonedx_package.set_property(params["name"], params["value"])
+        for references in component.findall(self.schema + "externalReferences"):
             for reference in references.findall(self.schema + "reference"):
                 params = reference.attrib
                 ref_type = params.get("type")
