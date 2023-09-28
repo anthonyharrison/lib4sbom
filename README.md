@@ -9,8 +9,8 @@ The following facilities are provided:
 
 - Generate SPDX SBOM in TagValue, JSON and YAML formats
 - Generate CycloneDX SBOM in JSON format
-- Parse SPDX SBOM in TagValue, JSON and YAML formats
-- Parse CycloneDX SBOM in JSON format
+- Parse SPDX SBOM in TagValue, JSON, YAML, XML and RDF formats
+- Parse CycloneDX SBOM in JSON and XMLformat
 - Create and manipulate a SBOM file object
 - Create and manipulate a SBOM package object
 - Create and manipulate a SBOM dependency relationship object
@@ -43,16 +43,24 @@ The focus of the implementation is on providing a common set of SBOM data regard
 
 SBOMs are supported in the following formats
 
-| SBOM Type | Version | Format         |
-| --------- |---------| ---------------|
-| SPDX      | 2.2     | TagValue       |
-| SPDX      | 2.2     | JSON           |
-| SPDX      | 2.2     | YAML           |
-| SPDX      | 2.3     | TagValue       |
-| SPDX      | 2.3     | JSON           |
-| SPDX      | 2.3     | YAML           |
-| CycloneDX | 1.4     | JSON           |
-| CycloneDX | 1.5     | JSON           |
+| SBOM Type | Version | Format   |
+| --------- |---------|----------|
+| SPDX      | 2.2     | TagValue |
+| SPDX      | 2.2     | JSON     |
+| SPDX      | 2.2     | YAML     |
+| SPDX      | 2.2     | RDF      |
+| SPDX      | 2.2     | XML      |
+| SPDX      | 2.3     | TagValue |
+| SPDX      | 2.3     | JSON     |
+| SPDX      | 2.3     | YAML     |
+| SPDX      | 2.3     | RDF       |
+| SPDX      | 2.3     | XML      |
+| CycloneDX | 1.4     | JSON     |
+| CycloneDX | 1.4     | XML      |
+| CycloneDX | 1.5     | JSON     |
+| CycloneDX | 1.5     | XML      |
+
+**Note** that support for SPDX RDF and XML formats is limited to a few package attributes.
 
 _class_ **SBOMParser**(_sbom_type='auto_')
 
@@ -61,13 +69,16 @@ which represents the type of SBOM (either spdx, cyclonedx or auto). The default 
 which case the parser will automatically work out the SBOM type using the
 following filename conventions.
 
-| SBOM      | Format    | Filename extension |
-| --------- | --------- |--------------------|
-| SPDX      | TagValue  | .spdx              |
-| SPDX      | JSON      | .spdx.json         |
-| SPDX      | YAML      | .spdx.yaml         |
-| SPDX      | YAML      | .spdx.yml          |
-| CycloneDX | JSON      | .json              |
+| SBOM      | Format   | Filename extension |
+| --------- |----------|--------------------|
+| SPDX      | TagValue | .spdx              |
+| SPDX      | JSON     | .spdx.json         |
+| SPDX      | YAML     | .spdx.yaml         |
+| SPDX      | YAML     | .spdx.yml          |
+| SPDX      | RDF      | .spdx.rdf          |
+| SPDX      | XML      | .spdx.xml          |
+| CycloneDX | JSON     | .json              |
+| CycloneDX | XML      | .xml               |
 
 The parser will check that the correct JSON files is being processed by the correct parser.
 A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
@@ -713,9 +724,6 @@ Returns the vulnerability object as a dictionary.
 >>> my_sbom.add_vulnerabilities(vulnerabilities)
 ```
 
-
-
-
 ## Examples
 
 A number of example scripts are included in the _examples_ subdirectory.
@@ -735,7 +743,7 @@ user of the tool is reminded that they should assert the quality of any data whi
 
 ## Future Development
 
-1. Support later versions of SPDX (3.0) and CycloneDX.
+1. Support later versions of SPDX (3.0).
 
 2. Enhance validation of SBOM data to check for all mandatory elements.
 
@@ -745,9 +753,11 @@ user of the tool is reminded that they should assert the quality of any data whi
 
 5. Utilise third-party SPDX and CycloneDX parsers and generators
 
-6. Add support for XML and RDF formats
+6. Add further support for SPDX XML and RDF formats
 
-7. Implement test suite.
+7. Add generator for CycloneDX XML documents.
+
+8. Implement test suite.
 
 ## License
 
