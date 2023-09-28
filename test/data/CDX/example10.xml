@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.5"
+     serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+     version="1">
+    <components>
+        <component type="library">
+            <supplier>
+                <name>Example Inc.</name>
+                <url>https://example.com</url>
+                <url>https://example.net</url>
+                <contact>
+                    <name>Example Support AMER</name>
+                    <email>support@example.com</email>
+                    <phone>800-555-1212</phone>
+                </contact>
+                <contact>
+                    <name>Example Support APAC</name>
+                    <email>support@apac.example.com</email>
+                </contact>
+            </supplier>
+            <author>Example Development Labs - Alpha Team</author>
+            <publisher>Example Development Labs</publisher>
+            <group>com.example</group>
+            <name>crypto-library</name>
+            <version>3.0.0</version>
+            <purl>pkg:maven/com.example/crypto-library@3.0.0?repository_url=repo.example.com</purl>
+            <swid tagId="swidgen-5dcb79af-a1d2-61b3-34fd-536c53b08810_3.0.0" name="Crypto Library" version="3.0.0">
+                <text content-type="text/xml" encoding="base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8+CjxTb2Z0d2FyZUlkZW50aXR5IHhtbDpsYW5nPSJFTiIgbmFtZT0iQ3J5cHRvIExpYnJhcnkiIHZlcnNpb249IjMuMC4wIiAKIHZlcnNpb25TY2hlbWU9Im11bHRpcGFydG51bWVyaWMiIAogdGFnSWQ9InN3aWRnZW4tNWRjYjc5YWYtYTFkMi02MWIzLTM0ZmQtNTM2YzUzYjA4ODEwXzMuMC4wIiAKIHhtbG5zPSJodHRwOi8vc3RhbmRhcmRzLmlzby5vcmcvaXNvLzE5NzcwLy0yLzIwMTUvc2NoZW1hLnhzZCI+IAogeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYS1pbnN0YW5jZSIgCiB4c2k6c2NoZW1hTG9jYXRpb249Imh0dHA6Ly9zdGFuZGFyZHMuaXNvLm9yZy9pc28vMTk3NzAvLTIvMjAxNS1jdXJyZW50L3NjaGVtYS54c2Qgc2NoZW1hLnhzZCIgPgogIDxNZXRhIGdlbmVyYXRvcj0iU1dJRCBUYWcgT25saW5lIEdlbmVyYXRvciB2MC4xIiAvPiAKICA8RW50aXR5IG5hbWU9IkV4YW1wbGUsIEluYy4iIHJlZ2lkPSJleGFtcGxlLmNvbSIgcm9sZT0idGFnQ3JlYXRvciIgLz4gCjwvU29mdHdhcmVJZGVudGl0eT4=</text>
+            </swid>
+        </component>
+    </components>
+</bom>

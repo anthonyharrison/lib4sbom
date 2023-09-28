@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.5"
+     serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+     version="1">
+    <components>
+        <component type="library">
+            <group>org.apache.tomcat</group>
+            <name>tomcat-catalina</name>
+            <version>9.0.14</version>
+            <!-- This component is published to the ecosystems default repository -->
+            <purl>pkg:maven/org.apache.tomcat/tomcat-catalina@9.0.14</purl>
+        </component>
+        <component type="library">
+            <group>org.acme</group>
+            <name>card-verifier</name>
+            <version>1.0.2</version>
+            <!-- This component is published to Acme's repository -->
+            <purl>pkg:maven/org.acme/card-verifier@1.0.2?repository_url=repo.acme.org/maven</purl>
+        </component>
+    </components>
+</bom>

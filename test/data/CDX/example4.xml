@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom xmlns="http://cyclonedx.org/schema/bom/1.5"
+     serialNumber="urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79"
+     version="1">
+    <components>
+        <component type="library">
+            <publisher>Apache</publisher>
+            <group>org.apache.tomcat</group>
+            <name>tomcat-catalina</name>
+            <version>9.0.14</version>
+            <hashes>
+                <hash alg="MD5">3942447fac867ae5cdb3229b658f4d48</hash>
+                <hash alg="SHA-1">e6b1000b94e835ffd37f4c6dcbdad43f4b48a02a</hash>
+                <hash alg="SHA-256">f498a8ff2dd007e29c2074f5e4b01a9a01775c3ff3aeaf6906ea503bc5791b7b</hash>
+                <hash alg="SHA-512">e8f33e424f3f4ed6db76a482fde1a5298970e442c531729119e37991884bdffab4f9426b7ee11fccd074eeda0634d71697d6f88a460dce0ac8d627a29f7d1282</hash>
+            </hashes>
+            <licenses>
+                <license>
+                    <id>Apache-2.0</id>
+                </license>
+            </licenses>
+            <purl>pkg:maven/org.apache.tomcat/tomcat-catalina@9.0.14</purl>
+        </component>
+    </components>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+            <ds:Reference URI="">
+                <ds:Transforms>
+                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                </ds:Transforms>
+                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                <ds:DigestValue>sZjV4XcMOuD6NA9bXEd2sGWQYE0=</ds:DigestValue>
+            </ds:Reference>
+        </ds:SignedInfo>
+        <ds:SignatureValue>
+            QEl5/ZHZw3iLDjchfAmdwjXzx7qE03lUwd10e98tjRIUFox31WSB5XIl88IX30k5ICj2pFeWzMvk
+            EZrH7yu5l5oqkEs71QFjigFDbFh6bW5bXIii537HGsCUsMLUhGzDFYef1H8Ph/JVdbdM+pl4TEh6
+            mRNdSt+fqYbdpbbA+EbFEboSoBtK6j2efVo4Wzb1P40IO+Oq8S8lqltc5FVvOXPfvkAxb78j/AUQ
+            HF2zRN3+bcddsDYBa7f0GswUkZXGqlFmtdZW0MowQTg7mxxu6p4moTPBSrkCQLNj72LNPy4SaqI2
+            2lTvqNq5CLeaIHAyOM8ZRaL2UvJsMDx+Hee51tw+cc9J90bWRNN5Gu+oHMt1m5Jnvguu6kjQ9rS3
+            TiqFgDoMDuAXqPnVerf/6ngR4jYmDL6CzEKgfpFNiC5bf+CatODWcNfAkzWdlz0sSzMa/G/kJiZa
+            b+BjKbn2lr6bTofH6GxSoQ92mB1KeK+Dy/GVZlUKuK7DjB6VGmnVlH7bfIpxKc/cGQuZnbcfTPbY
+            Z7AR9Gclj2+YxPj/ncjq/uAVDjD1d8CDi0amcHml6wEEVi6uTitDPyftCUL6A6bc89a9oKvfP61m
+            /703gLocgkAZ+UVuBl5ImjEQbYoRfE+Q+O9RNvFkUSPluMaVvm6/CVd3X6lwbc/51A1fH1Swwvo=
+        </ds:SignatureValue>
+        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:X509Data>
+                <ds:X509SubjectName>CN=bomsigner,OU=development,O=cyclonedx</ds:X509SubjectName>
+                <ds:X509Certificate>
+                    MIIE+DCCAuCgAwIBAgIEXGzayTANBgkqhkiG9w0BAQsFADA+MRIwEAYDVQQKDAljeWNsb25lZHgx
+                    FDASBgNVBAsMC2RldmVsb3BtZW50MRIwEAYDVQQDDAlib21zaWduZXIwHhcNMTkwMjIwMDQ0MjQ5
+                    WhcNNDkwMjIwMDQ0MjQ5WjA+MRIwEAYDVQQKDAljeWNsb25lZHgxFDASBgNVBAsMC2RldmVsb3Bt
+                    ZW50MRIwEAYDVQQDDAlib21zaWduZXIwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCo
+                    5JZsM4ZLfWW/dpRlU6CpnItWspddF+bEVDETKVwVj9tGpqR5jURgKS/BOQP2TGUsR3/ZJJBhYRll
+                    ONhrUQrVKV/I6wp3Z40qPEa1RJLE+QlG9iL8qBV52CnXkLmnUSax3dspSzmSct5vDiTnvpHG9jr0
+                    AKFeTjy7U9rv8GJybz0ijwlpBoO9JRdYPX2PrrzoSeJLoxKq+GwuyCZ5LhXRN0p1a+NAirTAmY+c
+                    G1ZTLkMmfeCUy1t6H/bG4RnYOSSPOvk7Rb68lQpUqb+pbbNuB2o/b9cDwtLLCtGVlu+5Wj8mrytY
+                    3FGFQM20j3yVeRInmGqTTDBelQa/CO4JKqBlmaeYEIvNYbFs9+AlqadivwDO51RpdPo9fPSpsBpy
+                    ZMv6S2bXNuUML+Rk99WyKJTPM0PTZhRLZ64ZXEhlz3kQWVoSlrcwwim6sj6LRUb5IRqA3lxRFUI6
+                    NXKyiQLamQp+t3/9OGW9L1rLCcw7yFo0s8LhMTPMiv4ol9/hQViT+8ICzDsr0OM9ZiF4/UagFRlt
+                    IClV70cjh1DpsZjzQIRVGaj8uQ/JdtfRz4E43Ki7U0a2Vpho/t6poLVndv46tkX5nYGtMW4WfMoD
+                    ZflQ9pajvvKtr2jB1wob6nsU+VTmAcWZy4BCPH+XyfDw/0SFBdUceJJJtPWIeYFDUY7onptf+wID
+                    AQABMA0GCSqGSIb3DQEBCwUAA4ICAQCOVariNgK+9OF/5T9ZaSvZbkk45RTmzgQNXtFc5xfRvqwP
+                    s+pu/DFXm1R+ltjyS5j3w6NBZUFUI5MqLQr6JEEDrbu8BvfBO57wJNAEATj1JIHEfDfh7BxnBF8f
+                    oYFOwbrh4jOt0wz0FW2obsSVmF4GSvS7tTlWqTcsxjdZVmwP40RWu18B9jzv7M61adrWD3ksDA5O
+                    amSOsZi3Nt0aacDkyGRdCIEFi0fplxQInXMtD1z3RhXu2JSTAIr54Cei49Bh71kAXSWHMCog/f8a
+                    lSrZyqZBty/ACfU9DqlPIM+giHePKm4z2bcdpUdKZk6wcKDn4CvuBOqsMBMg7L05UEyyqTPD/4dk
+                    2GwJ8Nv0E5gsYHCIXF2cZ3OUVsw0mB/ozleEJVDE02uZZN/1wW1Xq028LsMdgN0Wk1WvWyF5MEdh
+                    nPWuhqp6tNaDI/kK6XQF+LjYJUzua3AQFOHfYNLKhO6d+bJ4rr0833v4v3cLW34kbXkKb6U3Yv8X
+                    SK3jBGCACiPgnc0N6awkh1kDlrZQ7GMsl14c+2+vpl9Lf0sL0mRUIyICfSC8MjlsP/BZH3emyfsk
+                    iWivPALomycKqP+PSkt1WaWApGENZWk1wNN99FYSYlt6LViW2p6T97fRx4jPRlHu+wecfD2k9RP4
+                    bt5W2HWfOP0zNAS7SnAVLEl2QZxXKw==
+                </ds:X509Certificate>
+            </ds:X509Data>
+            <ds:KeyValue>
+                <ds:RSAKeyValue>
+                    <ds:Modulus>qOSWbDOGS31lv3aUZVOgqZyLVrKXXRfmxFQxEylcFY/bRqakeY1EYCkvwTkD9kxlLEd/2SSQYWEZ
+                        ZTjYa1EK1SlfyOsKd2eNKjxGtUSSxPkJRvYi/KgVedgp15C5p1Emsd3bKUs5knLebw4k576RxvY6
+                        9AChXk48u1Pa7/Bicm89Io8JaQaDvSUXWD19j6686EniS6MSqvhsLsgmeS4V0TdKdWvjQIq0wJmP
+                        nBtWUy5DJn3glMtbeh/2xuEZ2Dkkjzr5O0W+vJUKVKm/qW2zbgdqP2/XA8LSywrRlZbvuVo/Jq8r
+                        WNxRhUDNtI98lXkSJ5hqk0wwXpUGvwjuCSqgZZmnmBCLzWGxbPfgJamnYr8AzudUaXT6PXz0qbAa
+                        cmTL+ktm1zblDC/kZPfVsiiUzzND02YUS2euGVxIZc95EFlaEpa3MMIpurI+i0VG+SEagN5cURVC
+                        OjVysokC2pkKfrd//ThlvS9aywnMO8haNLPC4TEzzIr+KJff4UFYk/vCAsw7K9DjPWYheP1GoBUZ
+                        bSApVe9HI4dQ6bGY80CEVRmo/LkPyXbX0c+BONyou1NGtlaYaP7eqaC1Z3b+OrZF+Z2BrTFuFnzK
+                        A2X5UPaWo77yra9owdcKG+p7FPlU5gHFmcuAQjx/l8nw8P9EhQXVHHiSSbT1iHmBQ1GO6J6bX/s=</ds:Modulus>
+                    <ds:Exponent>AQAB</ds:Exponent>
+                </ds:RSAKeyValue>
+            </ds:KeyValue>
+        </ds:KeyInfo>
+    </ds:Signature>
+</bom>
