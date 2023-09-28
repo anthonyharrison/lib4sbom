@@ -282,7 +282,7 @@ class SBOMGenerator:
             bom_version = sbom_data["bom_version"]
         else:
             bom_version = "1"
-        component_data = {"type": "application", "supplier": None, "version": None}
+        component_data = {"type": "application", "supplier": None, "version": None, "bom-ref": None, "timestamp": None, "creator": None}
         if "document" in sbom_data:
             doc = SBOMDocument()
             doc.copy_document(sbom_data["document"])
