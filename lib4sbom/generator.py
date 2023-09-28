@@ -290,6 +290,9 @@ class SBOMGenerator:
             component_data["type"] = doc.get_value("metadata_type", "application")
             component_data["supplier"] = doc.get_value("metadata_supplier")
             component_data["version"] = doc.get_value("metadata_version")
+            component_data["bom-ref"] = doc.get_value("bom-ref")
+            component_data["timestamp"] = doc.get_created()
+            component_data["creator"] = doc.get_creator()
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(
@@ -333,14 +336,8 @@ class SBOMGenerator:
                 id = id + 1
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
-                self.bom.generateRelationship(
-                    self._get_element(
-                        relationship["source"], relationship["source_id"]
-                    ),
-                    self._get_element(
-                        relationship["target"], relationship["target_id"]
-                    ),
-                )
+                self.bom.generateRelationship(relationship["source_id"],relationship["target_id"] )
+
         if "vulnerabilities" in sbom_data:
             self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
 
