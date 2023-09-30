@@ -169,8 +169,6 @@ class SPDXParser:
             elif line_elements[0] == "PackageVersion":
                 # Version may have ':' in version specifier
                 version = line[16:].strip().rstrip("\n")
-                version = version.split("-")[0]
-                version = version.split("+")[0]
                 spdx_package.set_version(version)
                 # Assume ID is after name
                 elements[spdx_id] = element_name
