@@ -141,24 +141,33 @@ class CycloneDXParser:
                     if cyclonedx_version == "1.5":
                         if "components" in data["metadata"]["tools"]:
                             for component in data["metadata"]["tools"]["components"]:
+                                name = component["name"]
+                                if "version" in component:
+                                    name = f'{name}#{component["version"]}'
                                 cyclonedx_document.set_creator(
-                                    "tool", component["name"]
+                                    "tool", name
                                 )
                         else:
                             # This is the legacy interface which is deprecated.
                             if self.debug:
                                 print("Legacy tool(s) specification still being used.")
+                            name = data["metadata"]["tools"][0]["name"]
+                            if "version" in data["metadata"]["tools"]:
+                                name = f'{name}#{data["metadata"]["tools"][0]["name"]}'
                             cyclonedx_document.set_creator(
-                                "tool", data["metadata"]["tools"][0]["name"]
+                                "tool", name
                             )
                     else:
-                        cyclonedx_document.set_creator(
-                            "tool", data["metadata"]["tools"][0]["name"]
-                        )
-
+                        name = data["metadata"]["tools"][0]["name"]
+                        if "version" in data["metadata"]["tools"]:
+                            name = f'{name}#{data["metadata"]["tools"][0]["name"]}'
+                        cyclonedx_document.set_creator("tool", name)
                 if "authors" in data["metadata"]:
+                    name = data["metadata"]["authors"][0]["name"]
+                    if "email" in data["metadata"]["authors"]:
+                        name = f'{name}#{data["metadata"]["authors"][0]["email"]}'
                     cyclonedx_document.set_creator(
-                        "person", data["metadata"]["authors"][0]["name"]
+                        "person", name
                     )
                 if "component" in data["metadata"]:
                     component_name = data["metadata"]["component"]["name"]
