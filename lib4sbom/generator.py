@@ -261,8 +261,6 @@ class SBOMGenerator:
                 return check[index][0]
             else:
                 # Could be two elements
-                if id is None:
-                    return check[0][0]
                 if check[0][1] == id:
                     return check[0][1]
                 return check[0][0]
@@ -324,7 +322,11 @@ class SBOMGenerator:
             sbom_packages = [x for x in sbom_data["packages"].values()]
             for package in sbom_packages:
                 product = package["name"]
-                my_id = package.get("id", None)
+                my_id = package.get("bom-ref", None)
+                if my_id is None:
+                    my_id = package.get("id", None)
+                    if not self._validate_id(my_id):
+                        my_id = f"{id}-{product}"
                 self._save_element(product, str(id) + "-" + product, my_id)
                 if parent == "-":
                     type = "application"
@@ -337,7 +339,12 @@ class SBOMGenerator:
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
                 self.bom.generateRelationship(
-                    relationship["source_id"], relationship["target_id"]
+                    self._get_element(
+                      relationship["source"], relationship["source_id"]
+                    ),
+                    self._get_element(
+                      relationship["target"], relationship["target_id"]
+                    )
                 )
 
         if "vulnerabilities" in sbom_data:
