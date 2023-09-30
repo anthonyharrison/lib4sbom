@@ -129,12 +129,13 @@ class CycloneDXGenerator:
         if component_type["creator"] is not None:
             for creator in component_type["creator"]:
                 type, param = creator
-                if type == "tool":
-                    tool["name"] = param.split("#")[0]
-                    tool["version"] = param.split("#")[1]
-                elif type == "person":
-                    author["name"] = param.split("#")[0]
-                    author["email"] = param.split("#")[1]
+                if "#" in param:
+                    if type == "tool":
+                        tool["name"] = param.split("#")[0]
+                        tool["version"] = param.split("#")[1]
+                    elif type == "person":
+                        author["name"] = param.split("#")[0]
+                        author["email"] = param.split("#")[1]
         if len(tool) == 0:
             tool["name"] = self.application
             tool["version"] = self.application_version
