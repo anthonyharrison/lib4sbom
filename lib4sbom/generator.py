@@ -280,7 +280,14 @@ class SBOMGenerator:
             bom_version = sbom_data["bom_version"]
         else:
             bom_version = "1"
-        component_data = {"type": "application", "supplier": None, "version": None, "bom-ref": None, "timestamp": None, "creator": None}
+        component_data = {
+            "type": "application",
+            "supplier": None,
+            "version": None,
+            "bom-ref": None,
+            "timestamp": None,
+            "creator": None,
+        }
         if "document" in sbom_data:
             doc = SBOMDocument()
             doc.copy_document(sbom_data["document"])
@@ -340,11 +347,11 @@ class SBOMGenerator:
             for relationship in sbom_data["relationships"]:
                 self.bom.generateRelationship(
                     self._get_element(
-                      relationship["source"], relationship["source_id"]
+                        relationship["source"], relationship["source_id"]
                     ),
                     self._get_element(
-                      relationship["target"], relationship["target_id"]
-                    )
+                        relationship["target"], relationship["target_id"]
+                    ),
                 )
 
         if "vulnerabilities" in sbom_data:

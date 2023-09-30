@@ -144,9 +144,7 @@ class CycloneDXParser:
                                 name = component["name"]
                                 if "version" in component:
                                     name = f'{name}#{component["version"]}'
-                                cyclonedx_document.set_creator(
-                                    "tool", name
-                                )
+                                cyclonedx_document.set_creator("tool", name)
                         else:
                             # This is the legacy interface which is deprecated.
                             if self.debug:
@@ -154,9 +152,7 @@ class CycloneDXParser:
                             name = data["metadata"]["tools"][0]["name"]
                             if "version" in data["metadata"]["tools"]:
                                 name = f'{name}#{data["metadata"]["tools"][0]["name"]}'
-                            cyclonedx_document.set_creator(
-                                "tool", name
-                            )
+                            cyclonedx_document.set_creator("tool", name)
                     else:
                         name = data["metadata"]["tools"][0]["name"]
                         if "version" in data["metadata"]["tools"]:
@@ -166,9 +162,7 @@ class CycloneDXParser:
                     name = data["metadata"]["authors"][0]["name"]
                     if "email" in data["metadata"]["authors"]:
                         name = f'{name}#{data["metadata"]["authors"][0]["email"]}'
-                    cyclonedx_document.set_creator(
-                        "person", name
-                    )
+                    cyclonedx_document.set_creator("person", name)
                 if "component" in data["metadata"]:
                     component_name = data["metadata"]["component"]["name"]
                     cyclonedx_document.set_name(component_name)
