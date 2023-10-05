@@ -86,6 +86,8 @@ class SBOMGenerator:
                 sbom_out.generate_output(self.sbom)
 
     def _validate_id(self, id):
+        if id is None:
+            return False
         return len(re.findall(r"([0-9a-zA-Z\.\-\+]+)$", id)) == len(id)
 
     def _generate_spdx(self, project_name: str, sbom_data: SBOMData) -> None:
