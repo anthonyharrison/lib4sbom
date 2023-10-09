@@ -46,6 +46,9 @@ class SBOM:
     def set_version(self, version):
         self.sbom["version"] = version
 
+    def set_uuid(self, uuid):
+        self.sbom["uuid"] = uuid
+
     def get_sbom(self) -> SBOMData:
         return self.sbom
 
@@ -73,3 +76,6 @@ class SBOM:
 
     def get_type(self) -> str:
         return self.sbom.get("type", "")
+
+    def get_uuid(self):
+        return self.sbom.get("uuid", None)

@@ -75,7 +75,7 @@ class SPDXGenerator:
         # Generate data/time label in format YYYY-MM-DDThh:mm:ssZ
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    def generateTagDocumentHeader(self, project_name):
+    def generateTagDocumentHeader(self, project_name, uuid=None):
         # Geerate SPDX Document Header
         self.generateTag("SPDXVersion", self.SPDX_VERSION)
         self.generateTag("DataLicense", self.DATA_LICENSE)
@@ -100,7 +100,7 @@ class SPDXGenerator:
         )
         return self.SPDX_PROJECT_ID
 
-    def generateJSONDocumentHeader(self, project_name):
+    def generateJSONDocumentHeader(self, project_name, uuid=None):
         # Generate SPDX Document Header
         self.doc["SPDXID"] = self.SPDX_PROJECT_ID
         self.doc["spdxVersion"] = self.SPDX_VERSION

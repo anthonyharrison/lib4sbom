@@ -239,6 +239,9 @@ class SBOMGenerator:
                     i += 1
                 return check[index][0]
             else:
+                # Could be two elements
+                if check[0][1] == id:
+                    return check[0][1]
                 return check[0][0]
         return check
 
@@ -246,12 +249,16 @@ class SBOMGenerator:
         # Set spec version if explicitly specified
         if "version" in sbom_data:
             self.bom.spec_version(sbom_data["version"])
+        if "uuid" in sbom_data:
+            uuid = sbom_data["uuid"]
+        else:
+            uuid = None
         if "document" in sbom_data and "name" in sbom_data["document"]:
             # Use existing document name
-            project_id = self.bom.generateDocumentHeader(sbom_data["document"]["name"])
+            project_id = self.bom.generateDocumentHeader(sbom_data["document"]["name"], uuid)
             self._save_element(sbom_data["document"]["name"], project_id)
         else:
-            project_id = self.bom.generateDocumentHeader(project_name)
+            project_id = self.bom.generateDocumentHeader(project_name,uuid)
             self._save_element(project_name, project_id)
         parent = project_name
         # Process list of files

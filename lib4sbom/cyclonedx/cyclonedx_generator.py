@@ -78,23 +78,26 @@ class CycloneDXGenerator:
         if version in ["1.3", "1.4", "1.5"]:
             self.cyclonedx_version = version
 
-    def generateDocumentHeader(self, project_name):
+    def generateDocumentHeader(self, project_name, uuid=None):
         # Assume a new document being created
         self.relationship = []
         self.sbom_complete = False
         if self.format == "xml":
             self.doc = []
-            return self.generateXMLDocumentHeader(project_name)
+            return self.generateXMLDocumentHeader(project_name, uuid)
         else:
             self.doc = {}
             self.component = []
-            return self.generateJSONDocumentHeader(project_name)
+            return self.generateJSONDocumentHeader(project_name, uuid)
 
     def _generate_urn(self):
         return "urn:uuid:" + str(uuid.uuid4())
 
-    def generateJSONDocumentHeader(self, project_name):
-        urn = self._generate_urn()
+    def generateJSONDocumentHeader(self, project_name, uuid=None):
+        if uuid is None:
+            urn = self._generate_urn()
+        else:
+            urn = uuid
         project_id = self.PROJECT_ID
         if self.cyclonedx_version == self.CYCLONEDX_VERSION:
             # 1.5 version
@@ -147,8 +150,11 @@ class CycloneDXGenerator:
             }
         return project_id
 
-    def generateXMLDocumentHeader(self, project_name):
-        urn = self._generate_urn()
+    def generateXMLDocumentHeader(self, project_name, uuid=None):
+        if uuid is None:
+            urn = self._generate_urn()
+        else:
+            urn = uuid
         project_id = self.PROJECT_ID
         self.store("<?xml version='1.0' encoding='UTF-8'?>")
         self.store("<bom xmlns='http://cyclonedx.org/schema/bom/1.4'")
@@ -259,8 +265,13 @@ class CycloneDXGenerator:
                     component["hashes"].append(checksum_entry)
                 else:
                     component["hashes"] = [checksum_entry]
-        if "licenseconcluded" in package:
-            license_id = self.license.find_license(package["licenseconcluded"])
+        if "licenseconcluded" or "licensedeclared" in package:
+            if "licenseconcluded" in package:
+                license_definition = package["licenseconcluded"]
+            else:
+                license_definition = package["licensedeclared"]
+            #license_id = self.license.find_license(package["licenseconcluded"])
+            license_id = self.license.find_license(license_definition)
             if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # A valid SPDX license
                 license = dict()
@@ -275,10 +286,11 @@ class CycloneDXGenerator:
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
-            elif package["licenseconcluded"] not in ["UNKNOWN", "NOASSERTION", "NONE"]:
+            # elif package["licenseconcluded"] not in ["UNKNOWN", "NOASSERTION", "NONE"]:
+            elif license_definition not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # Not a valid SPDX license
                 license = dict()
-                license["name"] = package["licenseconcluded"]
+                license["name"] = license_definition # package["licenseconcluded"]
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
@@ -307,11 +319,21 @@ class CycloneDXGenerator:
                 ref_value = reference[2]
                 if ref_category == "SECURITY" and ref_type == "cpe23Type":
                     component["cpe"] = ref_value
-                if (
+                elif (
                     ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
                     and ref_type == "purl"
                 ):
                     component["purl"] = ref_value
+                else:
+                    externalReference = dict()
+                    externalReference["url"] = ref_value
+                    externalReference["type"] = ref_type
+                    externalReference["comment"] = ref_category
+                    if "externalReferences" in component:
+                        component["externalReferences"].append(externalReference)
+                    else:
+                        component["externalReferences"] = [externalReference]
+
         if "property" in package:
             for property in package["property"]:
                 property_entry = dict()
