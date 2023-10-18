@@ -355,7 +355,6 @@ class SBOMGenerator:
                         relationship["target"], relationship["target_id"]
                     ),
                 )
-
         if "vulnerabilities" in sbom_data:
             self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
 

@@ -29,6 +29,7 @@ class SBOMParser:
         self.files = None
         self.packages = None
         self.relationships = None
+        self.vulnerabilities = None
         self.sbom = SBOM(self.sbom_type)
 
     def parse_file(self, filename: str) -> None:
@@ -68,6 +69,7 @@ class SBOMParser:
                 self.files,
                 self.packages,
                 self.relationships,
+                self.vulnerabilities,
             ) = self.parser.parse(filename)
             # but if no packages or files found, assume it must be CycloneDX
             if len(self.packages) == 0 and len(self.files) == 0:
@@ -78,6 +80,7 @@ class SBOMParser:
                     self.files,
                     self.packages,
                     self.relationships,
+                    self.vulnerabilities,
                 ) = self.parser.parse(filename)
         else:
             (
@@ -85,12 +88,15 @@ class SBOMParser:
                 self.files,
                 self.packages,
                 self.relationships,
+                self.vulnerabilities,
             ) = self.parser.parse(filename)
         self.sbom.add_files(self.files)
         self.sbom.add_packages(self.packages)
         self.sbom.add_relationships(self.relationships)
         if len(self.document) > 0:
             self.sbom.add_document(self.document.get_document())
+        if len(self.vulnerabilities) > 0:
+            self.sbom.add_vulnerabilities(self.vulnerabilities)
         self.sbom.set_type(self.sbom_type)
 
     def set_type(self, sbom_type: str = "auto") -> None:
@@ -143,7 +149,16 @@ class SBOMParser:
         """Returns the relationship elements from within a parsed SBOM
         Returns
         -------
-        relationships : list of SBOMRelationship objects
+        relationships : list of SBOMDocument objects
 
         """
         return self.sbom.get_document()
+
+    def get_vulnerabilities(self) -> List[Dict]:
+        """Returns the vulnerability elements from within a parsed SBOM
+        Returns
+        -------
+        relationships : list of SBOMVulnerability objects
+
+        """
+        return self.sbom.get_vulnerabilities()

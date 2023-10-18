@@ -454,5 +454,14 @@ class CycloneDXGenerator:
             if "comment" in vuln:
                 analysis["detail"] = vuln_info.get_value("comment")
             vulnerability["analysis"] = analysis
+            affects = []
+            affected = {}
+            affected["ref"] = vulnerability["bom-ref"]
+            version_info = {}
+            version_info["version"] = vuln_info.get_value("release")
+            version_info["status"] = analysis["state"]
+            affected["version"] = version_info
+            affects.append(affected)
+            vulnerability["affects"] = affects
             statements.append(vulnerability)
         self.vulnerability = statements

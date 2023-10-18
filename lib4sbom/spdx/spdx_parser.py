@@ -15,7 +15,8 @@ from lib4sbom.data.relationship import SBOMRelationship
 
 class SPDXParser:
     def __init__(self):
-        pass
+        # Vulnerabilities not in SPDX
+        self.vulnerabilities = []
 
     def parse(self, sbom_file):
         """parses SPDX SBOM file"""
@@ -33,7 +34,7 @@ class SPDXParser:
         elif sbom_file.endswith(".spdx.xml"):
             return self.parse_spdx_xml(sbom_file)
         else:
-            return {}, {}, {}, []
+            return {}, {}, {}, [], self.vulnerabilities
 
     def parse_spdx_tag(self, sbom_file):
         """parses SPDX tag value file extracting all SBOM data"""
@@ -277,6 +278,7 @@ class SPDXParser:
             files,
             packages,
             self._transform_relationship(relationships, elements),
+            self.vulnerabilities
         )
 
     def parse_spdx_json(self, sbom_file):
@@ -439,6 +441,7 @@ class SPDXParser:
             files,
             packages,
             self._transform_relationship(relationships, elements),
+            self.vulnerabilities
         )
 
     def parse_spdx_yaml(self, sbom_file):
@@ -487,7 +490,7 @@ class SPDXParser:
                     continue
                 version = version_match.group(1)
                 packages[(package, version)] = {"name": package, "version": version}
-        return ({}, {}, packages, [])
+        return ({}, {}, packages, [], self.vulnerabilities)
 
     def parse_spdx_xml(self, sbom_file):
         # parses SPDX XML BOM file extracting package name and version ONLY
@@ -513,4 +516,4 @@ class SPDXParser:
             if version is None:
                 continue
             packages[(package, version)] = {"name": package, "version": version}
-        return ({}, {}, packages, [])
+        return ({}, {}, packages, [], self.vulnerabilities)

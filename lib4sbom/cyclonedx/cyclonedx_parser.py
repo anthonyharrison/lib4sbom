@@ -9,6 +9,7 @@ import defusedxml.ElementTree as ET
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
+from lib4sbom.data.vulnerability import Vulnerability
 
 
 class CycloneDXParser:
@@ -174,8 +175,9 @@ class CycloneDXParser:
                     else:
                         bom_ref = "CylconeDX-Component-0000"
                     self.id[bom_ref] = component_name
-            for d in data["components"]:
-                self._cyclondex_component(d)
+            if "components" in data:
+                for d in data["components"]:
+                    self._cyclondex_component(d)
             if "dependencies" in data:
                 # First relationship is assumed to be the root element
                 relationship_type = " DESCRIBES "
@@ -204,7 +206,25 @@ class CycloneDXParser:
                             elif self.debug:
                                 print(f"[ERROR] Unable to find {target_id}")
                     relationship_type = " DEPENDS_ON "
-        return cyclonedx_document, files, self.packages, relationships
+            if "vulnerabilities" in data:
+                vulnerabilities = []
+                vuln_info = Vulnerability(validation="cyclonedx")
+                for vuln in data["vulnerabilities"]:
+                    vuln_info.initialise()
+                    vuln_info.set_value("bom-ref", vuln["bom-ref"])
+                    vuln_info.set_id(vuln["id"])
+                    if "source" in vuln:
+                        vuln_info.set_value("source-name", vuln["source"]["name"])
+                        vuln_info.set_value("source-url", vuln["source"]["url"])
+                    if "description" in vuln:
+                        vuln_info.set_description(vuln["description"])
+                    if "analysis" in vuln:
+                        vuln_info.set_value("status", vuln["analysis"]["state"])
+                        vuln_info.set_comment(vuln["analysis"]["detail"])
+                    vulnerabilities.append(vuln_info.get_vulnerability())
+                if self.debug:
+                    print(vulnerabilities)
+        return cyclonedx_document, files, self.packages, relationships, vulnerabilities
 
     def _parse_component(self, component_element):
         """Parses a CycloneDX component element and returns a dictionary of its contents."""
@@ -372,6 +392,11 @@ class CycloneDXParser:
                     relationship_type = " DEPENDS_ON "
         return relationships
 
+    def parse_vulnerabilities_xml(self):
+        # TODO
+        vulnerabilities = []
+        return vulnerabilities
+
     def parse_cyclonedx_xml(self, sbom_file):
         self.tree = ET.parse(sbom_file)
         self.root = self.tree.getroot()
@@ -380,4 +405,5 @@ class CycloneDXParser:
         document = self.parse_document_xml()
         self.parse_components_xml()
         dependencies = self.parse_dependencies_xml()
-        return document, {}, self.packages, dependencies
+        vulnerabilities = self.parse_vulnerabilities_xml()
+        return document, {}, self.packages, dependencies, vulnerabilities
