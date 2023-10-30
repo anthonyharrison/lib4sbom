@@ -445,6 +445,11 @@ class CycloneDXGenerator:
                 vulnerability["source"] = source
             if "description" in vuln:
                 vulnerability["description"] = vuln_info.get_value("description")
+            vulnerability["updated"] = self.doc["metadata"]["timestamp"]
+            if "created" in vuln:
+                vulnerability["created"] = vuln_info.get_value("created")
+            else:
+                vulnerability["created"] = vulnerability["updated"]
             analysis = {}
             analysis["state"] = vuln_info.get_value("status")
             if analysis["state"] is None or not vuln_info.validate_status(

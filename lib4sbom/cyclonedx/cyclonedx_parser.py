@@ -127,6 +127,7 @@ class CycloneDXParser:
         data = json.load(open(sbom_file))
         files = {}
         relationships = []
+        vulnerabilities = []
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         # Check valid CycloneDX JSON file (and not SPDX)
@@ -207,7 +208,6 @@ class CycloneDXParser:
                                 print(f"[ERROR] Unable to find {target_id}")
                     relationship_type = " DEPENDS_ON "
             if "vulnerabilities" in data:
-                vulnerabilities = []
                 vuln_info = Vulnerability(validation="cyclonedx")
                 for vuln in data["vulnerabilities"]:
                     vuln_info.initialise()
@@ -218,6 +218,8 @@ class CycloneDXParser:
                         vuln_info.set_value("source-url", vuln["source"]["url"])
                     if "description" in vuln:
                         vuln_info.set_description(vuln["description"])
+                    if "created" in vuln:
+                        vuln_info.set_value("created", vuln["created"])
                     if "analysis" in vuln:
                         vuln_info.set_value("status", vuln["analysis"]["state"])
                         vuln_info.set_comment(vuln["analysis"]["detail"])
