@@ -458,13 +458,20 @@ class CycloneDXGenerator:
                 analysis["state"] = "in_triage"
             if "comment" in vuln:
                 analysis["detail"] = vuln_info.get_value("comment")
+            if "justification" in vuln:
+                analysis["justification"] = vuln_info.get_value("justification")
             vulnerability["analysis"] = analysis
             affects = []
             affected = {}
             affected["ref"] = vulnerability["bom-ref"]
             version_info = {}
             version_info["version"] = vuln_info.get_value("release")
-            version_info["status"] = analysis["state"]
+            if analysis["state"] == "not_affected":
+                version_info["status"] = "unaffected"
+            elif analysis["state"] == "in_triage":
+                version_info["status"] = "unknown"
+            else:
+                version_info["status"] = "affected"
             affected["version"] = version_info
             affects.append(affected)
             vulnerability["affects"] = affects
