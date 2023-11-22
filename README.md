@@ -391,7 +391,7 @@ Returns the SBOM object as a dictionary.
 >>> from lib4sbom.data.document import SBOMDocument
 >>> my_doc = SBOMDocument()
 >>> my_doc.set_metadata_type("firmware")
->>> sbom.add_document(my_doc)
+>>> sbom.add_document(my_doc.get_document())
 ```
 
 ### SBOMDocument Object 
@@ -451,7 +451,7 @@ Returns the value of the attribute. A default value is returned if the attribute
 'test_file'
 >>> from lib4sbom.sbom import SBOM
 >>> my_sbom = SBOM()
->>> my_sbom.add_document(sbom_document)
+>>> my_sbom.add_document(sbom_document.get_document())
 ```
 
 ### SBOMFile Object
