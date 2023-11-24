@@ -264,6 +264,8 @@ class SBOMGenerator:
             else:
                 # Could be two elements
                 if check[0][1] == id:
+                    if id is None:
+                        return check[0][0]
                     return check[0][1]
                 return check[0][0]
         return check
