@@ -269,9 +269,13 @@ class CycloneDXGenerator:
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
                 if "version" in package:
+                    if component["type"] == "operating-system":
+                        cpe_type = "/o"
+                    else:
+                        cpe_type = "/a"
                     component[
                         "cpe"
-                    ] = f'cpe:/a:{supplier_name.replace(" ", "_")}:{name}:{version}'
+                    ] = f'cpe:{cpe_type}:{supplier_name.replace(" ", "_")}:{name}:{version}'
                 # Alternative is it within external reference
         if "originator" in package:
             component["author"] = package["originator"]
