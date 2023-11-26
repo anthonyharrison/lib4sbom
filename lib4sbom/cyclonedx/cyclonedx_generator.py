@@ -383,10 +383,10 @@ class CycloneDXGenerator:
                 component["properties"].append(property_entry)
             else:
                 component["properties"] = [property_entry]
-        if "comments" in package:
+        if "comment" in package:
             property_entry = dict()
             property_entry["name"] = "Component Comments"
-            property_entry["value"] = package["comments"]
+            property_entry["value"] = package["comment"]
             if "properties" in component:
                 component["properties"].append(property_entry)
             else:
