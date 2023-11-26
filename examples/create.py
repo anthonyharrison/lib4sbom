@@ -40,9 +40,10 @@ sbom_packages[(my_package.get_name(), my_package.get_value('version'))] = my_pac
 my_package.initialise()
 my_package.set_name("glibc")
 my_package.set_version("2.29")
+my_package.set_property("language","C")
 my_package.set_supplier("organisation","gnu")
 my_package.set_licensedeclared("GPL3")
-#### This has no affect as this is a duplicated package (same name and version)
+#### This overwrites the package (same name and version)
 sbom_packages[(my_package.get_name(), my_package.get_value('version'))] = my_package.get_package()
 # Generate SBOM
 my_sbom = SBOM()
