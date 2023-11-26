@@ -286,7 +286,7 @@ class CycloneDXGenerator:
         if "checksum" in package:
             for checksum in package["checksum"]:
                 checksum_entry = dict()
-                checksum_entry["alg"] = checksum[0]
+                checksum_entry["alg"] = checksum[0].replace("SHA","SHA-")
                 checksum_entry["content"] = checksum[1]
                 if "hashes" in component:
                     component["hashes"].append(checksum_entry)

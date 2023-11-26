@@ -62,7 +62,7 @@ class CycloneDXParser:
                 # Potentially multiple entries
                 for checksum in d["hashes"]:
                     self.cyclonedx_package.set_checksum(
-                        checksum["alg"], checksum["content"]
+                        checksum["alg"].replace("SHA-","SHA"), checksum["content"]
                     )
             license_data = None
             # Multiple ways of defining license data
