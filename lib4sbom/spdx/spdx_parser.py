@@ -278,7 +278,7 @@ class SPDXParser:
             files,
             packages,
             self._transform_relationship(relationships, elements),
-            self.vulnerabilities
+            self.vulnerabilities,
         )
 
     def parse_spdx_json(self, sbom_file):
@@ -441,7 +441,7 @@ class SPDXParser:
             files,
             packages,
             self._transform_relationship(relationships, elements),
-            self.vulnerabilities
+            self.vulnerabilities,
         )
 
     def parse_spdx_yaml(self, sbom_file):

@@ -224,7 +224,9 @@ class CycloneDXParser:
                         vuln_info.set_value("status", vuln["analysis"]["state"])
                         vuln_info.set_comment(vuln["analysis"]["detail"])
                         if "justification" in vuln["analysis"]:
-                            vuln_info.set_value("justification", vuln["analysis"]["justification"] )
+                            vuln_info.set_value(
+                                "justification", vuln["analysis"]["justification"]
+                            )
                     vulnerabilities.append(vuln_info.get_vulnerability())
                 if self.debug:
                     print(vulnerabilities)
