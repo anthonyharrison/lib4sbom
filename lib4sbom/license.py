@@ -121,7 +121,7 @@ class LicenseScanner:
         return result
 
     def find_license(self, license_expression):
-        # Multiple liceneses can be specified and connected using boolean logic.
+        # Multiple licenses can be specified and connected using boolean logic.
         # This will preserve any brackets and boolean operators included in the expression
         # Ensure case of operators is uppercase
         updated_expression = (
@@ -129,9 +129,13 @@ class LicenseScanner:
             .replace(" Or ", " OR ")
             .replace(" and ", " AND ")
             .replace(" And ", " AND ")
+            .replace("MIT/Apache-2.0", "MIT OR Apache-2.0")
+            .replace("Apache-2.0/MIT", "Apache-2.0 OR MIT")
+            .replace("Unlicense/MIT", "Unlicense OR MIT")
+            .replace("MIT/Unlicense", "MIT OR Unlicense")
         )
         # Remove brackets and split into elements (separated by boolean operators)
-        license_information = self._expression_split(license_expression)
+        license_information = self._expression_split(updated_expression)
         # Now process license information and build up list of valid licenses
         license_data = []
         for license in license_information:
