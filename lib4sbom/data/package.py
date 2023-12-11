@@ -74,6 +74,8 @@ class SBOMPackage:
             return supplier_type.capitalize()
         if supplier_type == "author":
             return "Person"
+        if supplier_type == "unknown":
+            return "UNKNOWN"
         return "Organization"
 
     def set_supplier(self, type, name):
