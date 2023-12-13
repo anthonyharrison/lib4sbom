@@ -35,7 +35,7 @@ class LicenseScanner:
                     data_list[line.strip().upper()] = license
 
     def get_license_version(self):
-        return self.SPDX_LICENSE_VERSION
+        return self.licenses.get("licenseListVersion", self.SPDX_LICENSE_VERSION)
 
     def check_synonym(self, license):
         # Look for synonyms. Check done in uppercase to handle mixed case license identifiers
