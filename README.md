@@ -689,14 +689,14 @@ e.g. set_release(). Each method takes a single parameter for the value. Multiple
 
 **Note**
 
-1 The set_id method is used to indicate the identity of the vulnerability e.g. CVE-2021-44228
+1. The set_id method is used to indicate the identity of the vulnerability e.g. CVE-2021-44228
 
-2 The set_status is used to indicate the status of the vulnerability. Validation of the value of status may be optionally performed as determined by
+2. The set_status is used to indicate the status of the vulnerability. Validation of the value of status may be optionally performed as determined by
 the optional parameter _validation_ specified in the creation of the Vulnerability object. An invalid status is indicated by a value of None.
 
-3 The set_comment method is used to provide additional inforamtion to support the status value e.g. a brief justification
+3. The set_comment method is used to provide additional information to support the status value e.g. a brief justification
 
-3 The set_description method is used to describe the vulnerability.
+4. The set_description method is used to describe the vulnerability.
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
