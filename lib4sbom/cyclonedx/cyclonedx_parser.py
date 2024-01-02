@@ -7,6 +7,7 @@ import os
 import defusedxml.ElementTree as ET
 
 from lib4sbom.data.document import SBOMDocument
+from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.vulnerability import Vulnerability
@@ -19,6 +20,7 @@ class CycloneDXParser:
         self.packages = {}
         self.id = {}
         self.component_id = 0
+        self.model_card = SBOMModelCard()
 
     def parse(self, sbom_file):
         """parses CycloneDX BOM file extracting package name, version and license"""
@@ -27,10 +29,176 @@ class CycloneDXParser:
         else:
             return self.parse_cyclonedx_xml(sbom_file)
 
+    def _governance_element(self, element):
+        elements = []
+        for item in element:
+            entry = {}
+            if "organization" in item:
+                if "name" in item["organization"]:
+                    entry["organization"] = item["organization"]["name"]
+            if "contact" in item:
+                if "email" in item["contact"]:
+                    entry["contact"] = item["contact"]["email"]
+            if len(entry) > 0:
+                elements.append(entry)
+        return elements
+
+    def _cyclonedx_mlmodel(self, d):
+        # Machine learning model data
+        self.model_card.initialise()
+        if "bom-ref" in d["modelCard"]:
+            self.model_card.set_id(d["modelCard"]["bom-ref"])
+        if "modelParameters" in d["modelCard"]:
+            if "approach" in d["modelCard"]["modelParameters"]:
+                self.model_card.set_model_type(
+                    d["modelCard"]["modelParameters"]["approach"]["type"]
+                )
+            if "task" in d["modelCard"]["modelParameters"]:
+                self.model_card.set_task(d["modelCard"]["modelParameters"]["task"])
+            if "architectureFamily" in d["modelCard"]["modelParameters"]:
+                self.model_card.set_architecture(
+                    d["modelCard"]["modelParameters"]["architectureFamily"]
+                )
+            if "modelArchitecture" in d["modelCard"]["modelParameters"]:
+                self.model_card.set_model(
+                    d["modelCard"]["modelParameters"]["modelArchitecture"]
+                )
+            if "datasets" in d["modelCard"]["modelParameters"]:
+                for dataset in d["modelCard"]["modelParameters"]["datasets"]:
+                    dataset_info = ModelDataset()
+                    dataset_info.set_dataset_type(dataset["type"])
+                    dataset_info.set_name(dataset["name"])
+                    dataset_info.set_id(dataset.get("bom-ref"))
+                    # Contents
+                    if "contents" in dataset:
+                        if "attachment" in dataset["contents"]:
+                            dataset_info.set_contents(
+                                dataset["contents"]["attachment"]["content"]
+                            )
+                        if "url" in dataset["contents"]:
+                            dataset_info.set_contents(url=dataset["contents"]["url"])
+                        if "properties" in dataset["contents"]:
+                            for property in dataset["contents"]["properties"]:
+                                dataset_info.set_conent_property(
+                                    property["name"], property["value"]
+                                )
+                    dataset_info.set_classification(dataset["classification"])
+                    if "sensitiveData" in dataset:
+                        dataset_info.set_sensitive_data(dataset["sensitiveData"])
+                    # Graphics
+                    if "graphics" in dataset:
+                        graphicset = ModelGraphicset()
+                        graphicset.set_description(dataset["graphics"]["description"])
+                        for graphic in dataset["graphics"]["collection"]:
+                            image = graphic["image"]
+                            graphicset.add_image(
+                                graphic.get("name"), image.get("content")
+                            )
+                        dataset_info.set_graphics(graphicset.get_graphicset())
+                    if "description" in dataset:
+                        dataset_info.set_description(dataset["description"])
+                    # Governance
+                    if "governance" in dataset:
+                        if "custodians" in dataset["governance"]:
+                            for entry in self._governance_element(
+                                dataset["governance"]["custodians"]
+                            ):
+                                dataset_info.set_governance(custodian=entry)
+                        if "stewards" in dataset["governance"]:
+                            for entry in self._governance_element(
+                                dataset["governance"]["stewards"]
+                            ):
+                                dataset_info.set_governance(steward=entry)
+                        if "owners" in dataset["governance"]:
+                            for entry in self._governance_element(
+                                dataset["governance"]["owners"]
+                            ):
+                                dataset_info.set_governance(owner=entry)
+                    self.model_card.set_dataset(dataset_info.get_dataset())
+            if "inputs" in d["modelCard"]["modelParameters"]:
+                for inputs in d["modelCard"]["modelParameters"]["inputs"]:
+                    self.model_card.set_inputs(inputs["format"])
+            if "outputs" in d["modelCard"]["modelParameters"]:
+                for outputs in d["modelCard"]["modelParameters"]["outputs"]:
+                    self.model_card.set_outputs(outputs["format"])
+        if "quantitativeAnalysis" in d["modelCard"]:
+            if "performanceMetrics" in d["modelCard"]["quantitativeAnalysis"]:
+                for metric in d["modelCard"]["quantitativeAnalysis"][
+                    "performanceMetrics"
+                ]:
+                    lowerbound = upperbound = None
+                    if "confidenceInterval" in metric:
+                        interval = metric["confidenceInterval"]
+                        lowerbound = interval.get("lowerBound")
+                        upperbound = interval.get("upperBound")
+                    self.model_card.set_performance(
+                        metric.get("type"),
+                        metric.get("value"),
+                        metric.get("slice"),
+                        lowerbound,
+                        upperbound,
+                    )
+            if "graphics" in d["modelCard"]["quantitativeAnalysis"]:
+                graphicset = ModelGraphicset()
+                graphicset.set_description(
+                    d["modelCard"]["quantitativeAnalysis"]["graphics"]["description"]
+                )
+                for graphic in d["modelCard"]["quantitativeAnalysis"]["graphics"][
+                    "collection"
+                ]:
+                    image = graphic["image"]
+                    graphicset.add_image(graphic.get("name"), image.get("content"))
+                self.model_card.set_graphics(graphicset.get_graphicset())
+        if "considerations" in d["modelCard"]:
+            if "users" in d["modelCard"]["considerations"]:
+                for user in d["modelCard"]["considerations"]["users"]:
+                    self.model_card.set_user(user)
+            if "useCases" in d["modelCard"]["considerations"]:
+                for usecase in d["modelCard"]["considerations"]["useCases"]:
+                    self.model_card.set_usecase(usecase)
+            if "technicalLimitations" in d["modelCard"]["considerations"]:
+                for limitation in d["modelCard"]["considerations"][
+                    "technicalLimitations"
+                ]:
+                    self.model_card.set_limitation(limitation)
+            if "performanceTradeoffs" in d["modelCard"]["considerations"]:
+                for tradeoff in d["modelCard"]["considerations"][
+                    "performanceTradeoffs"
+                ]:
+                    self.model_card.set_tradeoff(tradeoff)
+            if "ethicalConsiderations" in d["modelCard"]["considerations"]:
+                for consideration in d["modelCard"]["considerations"][
+                    "ethicalConsiderations"
+                ]:
+                    self.model_card.set_ethicalrisk(
+                        consideration.get("name"),
+                        consideration.get("mitigationStrategy"),
+                    )
+            if "fairnessAssessments" in d["modelCard"]["considerations"]:
+                for assessment in d["modelCard"]["considerations"][
+                    "fairnessAssessments"
+                ]:
+                    self.model_card.set_fairness(
+                        assessment["groupAtRisk"],
+                        assessment["benefits"],
+                        assessment["harms"],
+                        assessment["mitigationStrategy"],
+                    )
+        if "properties" in d["modelCard"]:
+            # Potentially multiple entries
+            for property in d["modelCard"]["properties"]:
+                self.model_card.set_property(property["name"], property["value"])
+
     def _cyclondex_component(self, d):
         self.cyclonedx_package.initialise()
         self.component_id = self.component_id + 1
-        if d["type"] in ["file", "library", "application", "operating-system"]:
+        if d["type"] in [
+            "file",
+            "library",
+            "application",
+            "operating-system",
+            "machine-learning-model",
+        ]:
             package = d["name"]
             self.cyclonedx_package.set_name(package)
             if "version" in d:
@@ -114,6 +282,11 @@ class CycloneDXParser:
                         self.cyclonedx_package.set_homepage(ref_url)
                     elif ref_type == "distribution":
                         self.cyclonedx_package.set_downloadlocation(ref_url)
+            if "modelCard" in d:
+                self._cyclonedx_mlmodel(d)
+                self.cyclonedx_package.set_value(
+                    "modelCard", self.model_card.get_modelcard()
+                )
             # Save package metadata
             self.packages[(package, version)] = self.cyclonedx_package.get_package()
             self.id[bom_ref] = package
@@ -221,8 +394,10 @@ class CycloneDXParser:
                     if "created" in vuln:
                         vuln_info.set_value("created", vuln["created"])
                     if "analysis" in vuln:
-                        vuln_info.set_value("status", vuln["analysis"]["state"])
-                        vuln_info.set_comment(vuln["analysis"]["detail"])
+                        if "state" in "analysis":
+                            vuln_info.set_value("status", vuln["analysis"]["state"])
+                        if "detail" in vuln["analysis"]:
+                            vuln_info.set_comment(vuln["analysis"]["detail"])
                         if "justification" in vuln["analysis"]:
                             vuln_info.set_value(
                                 "justification", vuln["analysis"]["justification"]
@@ -350,7 +525,13 @@ class CycloneDXParser:
         for properties in component.findall(self.schema + "properties"):
             for property in properties.findall(self.schema + "property"):
                 params = property.attrib
-                self.cyclonedx_package.set_property(params["name"], params["value"])
+                # Handle different ways of specifying property
+                if params.get("value") is not None:
+                    # Explicit value specified as attribute
+                    self.cyclonedx_package.set_property(params["name"], params["value"])
+                else:
+                    # Implicit value
+                    self.cyclonedx_package.set_property(params["name"], property.text)
         for references in component.findall(self.schema + "externalReferences"):
             for reference in references.findall(self.schema + "reference"):
                 params = reference.attrib

@@ -84,6 +84,10 @@ class CycloneDXGenerator:
         if version in ["1.3", "1.4", "1.5"]:
             self.cyclonedx_version = version
 
+    def _cyclonedx_15(self):
+        # utility for features introduced in version 1.5
+        return self.cyclonedx_version in ["1.5"]
+
     def generateDocumentHeader(
         self, project_name, component_type, uuid=None, bom_version="1"
     ):
@@ -238,6 +242,207 @@ class CycloneDXGenerator:
         email_address = emails[-1] if len(emails) > 0 else ""
         return supplier.strip(), email_address
 
+    def _governance_element(self, attribute):
+        element_property = []
+        for element in attribute:
+            element_entry = {}
+            if "organization" in element:
+                item = {}
+                item["name"] = element["organization"]
+                element_entry["organization"] = item
+            if "contact" in element:
+                item = {}
+                item["email"] = element["contact"]
+                element_entry["contact"] = item
+            element_property.append(element_entry)
+        return element_property
+
+    def _generate_mlmodel(self, package, id):
+        ml_model = {}
+        ml_model["bom-ref"] = f"{id}-model"
+        if "modelcard" in package:
+            # We have model card data!
+            modelcard = package["modelcard"]
+            ml_parameters = {}
+            if "learning_type" in modelcard:
+                ml_type = {}
+                ml_type["type"] = modelcard["learning_type"]
+                ml_parameters["approach"] = ml_type
+            if "task" in modelcard:
+                ml_parameters["task"] = modelcard["task"]
+            if "architecture" in modelcard:
+                ml_parameters["architectureFamily"] = modelcard["architecture"]
+            if "model" in modelcard:
+                ml_parameters["modelArchitecture"] = modelcard["model"]
+            # Dataset
+            if "dataset" in modelcard:
+                ml_dataset = []
+                for dataset in modelcard["dataset"]:
+                    elements = {}
+                    elements["type"] = dataset["dataset_type"]
+                    if "name" in dataset:
+                        elements["name"] = dataset["name"]
+                    # contents
+                    content = {}
+                    if "content" in dataset:
+                        attachment = {}
+                        attachment["contentType"] = dataset["content_type"]
+                        attachment["encoding"] = dataset["encoding"]
+                        attachment["content"] = dataset["content"]
+                        content["attachment"] = attachment
+                    if "url" in dataset:
+                        content["url"] = dataset["url"]
+                    if "property" in dataset:
+                        content_property = []
+                        for property in dataset["property"]:
+                            property_entry = dict()
+                            property_entry["name"] = property[0]
+                            property_entry["value"] = property[1]
+                            content_property.append(property_entry)
+                        content["properties"] = content_property
+                    if len(content) > 0:
+                        elements["contents"] = content
+                    if "classification" in dataset:
+                        elements["classification"] = dataset["classification"]
+                    if "sensitive_data" in dataset:
+                        elements["sensitiveData"] = dataset["sensitive_data"]
+                    if "graphics" in dataset:
+                        graphics = {}
+                        graphics["description"] = dataset["graphics"]["description"]
+                        graphics["collection"] = []
+                        for element in dataset["graphics"]["collection"]:
+                            graphic_entry = dict()
+                            graphic_entry["name"] = element[0]
+                            image = {}
+                            image["contentType"] = "text/plain"
+                            image["encoding"] = "base64"
+                            image["content"] = element[1]
+                            graphic_entry["image"] = image
+                            graphics["collection"].append(graphic_entry)
+                        elements["graphics"] = graphics
+                    if "description" in dataset:
+                        elements["description"] = dataset["description"]
+                    governance = {}
+                    if "custodian" in dataset:
+                        governance["custodians"] = self._governance_element(
+                            dataset["custodian"]
+                        )
+                    if "steward" in dataset:
+                        governance["stewards"] = self._governance_element(
+                            dataset["steward"]
+                        )
+                    if "owner" in dataset:
+                        governance["owners"] = self._governance_element(
+                            dataset["owner"]
+                        )
+                    if len(governance) > 0:
+                        elements["governance"] = governance
+                    ml_dataset.append(elements)
+                ml_parameters["datasets"] = ml_dataset
+            if "inputs" in modelcard:
+                input_type = []
+                for input in modelcard["inputs"]:
+                    element = {}
+                    element["format"] = input
+                    input_type.append(element)
+                ml_parameters["inputs"] = input_type
+            if "outputs" in modelcard:
+                output_type = []
+                for output in modelcard["outputs"]:
+                    element = {}
+                    element["format"] = output
+                    output_type.append(element)
+                ml_parameters["outputs"] = output_type
+            if len(ml_parameters) > 0:
+                ml_model["modelParameters"] = ml_parameters
+            # Quantitative Analysis
+            quantitative = {}
+            if "performance" in modelcard:
+                performance_property = []
+                for metric in modelcard["performance"]:
+                    metric_entry = dict()
+                    metric_entry["type"] = metric[0]
+                    metric_entry["value"] = metric[1]
+                    if len(metric[2]) > 0:
+                        metric_entry["slice"] = metric[2]
+                    interval = {}
+                    interval["lowerBound"] = metric[3]
+                    interval["upperBound"] = metric[4]
+                    metric_entry["confidenceInterval"] = interval
+                    performance_property.append(metric_entry)
+                quantitative["performanceMetrics"] = performance_property
+            if "graphics" in modelcard:
+                graphics = {}
+                graphics["description"] = modelcard["graphics"]["description"]
+                graphics["collection"] = []
+                for element in modelcard["graphics"]["collection"]:
+                    graphic_entry = dict()
+                    graphic_entry["name"] = element[0]
+                    image = {}
+                    image["contentType"] = "text/plain"
+                    image["encoding"] = "base64"
+                    image["content"] = element[1]
+                    graphic_entry["image"] = image
+                    graphics["collection"].append(graphic_entry)
+                quantitative["graphics"] = graphics
+            if len(quantitative) > 0:
+                ml_model["quantitativeAnalysis"] = quantitative
+            # Considerations
+            considerations = {}
+            if "user" in modelcard:
+                user_property = []
+                for user in modelcard["user"]:
+                    user_property.append(user)
+                considerations["users"] = user_property
+            if "usecase" in modelcard:
+                usecase_property = []
+                for usecase in modelcard["usecase"]:
+                    usecase_property.append(usecase)
+                considerations["useCases"] = usecase_property
+            if "limitation" in modelcard:
+                limitation_property = []
+                for limitation in modelcard["limitation"]:
+                    limitation_property.append(limitation)
+                considerations["technicalLimitations"] = limitation_property
+            if "tradeoff" in modelcard:
+                tradeoff_property = []
+                for tradeoff in modelcard["tradeoff"]:
+                    tradeoff_property.append(tradeoff)
+                considerations["performanceTradeoffs"] = tradeoff_property
+            if "ethicalrisk" in modelcard:
+                ethicalrisk_property = []
+                for risk in modelcard["ethicalrisk"]:
+                    risk_entry = dict()
+                    risk_entry["name"] = risk[0]
+                    risk_entry["mitigationStrategy"] = risk[1]
+                    ethicalrisk_property.append(risk_entry)
+                considerations["ethicalConsiderations"] = ethicalrisk_property
+            if "fairness" in modelcard:
+                fairness_property = []
+                for risk in modelcard["fairness"]:
+                    risk_entry = dict()
+                    risk_entry["groupAtRisk"] = risk[0]
+                    risk_entry["benefits"] = risk[1]
+                    risk_entry["harms"] = risk[2]
+                    risk_entry["mitigationStrategy"] = risk[3]
+                    fairness_property.append(risk_entry)
+                considerations["fairnessAssessments"] = fairness_property
+            if len(considerations) > 0:
+                ml_model["considerations"] = considerations
+            # Properties
+            if "property" in modelcard:
+                ml_properties = []
+                for property in modelcard["property"]:
+                    property_entry = dict()
+                    property_entry["name"] = property[0]
+                    property_entry["value"] = property[1]
+                    if "properties" in ml_properties:
+                        ml_properties.append(property_entry)
+                    else:
+                        ml_properties = [property_entry]
+                ml_model["properties"] = ml_properties
+        return ml_model
+
     def generateJSONComponent(self, id, type, package):
         component = dict()
         if "type" in package:
@@ -268,14 +473,16 @@ class CycloneDXGenerator:
                     contact["email"] = supplier_email
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
-                if "version" in package:
-                    if component["type"] == "operating-system":
-                        cpe_type = "/o"
-                    else:
-                        cpe_type = "/a"
-                    component[
-                        "cpe"
-                    ] = f'cpe:{cpe_type}:{supplier_name.replace(" ", "_")}:{name}:{version}'
+                # Not for machine learning model
+                if component["type"] != "machine-learning-model":
+                    if "version" in package:
+                        if component["type"] == "operating-system":
+                            cpe_type = "/o"
+                        else:
+                            cpe_type = "/a"
+                        component[
+                            "cpe"
+                        ] = f'cpe:{cpe_type}:{supplier_name.replace(" ", "_")}:{name}:{version}'
                 # Alternative is it within external reference
         if "originator" in package:
             component["author"] = package["originator"]
@@ -391,6 +598,11 @@ class CycloneDXGenerator:
                 component["properties"].append(property_entry)
             else:
                 component["properties"] = [property_entry]
+        if self._cyclonedx_15() and component["type"] == "machine-learning-model":
+            # Only for version 1.5 or later
+            component["modelCard"] = self._generate_mlmodel(
+                package, component["bom-ref"]
+            )
         self.component.append(component)
 
     def generateXMLComponent(self, id, type, package):

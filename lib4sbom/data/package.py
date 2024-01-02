@@ -52,6 +52,7 @@ class SBOMPackage:
             "DEVICE",
             "FIRMWARE",
             "FILE",
+            "MACHINE-LEARNING-MODEL",
         ]:
             self.package["type"] = package_type
         else:
