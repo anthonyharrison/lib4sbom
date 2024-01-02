@@ -1,0 +1,113 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "metadata": {
+    "component": {
+       "type": "machine-learning-model",
+       "name": "RedPajama-INCITE-Instruct-3B",
+       "version": "1.4",
+       "description": "A 2.8B parameter pretrained language model."
+    },
+    "timestamp": "2023-03-28T19:16:23Z",
+    "authors": {
+      "name": "Firstname Lastname"
+    },
+    "tools": [
+      {
+        "name": "manifest-cli",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "components": [
+    {
+      "bom-ref": "ml-id-ref",
+      "type": "machine-learning-model",
+      "author": "Together Computer",
+      "name": "RedPajama-INCITE-Instruct-3B-v1",
+      "version": "1.4",
+      "description": "A 2.8B parameter pretrained language model.",
+      "properties" : {
+        "category": "text-generation",
+        "baseModel": "RedPajama-INCITE-Base-3B-v1",
+        "baseModelSource" : "https://huggingface.co/togethercomputer/RedPajama-INCITE-Base-3B-v1",
+        "intended-use": "Excluded uses are described below.",
+        "out-of-scope": "RedPajama-INCITE-Instruct-3B-v1 is a language model and may not perform well for other use cases outside of its intended scope. For example, it may not be suitable for use in safety-critical applications or for making decisions that have a significant impact on individuals or society. It is important to consider the limitations of the model and to only use it for its intended purpose.",
+        "misuse-or-malicious": "RedPajama-INCITE-Instruct-3B-v1 is designed for language modeling. Misuse of the model, such as using it to engage in illegal or unethical activities, is strictly prohibited and goes against the principles of the project. Using the model to generate content that is cruel to individuals is a misuse of this model. This includes, but is not limited to: Generating fake news, misinformation, or propaganda; Promoting hate speech, discrimination, or violence against individuals or groups; Impersonating individuals or organizations without their consent; Engaging in cyberbullying or harassment; Defamatory content; Spamming or scamming; Sharing confidential or sensitive information without proper authorization; Violating the terms of use of the model or the data used to train it; Creating automated bots for malicious purposes such as spreading malware, phishing scams, or spamming; "
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "modelCard": {
+        "modelParameters": {
+          "tasks": [
+            {
+              "task": "text inference"
+            }
+          ],
+          "architectureFamily": "GPT-NeoX (https://together.ai/blog/redpajama-models-v1)",
+          "modelArchitecture": "GPTNeoXForCausalLM",
+          "datasets": [
+            {
+              "type": "dataset",
+              "name": "RedPajama-Data-1T",
+              "contents": {
+                "url": "https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T"
+              },
+              "classification": "public"
+            }
+          ],
+          "inputs": [{ "format": "text" }],
+          "outputs": [{ "format": "text" }]
+        },
+        "considerations": {
+          "ethicalConsiderations": [
+            {
+              "name": "It is the responsibility of the end user to ensure that the model is used in a responsible and ethical manner."
+            }
+          ]
+        }
+      },
+      "externalReferences": [
+        {
+          "comment": "Model source",
+          "type": "vcs",
+          "url": "https://huggingface.co/togethercomputer/RedPajama-INCITE-Base-3B-v1"
+        },
+        {
+          "comment": "Model website",
+          "type": "website",
+          "url": "https://together.ai/blog/redpajama-models-v1"
+        },
+        {
+          "name": "Together Discord",
+          "type": "chat",
+          "url": "https://discord.gg/6ZVDU8tTD4"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pytorch-id-ref",
+      "name": "PyTorch",
+      "description": "PyTorch is a Python package that provides two high-level features: Tensor computation (like NumPy) with strong GPU acceleration; Deep neural networks built on a tape-based autograd system"
+    },
+    {
+      "type": "library",
+      "bom-ref": "transformers-id-ref",
+      "name": "transfomers",
+      "description": "Transformers provides thousands of pretrained models to perform tasks on different modalities such as text, vision, and audio."
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "ml-id-ref",
+      "dependsOn": ["pytorch-id-ref","transformers"]
+    }
+  ]
+}

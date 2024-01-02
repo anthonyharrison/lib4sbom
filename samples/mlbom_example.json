@@ -1,0 +1,229 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:997191f5-6c2b-4572-9a73-5e0f2d03cedd",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2024-01-02T11:02:22Z",
+    "tools": {
+      "components": [
+        {
+          "name": "lib4sbom",
+          "version": "0.6.0",
+          "type": "application"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "CDXRef-DOCUMENT",
+      "name": "MLApp"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "1-glibc",
+      "name": "glibc",
+      "version": "2.15",
+      "supplier": {
+        "name": "gnu"
+      },
+      "cpe": "cpe:/a:gnu:glibc:2.15",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-only",
+            "url": "https://www.gnu.org/licenses/gpl-3.0-standalone.html"
+          }
+        }
+      ]
+    },
+    {
+      "type": "operating-system",
+      "bom-ref": "2-almalinux",
+      "name": "almalinux",
+      "version": "9.0",
+      "supplier": {
+        "name": "alma"
+      },
+      "cpe": "cpe:/o:alma:almalinux:9.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "3-glibc",
+      "name": "glibc",
+      "version": "2.29",
+      "supplier": {
+        "name": "gnu"
+      },
+      "cpe": "cpe:/a:gnu:glibc:2.29",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-only",
+            "url": "https://www.gnu.org/licenses/gpl-3.0-standalone.html"
+          }
+        }
+      ],
+      "properties": [
+        {
+          "name": "language",
+          "value": "C"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "4-tomcat",
+      "name": "tomcat",
+      "version": "9.0.46",
+      "supplier": {
+        "name": "apache"
+      },
+      "cpe": "cpe:/a:apache:tomcat:9.0.46",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "machine-learning-model",
+      "bom-ref": "5-resnet-50",
+      "name": "resnet-50",
+      "version": "1.5",
+      "supplier": {
+        "name": "microsoft"
+      },
+      "description": "ResNet (Residual Network) is a convolutional neural network that democratized the concepts of residual learning and skip connections. This enables to train much deeper models.",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+      ],
+      "modelCard": {
+        "bom-ref": "5-resnet-50-model",
+        "modelParameters": {
+          "approach": {
+            "type": "supervised"
+          },
+          "task": "classification",
+          "architectureFamily": "Convolutional neural network",
+          "modelArchitecture": "ResNet-50",
+          "datasets": [
+            {
+              "type": "dataset",
+              "name": "ImageNet",
+              "contents": {
+                "url": "https://huggingface.co/datasets/imagenet-1k"
+              },
+              "classification": "public",
+              "sensitiveData": "no personal data",
+              "description": "ILSVRC 2012, commonly known as \"ImageNet\" is an image dataset organized according to the WordNet hierarchy. Each meaningful concept in WordNet, possibly described by multiple words or word phrases, is called a \"synonym set\" or \"synset\". There are more than 100,000 synsets in WordNet, majority of them are nouns (80,000+). ImageNet aims to provide on average 1000 images to illustrate each synset. Images of each concept are quality-controlled and human-annotated.",
+              "governance": {
+                "owners": [
+                  {
+                    "organization": {
+                      "name": "microsoft"
+                    },
+                    "contact": {
+                      "email": "sales@microsoft.com"
+                    }
+                  },
+                  {
+                    "organization": {
+                      "name": "microsoft"
+                    },
+                    "contact": {
+                      "email": "consulting@microsoft.com"
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "inputs": [
+            {
+              "format": "image"
+            }
+          ],
+          "outputs": [
+            {
+              "format": "image class"
+            }
+          ]
+        },
+        "quantitativeAnalysis": {
+          "performanceMetrics": [
+            {
+              "type": "CPU",
+              "value": "10%",
+              "confidenceInterval": {
+                "lowerBound": "8",
+                "upperBound": "12"
+              }
+            }
+          ],
+          "graphics": {
+            "description": "Test data",
+            "collection": [
+              {
+                "name": "cat",
+                "image": {
+                  "contentType": "text/plain",
+                  "encoding": "base64",
+                  "content": "cat.jpg"
+                }
+              },
+              {
+                "name": "dog",
+                "image": {
+                  "contentType": "text/plain",
+                  "encoding": "base64",
+                  "content": "dog.jpg"
+                }
+              }
+            ]
+          }
+        },
+        "considerations": {
+          "users": [
+            "Researcher"
+          ],
+          "technicalLimitations": [
+            "To be used in the EU.",
+            "To be used in the UK."
+          ],
+          "ethicalConsiderations": [
+            {
+              "name": "User from prohibited location",
+              "mitigationStrategy": "Use geolocation to validate source of request."
+            }
+          ]
+        },
+        "properties": [
+          {
+            "name": "num_channels",
+            "value": "3"
+          }
+        ]
+      }
+    }
+  ]
+}

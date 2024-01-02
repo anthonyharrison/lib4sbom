@@ -1,0 +1,105 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69c99",
+  "metadata": {
+    "component": {
+       "type": "machine-learning-model",
+       "name": "Falcon 7b Instruct",
+       "description": "Falcon-7B-Instruct is a 7B parameters causal decoder-only model built by TII based on Falcon-7B and finetuned on a mixture of chat/instruct datasets. It is made available under the Apache 2.0 license."
+    },
+    "timestamp": "2023-06-22T12:16:23Z",
+    "authors": {
+      "name": "Stringer Bell"
+    },
+    "tools": [
+      {
+        "name": "manifest-cli",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "components": [
+    {
+      "bom-ref": "falcon-7b-instruct",
+      "type": "machine-learning-model",
+      "author": "https://www.tii.ae",
+      "name": "Falcon 7b Instruct",
+      "description": "Falcon-7B-Instruct is a 7B parameters causal decoder-only model built by TII based on Falcon-7B and finetuned on a mixture of chat/instruct datasets. It is made available under the Apache 2.0 license.",
+      "properties" : {
+        "category": "text-generation",
+        "baseModel": "bloom",
+        "baseModelSource" : "https://huggingface.co/bigscience/bloom",
+        "intendedUse": "Falcon-7B-Instruct has been finetuned on a mixture of instruct and chat datasets.",
+        "outOfScopeUse": "Production use without adequate assessment of risks and mitigation; any use cases which may be considered irresponsible or harmful."
+      },
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "modelCard": {
+        "modelParameters": {
+          "task": "text-generation-inference",
+          "architectureFamily": "RefinedWeb/Falcon (https://falconllm.tii.ae/)",
+          "modelArchitecture": "RefinedWeb",
+          "datasets": [
+            {
+              "type": "dataset",
+              "name": "falcon-refinedweb",
+              "contents": {
+                "url": "https://huggingface.co/datasets/tiiuae/falcon-refinedweb"
+              },
+              "classification": "public"
+            }
+          ]
+        },
+        "considerations": {
+          "technicalLimitations": [
+            "What are the known technical limitations of the model? E.g. What kind(s) of data should the model be expected not to perform well on? What are the factors that might degrade model performance?"
+          ],
+          "ethicalConsiderations": [
+            {
+              "name": "Falcon-7B-Instruct is mostly trained on English data, and will not generalize appropriately to other languages. Furthermore, as it is trained on a large-scale corpora representative of the web, it will carry the stereotypes and biases commonly encountered online."
+            }
+          ]
+        }
+      },
+      "externalReferences": [
+        {
+          "comment": "Contact",
+          "type": "email",
+          "url": "falconllm@tii.ae"
+        },
+        {
+          "comment": "Source URL",
+          "type": "vcs",
+          "url": "https://huggingface.co/tiiuae/falcon-7b-instruct"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pytorch-id-ref",
+      "name": "PyTorch"
+    },
+    {
+      "type": "library",
+      "bom-ref": "core-ml-id-ref",
+      "name": "Core ML"
+    },
+    {
+      "type": "library",
+      "bom-ref": "transformers-id-ref",
+      "name": "Transformers"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "falcon-7b-instruct",
+      "dependsOn": ["pytorch-id-ref", "core-ml-id-ref", "transformers-id-ref"]
+    }
+  ]
+}
