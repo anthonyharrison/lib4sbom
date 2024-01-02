@@ -334,7 +334,9 @@ class CycloneDXParser:
                             name = f'{name}#{data["metadata"]["tools"][0]["name"]}'
                         cyclonedx_document.set_creator("tool", name)
                 if "authors" in data["metadata"]:
-                    name = data["metadata"]["authors"][0]["name"]
+                    name = ""
+                    if "name" in data["metadata"]["authors"]:
+                        name = data["metadata"]["authors"][0]["name"]
                     if "email" in data["metadata"]["authors"]:
                         name = f'{name}#{data["metadata"]["authors"][0]["email"]}'
                     cyclonedx_document.set_creator("person", name)

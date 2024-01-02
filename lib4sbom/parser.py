@@ -60,21 +60,11 @@ class SBOMParser:
             # Default parser is SPDX
             self.parser = SPDXParser()
 
-        if self.sbom_type == "auto":
-            # Work out the SBOM type for file
-            # Assume SPDX...
-            self.sbom_type = "spdx"
-            (
-                self.document,
-                self.files,
-                self.packages,
-                self.relationships,
-                self.vulnerabilities,
-            ) = self.parser.parse(filename)
-            # but if no packages or files found, assume it must be CycloneDX
-            if len(self.packages) == 0 and len(self.files) == 0:
-                self.sbom_type = "cyclonedx"
-                self.parser = CycloneDXParser()
+        try:
+            if self.sbom_type == "auto":
+                # Work out the SBOM type for file
+                # Assume SPDX...
+                self.sbom_type = "spdx"
                 (
                     self.document,
                     self.files,
@@ -82,22 +72,37 @@ class SBOMParser:
                     self.relationships,
                     self.vulnerabilities,
                 ) = self.parser.parse(filename)
-        else:
-            (
-                self.document,
-                self.files,
-                self.packages,
-                self.relationships,
-                self.vulnerabilities,
-            ) = self.parser.parse(filename)
-        self.sbom.add_files(self.files)
-        self.sbom.add_packages(self.packages)
-        self.sbom.add_relationships(self.relationships)
-        if len(self.document) > 0:
-            self.sbom.add_document(self.document.get_document())
-        if len(self.vulnerabilities) > 0:
-            self.sbom.add_vulnerabilities(self.vulnerabilities)
-        self.sbom.set_type(self.sbom_type)
+                # but if no packages or files found, assume it must be CycloneDX
+                if len(self.packages) == 0 and len(self.files) == 0:
+                    self.sbom_type = "cyclonedx"
+                    self.parser = CycloneDXParser()
+                    (
+                        self.document,
+                        self.files,
+                        self.packages,
+                        self.relationships,
+                        self.vulnerabilities,
+                    ) = self.parser.parse(filename)
+            else:
+                (
+                    self.document,
+                    self.files,
+                    self.packages,
+                    self.relationships,
+                    self.vulnerabilities,
+                ) = self.parser.parse(filename)
+            self.sbom.add_files(self.files)
+            self.sbom.add_packages(self.packages)
+            self.sbom.add_relationships(self.relationships)
+            if len(self.document) > 0:
+                self.sbom.add_document(self.document.get_document())
+            if len(self.vulnerabilities) > 0:
+                self.sbom.add_vulnerabilities(self.vulnerabilities)
+            self.sbom.set_type(self.sbom_type)
+        except KeyError:
+            pass
+        except TypeError:
+            pass
 
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type
