@@ -74,11 +74,9 @@ class SBOM:
         return package_data
 
     def get_relationships(self) -> List:
-        # return self.sbom['relationships']
         return self.sbom.get("relationships", [])
 
     def get_vulnerabilities(self) -> Dict:
-        # return self.sbom['relationships']
         return self.sbom.get("vulnerabilities", [])
 
     def get_version(self) -> str:
