@@ -1,0 +1,76 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "comment": "This document has been automatically generated.",
+    "creators": [
+      "Tool: lib4sbom-0.6.0"
+    ],
+    "created": "2023-12-19T08:51:57Z",
+    "licenseListVersion": "3.22"
+  },
+  "name": "iOSApp_Application",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "http://spdx.org/spdxdocs/iOSApp_Application-urn:uuid:My_uuid_1234",
+  "hasExtractedLicensingInfos": [
+    {
+      "licenseId": "LicenseRef-1",
+      "name": "SwiftTrace License",
+      "extractedText": "Copyright (c) 2015 John Holdsworth\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and\\/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n\nThis software contains code written by Oliver Letterer obtained from the\nfollowing github project which is licensed under the terms of that project:\n\nhttps:\\/\\/github.com\\/OliverLetterer\\/imp_implementationForwardingToSelector\n\nNow uses the very handy https:\\/\\/github.com\\/facebook\\/fishhook.\nSee the source and header files for licensing details.\n"
+    }
+  ],
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-1-iOSApp",
+      "name": "iOSApp",
+      "versionInfo": "1",
+      "primaryPackagePurpose": "APPLICATION",
+      "supplier": "Person: RH",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-2-swift-log",
+      "name": "swift-log",
+      "versionInfo": "1.5.2",
+      "primaryPackagePurpose": "LIBRARY",
+      "supplier": "Person: Apple Inc.",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "homepage": "https://github.com/apple/swift-log",
+      "licenseConcluded": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-3-SwiftTrace",
+      "name": "SwiftTrace",
+      "versionInfo": "8.4.6",
+      "primaryPackagePurpose": "LIBRARY",
+      "supplier": "Person: John Holdsworth",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "homepage": "https://github.com/johnno1962/SwiftTrace",
+      "licenseDeclared": "LicenseRef-1",
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-1-iOSApp",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-1-iOSApp",
+      "relatedSpdxElement": "SPDXRef-Package-2-swift-log",
+      "relationshipType": "DEPENDS_ON"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-1-iOSApp",
+      "relatedSpdxElement": "SPDXRef-Package-3-SwiftTrace",
+      "relationshipType": "DEPENDS_ON"
+    }
+  ]
+}
