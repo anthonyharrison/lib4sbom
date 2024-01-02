@@ -120,9 +120,9 @@ def generate_sbom():
 
     sbom.add_vulnerabilities(vulnerabilities)
 
-    sbg = SBOMGenerator(format='json', sbom_type='spdx')
+    sbg = SBOMGenerator(format='json', sbom_type='cyclonedx')
 
-    sbg.generate(parent_id, sbom.get_sbom(), 'test.spdx.json')
+    sbg.generate(parent_id, sbom.get_sbom(), 'test.json')
     # sbg.generate("iOSApp", sbom.get_sbom(), "mybomy-bom.json")
 
 generate_sbom()
