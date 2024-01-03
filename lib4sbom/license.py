@@ -176,8 +176,14 @@ class LicenseScanner:
             # License may be an expression
             for license_element in self._expression_split(license):
                 category = self.get_license_type(license_element)
-                license_category[category] = license_category.get(category,0) + 1
-        category="maximalcopyleft", "networkcopyleft", "copyleft", "weakcopyleft", "permissive"
+                license_category[category] = license_category.get(category, 0) + 1
+        category = (
+            "maximalcopyleft",
+            "networkcopyleft",
+            "copyleft",
+            "weakcopyleft",
+            "permissive",
+        )
         # Return most onerous category of license found
         for c in category:
             if license_category.get(c.upper()) is not None:
