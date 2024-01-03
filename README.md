@@ -766,6 +766,9 @@ Licensed under the Apache 2.0 Licence.
 The tool uses a local copy of the [SPDX Licenses List](https://github.com/spdx/license-list-data) which is released under
 [Creative Commons Attribution 3.0 (CC-BY-3.0)](http://creativecommons.org/licenses/by/3.0/).
 
+This tool uses information sourced from the [Blue Oak Council's License List](https://blueoakcouncil.org/list) which is released under
+[Creative Commons Attribution 1.0 (CC-BY-1.0)](https://creativecommons.org/licenses/by/1.0/).
+
 ## Limitations
 
 This tool is meant to support software development. The usefulness of the tool is dependent on the SBOM data

@@ -20,6 +20,10 @@ class LicenseScanner:
         synonym_file = os.path.join(license_dir, "license_data", "license_synonyms.txt")
         self.license_synonym = {}
         self.synonym_setup(synonym_file, self.license_synonym)
+        # Set up type of licenses
+        type_file = os.path.join(license_dir, "license_data", "license_type.txt")
+        self.license_type = {}
+        self.synonym_setup(type_file, self.license_type)
 
     def synonym_setup(self, filename, data_list):
         with open(filename, "r") as f:
@@ -157,3 +161,25 @@ class LicenseScanner:
     def license_expression(self, expression):
         # Determine if license expression contains multiple elements
         return len(self._expression_split(expression)) > 1
+
+    def get_license_type(self, license):
+        # Default is PERMISSIVE
+        license_id = self.check_synonym(license)
+        if license_id is None:
+            license_id = license
+        return self.license_type.get(license_id.upper(), "permissive").upper()
+
+    def get_license_category(self, license_list):
+        # For each license
+        license_category = {}
+        for license in license_list:
+            # License may be an expression
+            for license_element in self._expression_split(license):
+                category = self.get_license_type(license_element)
+                license_category[category] = license_category.get(category,0) + 1
+        category="maximalcopyleft", "networkcopyleft", "copyleft", "weakcopyleft", "permissive"
+        # Return most onerous category of license found
+        for c in category:
+            if license_category.get(c.upper()) is not None:
+                return c.upper()
+        return "UNKNOWN"
