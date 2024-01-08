@@ -388,7 +388,8 @@ class CycloneDXParser:
                 vuln_info = Vulnerability(validation="cyclonedx")
                 for vuln in data["vulnerabilities"]:
                     vuln_info.initialise()
-                    vuln_info.set_value("bom-ref", vuln["bom-ref"])
+                    if "bom-ref" in vuln:
+                        vuln_info.set_value("bom-ref", vuln["bom-ref"])
                     vuln_info.set_id(vuln["id"])
                     if "source" in vuln:
                         vuln_info.set_value("source-name", vuln["source"]["name"])
