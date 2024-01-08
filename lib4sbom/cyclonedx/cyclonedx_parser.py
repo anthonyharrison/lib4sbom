@@ -24,10 +24,12 @@ class CycloneDXParser:
 
     def parse(self, sbom_file):
         """parses CycloneDX BOM file extracting package name, version and license"""
-        if sbom_file.endswith("json"):
+        if sbom_file.endswith((".bom.json", ".cdx.json", ".json")):
             return self.parse_cyclonedx_json(sbom_file)
-        else:
+        elif sbom_file.endswith((".bom.xml", ".cdx.xml", ".xml")):
             return self.parse_cyclonedx_xml(sbom_file)
+        else:
+            return {}, {}, {}, [], []
 
     def _governance_element(self, element):
         elements = []
