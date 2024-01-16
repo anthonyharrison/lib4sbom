@@ -399,7 +399,7 @@ class CycloneDXParser:
                     if "created" in vuln:
                         vuln_info.set_value("created", vuln["created"])
                     if "analysis" in vuln:
-                        if "state" in "analysis":
+                        if "state" in vuln["analysis"]:
                             vuln_info.set_value("status", vuln["analysis"]["state"])
                         if "detail" in vuln["analysis"]:
                             vuln_info.set_comment(vuln["analysis"]["detail"])
