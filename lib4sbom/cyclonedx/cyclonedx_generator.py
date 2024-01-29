@@ -550,6 +550,8 @@ class CycloneDXGenerator:
                 component["externalReferences"].append(externalReference)
             else:
                 component["externalReferences"] = [externalReference]
+        if "group" in package:
+            component["group"] = package["group"]
         if "externalreference" in package:
             # Potentially multiple entries
             for reference in package["externalreference"]:

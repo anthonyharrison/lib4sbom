@@ -214,6 +214,7 @@ class CycloneDXParser:
             self.cyclonedx_package.set_type(d["type"])
             # If bom-ref not present, auto generate one
             bom_ref = d.get("bom-ref", f"CycloneDX-Component-{self.component_id}")
+            self.cyclonedx_package.set_value("bom-ref", bom_ref)
             if "supplier" in d:
                 # Assume that this refers to an organisation
                 supplier_name = d["supplier"]["name"]
@@ -268,6 +269,8 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_externalreference(
                     "PACKAGE-MANAGER", "purl", d["purl"]
                 )
+            if "group" in d:
+                self.cyclonedx_package.set_value("group",d["group"])
             if "properties" in d:
                 # Potentially multiple entries
                 for property in d["properties"]:
@@ -302,6 +305,8 @@ class CycloneDXParser:
         data = json.load(open(sbom_file))
         files = {}
         relationships = []
+        # First relationship is assumed to be the root element
+        relationship_type = " DESCRIBES "
         vulnerabilities = []
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
@@ -345,20 +350,21 @@ class CycloneDXParser:
                 if "component" in data["metadata"]:
                     component_name = data["metadata"]["component"]["name"]
                     cyclonedx_document.set_name(component_name)
-                    cyclonedx_document.set_metadata_type(
-                        data["metadata"]["component"]["type"]
-                    )
+                    component_type = data["metadata"]["component"]["type"]
+                    cyclonedx_document.set_metadata_type(component_type)
                     if "bom-ref" in data["metadata"]["component"]:
                         bom_ref = data["metadata"]["component"]["bom-ref"]
+                        cyclonedx_document.set_value("bom-ref", bom_ref)
                     else:
                         bom_ref = "CylconeDX-Component-0000"
                     self.id[bom_ref] = component_name
+                    if "version" in data["metadata"]["component"]:
+                        component_version = data["metadata"]["component"]["version"]
+                        cyclonedx_document.set_value("metadata_version", component_version)
             if "components" in data:
                 for d in data["components"]:
                     self._cyclondex_component(d)
             if "dependencies" in data:
-                # First relationship is assumed to be the root element
-                relationship_type = " DESCRIBES "
                 for d in data["dependencies"]:
                     source_id = d["ref"]
                     # Get source name
