@@ -152,7 +152,18 @@ class SPDXGenerator:
     def package_ident(self, id):
         # Only add preamble if not parent document
         if id != self.SPDX_PROJECT_ID:
-            return self.PACKAGE_PREAMBLE + str(id).replace(" ", "-").replace("_", "-")
+            spdx_id = ''
+            # SPDX id can only contain letters, numbers, ., and/or -.
+            for i in id:
+                if i.isalnum():
+                    spdx_id = spdx_id + i
+                elif i in ['.', '-']:
+                    spdx_id = spdx_id + i
+                else:
+                    # Invalid charcters are replaced
+                    spdx_id = spdx_id + '-'
+            #return self.PACKAGE_PREAMBLE + str(id).replace(" ", "-").replace("_", "-")
+            return self.PACKAGE_PREAMBLE + spdx_id
         return str(id)
 
     def file_ident(self, id):
