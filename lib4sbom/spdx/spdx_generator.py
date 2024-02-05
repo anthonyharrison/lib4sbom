@@ -162,7 +162,6 @@ class SPDXGenerator:
                 else:
                     # Invalid charcters are replaced
                     spdx_id = spdx_id + '-'
-            #return self.PACKAGE_PREAMBLE + str(id).replace(" ", "-").replace("_", "-")
             return self.PACKAGE_PREAMBLE + spdx_id
         return str(id)
 
