@@ -262,9 +262,14 @@ class CycloneDXParser:
             if "copyright" in d:
                 self.cyclonedx_package.set_copyrighttext(d["copyright"])
             if "cpe" in d:
-                self.cyclonedx_package.set_externalreference(
+                if d["cpe"].lower().startswith("cpe:2.3"):
+                    self.cyclonedx_package.set_externalreference(
                     "SECURITY", "cpe23Type", d["cpe"]
                 )
+                elif d["cpe"].lower().startswith("cpe:/"):
+                    self.cyclonedx_package.set_externalreference(
+                        "SECURITY", "cpe22Type", d["cpe"]
+                    )
             if "purl" in d:
                 self.cyclonedx_package.set_externalreference(
                     "PACKAGE-MANAGER", "purl", d["purl"]
@@ -528,7 +533,14 @@ class CycloneDXParser:
             self.cyclonedx_package.set_copyrighttext(copyright)
         cpe = self._xml_component(component, "cpe")
         if cpe != "":
-            self.cyclonedx_package.set_externalreference("SECURITY", "cpe23Type", cpe)
+            if cpe.lower().startswith("cpe:2.3"):
+                self.cyclonedx_package.set_externalreference(
+                    "SECURITY", "cpe23Type", cpe
+                )
+            elif cpe.lower().startswith("cpe:/"):
+                self.cyclonedx_package.set_externalreference(
+                    "SECURITY", "cpe22Type", cpe
+                )
         purl = self._xml_component(component, "purl")
         if purl != "":
             self.cyclonedx_package.set_externalreference(

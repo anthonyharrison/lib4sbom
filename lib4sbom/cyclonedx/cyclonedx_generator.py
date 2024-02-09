@@ -558,7 +558,7 @@ class CycloneDXGenerator:
                 ref_category = reference[0]
                 ref_type = reference[1]
                 ref_value = reference[2]
-                if ref_category == "SECURITY" and ref_type == "cpe23Type":
+                if ref_category == "SECURITY" and ref_type in ["cpe22Type", "cpe23Type"]:
                     component["cpe"] = ref_value
                 elif (
                     ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
@@ -636,7 +636,7 @@ class CycloneDXGenerator:
                 ref_category = reference[0]
                 ref_type = reference[1]
                 ref_value = reference[2]
-                if ref_category == "SECURITY" and ref_type == "cpe23Type":
+                if ref_category == "SECURITY" and ref_type in ["cpe22Type", "cpe23Type"]:
                     self.store(f"<cpe>{ref_value}</cpe>")
                 if (
                     ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
