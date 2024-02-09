@@ -27,10 +27,12 @@ class SBOM:
         self.sbom["document"] = document
 
     def add_files(self, files: Dict):
-        self.sbom["files"] = files
+        if len(files) > 0:
+            self.sbom["files"] = files
 
     def add_packages(self, packages: Dict):
-        self.sbom["packages"] = packages
+        if len(packages) > 0:
+            self.sbom["packages"] = packages
 
     def add_relationships(self, relationships: List):
         self.sbom["relationships"] = relationships
