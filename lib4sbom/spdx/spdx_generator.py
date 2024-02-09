@@ -152,16 +152,16 @@ class SPDXGenerator:
     def package_ident(self, id):
         # Only add preamble if not parent document
         if id != self.SPDX_PROJECT_ID:
-            spdx_id = ''
+            spdx_id = ""
             # SPDX id can only contain letters, numbers, ., and/or -.
             for i in id:
                 if i.isalnum():
                     spdx_id = spdx_id + i
-                elif i in ['.', '-']:
+                elif i in [".", "-"]:
                     spdx_id = spdx_id + i
                 else:
                     # Invalid charcters are replaced
-                    spdx_id = spdx_id + '-'
+                    spdx_id = spdx_id + "-"
             return self.PACKAGE_PREAMBLE + spdx_id
         return str(id)
 
@@ -175,13 +175,18 @@ class SPDXGenerator:
         return f"LicenseRef-{self.license_id}"
 
     def license_ident(self, license):
-        if self.validate_license and len(license) > 0:
+        if len(license) == 0:
+            return "NOASSERTION"
+        elif self.validate_license:
             if license != "UNKNOWN":
                 derived_license = self.license.find_license(license)
                 if derived_license != "UNKNOWN":
                     return derived_license
                 # Not an SPDX License id
-        return "NOASSERTION"
+            return "NOASSERTION"
+        else:
+            # No validation
+            return license
 
     def _text(file, text_item):
         if text_item not in ["NONE", "NOASSERTION"]:
