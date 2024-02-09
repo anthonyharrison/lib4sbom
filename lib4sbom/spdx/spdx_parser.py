@@ -39,7 +39,7 @@ class SPDXParser:
     def parse_spdx_tag(self, sbom_file):
         """parses SPDX tag value file extracting all SBOM data"""
         DEFAULT_VERSION = ""
-        with open(sbom_file) as f:
+        with open(sbom_file, "r", encoding="utf-8") as f:
             lines = f.readlines()
         spdx_document = SBOMDocument()
         packages = {}
@@ -283,7 +283,7 @@ class SPDXParser:
 
     def parse_spdx_json(self, sbom_file):
         """parses SPDX JSON SBOM file extracting SBOM data"""
-        data = json.load(open(sbom_file))
+        data = json.load(open(sbom_file, "r", encoding="utf-8"))
         return self._parse_spdx_data(data)
 
     def _parse_spdx_data(self, data):
@@ -446,7 +446,7 @@ class SPDXParser:
 
     def parse_spdx_yaml(self, sbom_file):
         """parses SPDX YAML SBOM file extracting SBOM data"""
-        data = yaml.safe_load(open(sbom_file))
+        data = yaml.safe_load(open(sbom_file, "r", encoding="utf-8"))
         return self._parse_spdx_data(data)
 
     def _transform_relationship(self, relationship_list, element_mapping):
@@ -469,7 +469,7 @@ class SPDXParser:
 
     def parse_spdx_rdf(self, sbom_file):
         # parses SPDX RDF BOM file extracting package name and version ONLY
-        with open(sbom_file) as f:
+        with open(sbom_file, "r", encoding="utf-8") as f:
             lines = f.readlines()
         packages = {}
         package = ""

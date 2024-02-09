@@ -270,7 +270,7 @@ class CycloneDXParser:
                     "PACKAGE-MANAGER", "purl", d["purl"]
                 )
             if "group" in d:
-                self.cyclonedx_package.set_value("group",d["group"])
+                self.cyclonedx_package.set_value("group", d["group"])
             if "properties" in d:
                 # Potentially multiple entries
                 for property in d["properties"]:
@@ -302,7 +302,7 @@ class CycloneDXParser:
 
     def parse_cyclonedx_json(self, sbom_file):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
-        data = json.load(open(sbom_file))
+        data = json.load(open(sbom_file, "r", encoding="utf-8"))
         files = {}
         relationships = []
         # First relationship is assumed to be the root element
@@ -360,7 +360,9 @@ class CycloneDXParser:
                     self.id[bom_ref] = component_name
                     if "version" in data["metadata"]["component"]:
                         component_version = data["metadata"]["component"]["version"]
-                        cyclonedx_document.set_value("metadata_version", component_version)
+                        cyclonedx_document.set_value(
+                            "metadata_version", component_version
+                        )
             if "components" in data:
                 for d in data["components"]:
                     self._cyclondex_component(d)

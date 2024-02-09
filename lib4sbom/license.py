@@ -14,7 +14,7 @@ class LicenseScanner:
         # Load licenses
         license_dir, filename = os.path.split(__file__)
         license_path = os.path.join(license_dir, "license_data", "spdx_licenses.json")
-        licfile = open(license_path)
+        licfile = open(license_path, "r", encoding="utf-8")
         self.licenses = json.load(licfile)
         # Set up list of license synonyms
         synonym_file = os.path.join(license_dir, "license_data", "license_synonyms.txt")
@@ -26,7 +26,7 @@ class LicenseScanner:
         self.synonym_setup(type_file, self.license_type)
 
     def synonym_setup(self, filename, data_list):
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding="utf-8") as f:
             lines = f.readlines()
             for line in lines:
                 if line.startswith("#"):
