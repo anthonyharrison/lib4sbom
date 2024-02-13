@@ -534,7 +534,8 @@ class CycloneDXGenerator:
                 item["license"] = license
                 component["licenses"] = [item]
         if "copyrighttext" in package:
-            component["copyright"] = package["copyrighttext"]
+            if package["copyrighttext"] != "NOASSERTION":
+                component["copyright"] = package["copyrighttext"]
         if "homepage" in package:
             externalReference = dict()
             externalReference["url"] = package["homepage"]
