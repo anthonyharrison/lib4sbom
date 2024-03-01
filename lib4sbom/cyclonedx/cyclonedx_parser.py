@@ -195,11 +195,18 @@ class CycloneDXParser:
         self.cyclonedx_package.initialise()
         self.component_id = self.component_id + 1
         if d["type"] in [
-            "file",
-            "library",
             "application",
+            "framework",
+            "library",
+            "container",
+            "platform",
             "operating-system",
+            "device",
+            "device-driver",
+            "firmware",
+            "file",
             "machine-learning-model",
+            "data",
         ]:
             package = d["name"]
             self.cyclonedx_package.set_name(package)
