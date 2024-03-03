@@ -691,7 +691,7 @@ class CycloneDXGenerator:
                 version_info["status"] = "unknown"
             else:
                 version_info["status"] = "affected"
-            affected["version"] = version_info
+            affected["versions"] = version_info
             affects.append(affected)
             vulnerability["affects"] = affects
             statements.append(vulnerability)
