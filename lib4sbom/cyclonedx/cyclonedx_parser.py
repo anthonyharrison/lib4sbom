@@ -11,6 +11,7 @@ from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.vulnerability import Vulnerability
+from lib4sbom.data.service import SBOMService
 
 
 class CycloneDXParser:
@@ -312,6 +313,9 @@ class CycloneDXParser:
                 for component in d["components"]:
                     self._cyclondex_component(component)
 
+    def _cyclonedx_service(self, d):
+        pass
+
     def parse_cyclonedx_json(self, sbom_file):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
         data = json.load(open(sbom_file, "r", encoding="utf-8"))
@@ -320,6 +324,7 @@ class CycloneDXParser:
         # First relationship is assumed to be the root element
         relationship_type = " DESCRIBES "
         vulnerabilities = []
+        services = []
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         # Check valid CycloneDX JSON file (and not SPDX)
@@ -428,6 +433,12 @@ class CycloneDXParser:
                                 "justification", vuln["analysis"]["justification"]
                             )
                     vulnerabilities.append(vuln_info.get_vulnerability())
+                if "services" in data:
+                    service_info = SBOMService()
+                    for service in data["services"]:
+                        service_info.initialise()
+                        # TODO extract parameters
+                        services.append(service_info.get_serrvice())
                 if self.debug:
                     print(vulnerabilities)
         return cyclonedx_document, files, self.packages, relationships, vulnerabilities

@@ -10,6 +10,7 @@ class SBOMData(NamedTuple):
     packages: Dict
     relationships: List
     vulnerabilities: Dict
+    services: Dict
     type: str
     version: str
 
@@ -39,6 +40,9 @@ class SBOM:
 
     def add_vulnerabilities(self, vulnerabilities: Dict):
         self.sbom["vulnerabilities"] = vulnerabilities
+
+    def add_services(self, services: Dict):
+        self.sbom["services"] = services
 
     def add_data(self, sbom_data: SBOMData) -> None:
         for key, value in sbom_data.items():
@@ -80,6 +84,9 @@ class SBOM:
 
     def get_vulnerabilities(self) -> Dict:
         return self.sbom.get("vulnerabilities", [])
+
+    def get_services(self) -> Dict:
+        return self.sbom.get("vservices", [])
 
     def get_version(self) -> str:
         return self.sbom.get("version", "")

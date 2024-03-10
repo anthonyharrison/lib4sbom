@@ -41,6 +41,7 @@ class CycloneDXGenerator:
             self.component = []
         self.relationship = []
         self.vulnerability = []
+        self.service = []
         self.sbom_complete = False
         self.include_purl = False
         # Can specify version of CycloneDX through environment variable
@@ -73,6 +74,8 @@ class CycloneDXGenerator:
                     self.doc["dependencies"] = self.relationship
                 if len(self.vulnerability) > 0:
                     self.doc["vulnerabilities"] = self.vulnerability
+                if len(self.service) > 0:
+                    self.doc["services"] = self.service
             self.sbom_complete = True
         return self.doc
 
@@ -696,3 +699,6 @@ class CycloneDXGenerator:
             vulnerability["affects"] = affects
             statements.append(vulnerability)
         self.vulnerability = statements
+
+    def generate_service_data(self, services):
+        pass

@@ -1,0 +1,159 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.4",
+  "serialNumber": "urn:uuid:My_uuid_1234",
+  "version": 2,
+  "metadata": {
+    "timestamp": "2023-12-18T15:06:38Z",
+    "tools": [
+      {
+        "name": "lib4sbom",
+        "version": "0.5.4"
+      }
+    ],
+    "component": {
+      "type": "firmware",
+      "supplier": {
+        "name": "Acme Inc."
+      },
+      "version": "1.0a",
+      "bom-ref": "CDXRef-DOCUMENT",
+      "name": "iOSApp_Application"
+    }
+  },
+  "components": [
+    {
+      "type": "application",
+      "bom-ref": "1-iOSApp",
+      "name": "iOSApp",
+      "version": "1",
+      "supplier": {
+        "name": "RH"
+      },
+      "cpe": "cpe:/a:RH:iOSApp:1",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "2-swift-log",
+      "name": "swift-log",
+      "version": "1.5.2",
+      "supplier": {
+        "name": "Apple Inc ."
+      },
+      "cpe": "cpe:/a:Apple_Inc_.:swift-log:1.5.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/apple/swift-log",
+          "type": "website",
+          "comment": "Home page for project"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "3-SwiftTrace",
+      "name": "SwiftTrace",
+      "version": "8.4.6",
+      "supplier": {
+        "name": "John Holdsworth"
+      },
+      "cpe": "cpe:/a:John_Holdsworth:SwiftTrace:8.4.6",
+      "licenses": [
+        {
+          "license": {
+            "name": "SwiftTrace License",
+            "text": {
+              "content": "Copyright (c) 2015 John Holdsworth\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and\\/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.\n\nThis software contains code written by Oliver Letterer obtained from the\nfollowing github project which is licensed under the terms of that project:\n\nhttps:\\/\\/github.com\\/OliverLetterer\\/imp_implementationForwardingToSelector\n\nNow uses the very handy https:\\/\\/github.com\\/facebook\\/fishhook.\nSee the source and header files for licensing details.\n"
+            }
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/johnno1962/SwiftTrace",
+          "type": "website",
+          "comment": "Home page for project"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "CDXRef-DOCUMENT",
+      "dependsOn": [
+        "1-iOSApp"
+      ]
+    },
+    {
+      "ref": "1-iOSApp",
+      "dependsOn": [
+        "2-swift-log",
+        "3-SwiftTrace"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "bom-ref": "swifttrace@8.4.6",
+      "id": "CVE-2020-2345",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2020-2345"
+      },
+      "updated": "2023-12-18T15:06:38Z",
+      "created": "2023-12-18T15:06:38Z",
+      "analysis": {
+        "state": "not_affected",
+        "detail": "Vulnerable function is not used."
+      },
+      "affects": [
+        {
+          "ref": "swifttrace@8.4.6",
+          "version": {
+            "version": "8.4.6",
+            "status": "unaffected"
+          }
+        }
+      ]
+    },
+    {
+      "bom-ref": "swifttrace@8.4.6",
+      "id": "CVE-2023-1235",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-1235"
+      },
+      "updated": "2023-12-18T15:06:38Z",
+      "created": "2023-12-18T15:06:38Z",
+      "analysis": {
+        "state": "in_triage"
+      },
+      "affects": [
+        {
+          "ref": "swifttrace@8.4.6",
+          "version": {
+            "version": "8.4.6",
+            "status": "unknown"
+          }
+        }
+      ]
+    }
+  ]
+}
