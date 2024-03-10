@@ -188,6 +188,22 @@ class SBOMPackage:
     def get_value(self, attribute):
         return self.package.get(attribute, None)
 
+    def get_purl(self):
+        # Return Package URL if present
+        if "externalreference" in self.package:
+            for e in self.package["externalreference"]:
+                if 'purl' in e:
+                    return e[2]
+        return None
+
+    def get_cpe(self):
+        # Return CPE record if present
+        if "externalreference" in self.package:
+            for e in self.package["externalreference"]:
+                if 'cpe23type' in e:
+                    return e[2]
+        return None
+
     def debug_package(self):
         print("OUTPUT:", self.package)
 
