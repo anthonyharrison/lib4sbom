@@ -192,16 +192,18 @@ class SBOMPackage:
         # Return Package URL if present
         if "externalreference" in self.package:
             for e in self.package["externalreference"]:
-                if 'purl' in e:
-                    return e[2]
+                category, element, value = e
+                if element == 'purl':
+                    return value
         return None
 
     def get_cpe(self):
         # Return CPE record if present
         if "externalreference" in self.package:
             for e in self.package["externalreference"]:
-                if 'cpe23type' in e:
-                    return e[2]
+                category, element, value = e
+                if element in ['cpe22Type', 'cpe23Type']:
+                    return value
         return None
 
     def debug_package(self):

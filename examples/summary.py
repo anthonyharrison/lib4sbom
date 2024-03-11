@@ -7,6 +7,7 @@
 import sys
 from lib4sbom.parser import SBOMParser
 from lib4sbom.data.document import SBOMDocument
+from lib4sbom.data.package import SBOMPackage
 
 
 test_parser = SBOMParser()
@@ -38,8 +39,12 @@ try:
     if len(packages) > 0:
         print (f"\n{'Name':30} {'Version':15} {'Type':20}")
         print ("-" * 70)
+        thepackage=SBOMPackage()
         for package in packages:
+            thepackage.copy_package(package)
             print (f"{package['name']:30} {package.get('version','MISSING'):15} {package['type']:20}")
+            print (f"PURL {thepackage.get_purl()}")
+            print (f"CPE {thepackage.get_cpe()}")
 
 except FileNotFoundError:
     print (f"{sys.argv[1]} not found")
