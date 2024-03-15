@@ -30,7 +30,7 @@ class CycloneDXParser:
         elif sbom_file.endswith((".bom.xml", ".cdx.xml", ".xml")):
             return self.parse_cyclonedx_xml(sbom_file)
         else:
-            return {}, {}, {}, [], []
+            return {}, {}, {}, [], [], []
 
     def _governance_element(self, element):
         elements = []
@@ -271,17 +271,11 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_copyrighttext(d["copyright"])
             if "cpe" in d:
                 if d["cpe"].lower().startswith("cpe:2.3"):
-                    self.cyclonedx_package.set_externalreference(
-                    "SECURITY", "cpe23Type", d["cpe"]
-                )
+                    self.cyclonedx_package.set_cpe(d["cpe"])
                 elif d["cpe"].lower().startswith("cpe:/"):
-                    self.cyclonedx_package.set_externalreference(
-                        "SECURITY", "cpe22Type", d["cpe"]
-                    )
+                    self.cyclonedx_package.set_cpe(d["cpe"], cpetype="cpe22Type")
             if "purl" in d:
-                self.cyclonedx_package.set_externalreference(
-                    "PACKAGE-MANAGER", "purl", d["purl"]
-                )
+                self.cyclonedx_package.set_purl(d["purl"])
             if "group" in d:
                 self.cyclonedx_package.set_value("group", d["group"])
             if "properties" in d:
@@ -312,9 +306,6 @@ class CycloneDXParser:
             if "components" in d:
                 for component in d["components"]:
                     self._cyclondex_component(component)
-
-    def _cyclonedx_service(self, d):
-        pass
 
     def parse_cyclonedx_json(self, sbom_file):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
@@ -433,15 +424,61 @@ class CycloneDXParser:
                                 "justification", vuln["analysis"]["justification"]
                             )
                     vulnerabilities.append(vuln_info.get_vulnerability())
-                if "services" in data:
-                    service_info = SBOMService()
-                    for service in data["services"]:
-                        service_info.initialise()
-                        # TODO extract parameters
-                        services.append(service_info.get_serrvice())
                 if self.debug:
                     print(vulnerabilities)
-        return cyclonedx_document, files, self.packages, relationships, vulnerabilities
+            if "services" in data:
+                service_info = SBOMService()
+                for service in data["services"]:
+                    service_info.initialise()
+                    service_info.set_id(service["bom-ref"])
+                    service_info.set_name(service["name"])
+                    if 'version' in service:
+                        service_info.set_version(service['version'])
+                    if "description" in service:
+                        service_info.set_description(service["description"])
+                    if "provider" in service:
+                        name=service["provider"].get("name","")
+                        url=service["provider"].get("url","")
+                        contact=email=phone=""
+                        if "contact" in service["provider"]:
+                            contact=service["provider"]["contact"].get('name',"")
+                            email=service["provider"]["contact"].get('email',"")
+                            phone=service["provider"]["contact"].get('phone',"")
+                        service_info.set_provider(name=name, url=url, contact=contact, email=email, phone=phone)
+                    if "endpoints" in service:
+                        for endpoint in service['endpoints']:
+                            service_info.set_endpoint(endpoint)
+                    if "authenticated" in service:
+                        service_info.set_value("authenticated",service['authenticated'])
+                    if "x-trust-boundary" in service:
+                        service_info.set_value("x-trust-boundary", service['x-trust-boundary'])
+                    if "trustZone" in service:
+                        service_info.set_value("trustZone", service['trustZone'])
+                    if "data" in service:
+                        for data_element in service['data']:
+                            flow=data_element.get("flow")
+                            classification=data_element.get("classification")
+                            name=data_element.get("name","")
+                            description=data_element.get("description","")
+                            service_info.set_data(flow,classification,name=name,description=description)
+                    if "licenses" in service:
+                        for license in service['licenses']:
+                            service_info.set_license(license["license"])
+                    if "properties" in service:
+                        for property in service["properties"]:
+                            service_info.set_property(
+                                property["name"], property["value"]
+                            )
+                    if "externalreference" in service:
+                        for reference in service["externalreference"]:
+                            url = reference.get('url')
+                            external_type = reference.get('type')
+                            comment = reference.get('comment',"")
+                            service_info.set_externalreference(url, external_type, comment=comment)
+                    services.append(service_info.get_service())
+                if self.debug:
+                    print(services)
+        return cyclonedx_document, files, self.packages, relationships, vulnerabilities, services
 
     def _parse_component(self, component_element):
         """Parses a CycloneDX component element and returns a dictionary of its contents."""
@@ -552,18 +589,12 @@ class CycloneDXParser:
         cpe = self._xml_component(component, "cpe")
         if cpe != "":
             if cpe.lower().startswith("cpe:2.3"):
-                self.cyclonedx_package.set_externalreference(
-                    "SECURITY", "cpe23Type", cpe
-                )
+                self.cyclonedx_package.set_cpe(cpe)
             elif cpe.lower().startswith("cpe:/"):
-                self.cyclonedx_package.set_externalreference(
-                    "SECURITY", "cpe22Type", cpe
-                )
+                self.cyclonedx_package.set_cpe(cpe,cpetype="cpe22Type")
         purl = self._xml_component(component, "purl")
         if purl != "":
-            self.cyclonedx_package.set_externalreference(
-                "PACKAGE-MANAGER", "purl", purl
-            )
+            self.cyclonedx_package.set_purl(purl)
         # Potentially multiple entries
         for properties in component.findall(self.schema + "properties"):
             for property in properties.findall(self.schema + "property"):
@@ -627,6 +658,11 @@ class CycloneDXParser:
         vulnerabilities = []
         return vulnerabilities
 
+    def parse_services_xml(self):
+        # TODO
+        services = []
+        return services
+
     def parse_cyclonedx_xml(self, sbom_file):
         self.tree = ET.parse(sbom_file)
         self.root = self.tree.getroot()
@@ -636,4 +672,5 @@ class CycloneDXParser:
         self.parse_components_xml()
         dependencies = self.parse_dependencies_xml()
         vulnerabilities = self.parse_vulnerabilities_xml()
-        return document, {}, self.packages, dependencies, vulnerabilities
+        services = self.parse_services_xml()
+        return document, {}, self.packages, dependencies, vulnerabilities, services

@@ -38,18 +38,18 @@ class SBOMService:
     def set_id(self, id):
         self.service["id"] = id
 
-    def set_flow_type(self, type):
+    def _flow_type(self, type):
         # Handle all types as upper case.
-        flow_type = type.upper().replace("_", "-").strip()
+        flow_type = type.lower().replace("_", "-").strip()
         if flow_type in [
-            "INBOUND",
-            "OUTBOUND",
-            "BI-DIRECTIONAL",
-            "UNKNOWN",
+            "inbound",
+            "outbound",
+            "bi-directional",
+            "unknown",
         ]:
-            self.service["flow_type"] = service_type
+            return flow_type
         else:
-            self.service["flow_type"] = "UNKNOWN"
+            return "unknown"
 
     def set_version(self, version):
         self.service["version"] = self._semantic_version(version)
@@ -58,28 +58,41 @@ class SBOMService:
         if my_id is None and my_name is not None:
             self.set_id(self.get_name() + "_" + str(self.service["version"]))
 
-    def _validate_provider_type(self, type):
-        provider_type = type.lower().strip()
-        if supplier_type in [
-            "person",
-            "organization",
-        ]:
-            return supplier_type.capitalize()
-        if supplier_type == "author":
-            return "Person"
-        if supplier_type == "unknown":
-            return "UNKNOWN"
-        return "Organization"
-
-    def set_supplier(self, type, name):
+    def set_provider(self, name="", url="", contact="", email="", phone=""):
+        provider={}
         if len(name) > 0:
-            self.service["supplier_type"] = self._validate_supplier_type(type.strip())
-            self.service["supplier"] = name
+            provider['name'] = name
+        if len(url) > 0 and self._url_valid(url):
+            provider['url'] = url
+        if len(contact) > 0:
+            provider['contact'] = contact
+        if len(email) > 0:
+            provider['email'] = email
+        if len(phone) > 0:
+            provider['phone'] = phone
+        # Make sure at least one parameter has been provided
+        if len(provider) > 0:
+            self.service["provider"] = provider
 
-    def set_originator(self, type, name):
+    def set_endpoint(self, endpoint_url):
+        # Allow multiple entries
+        if self._url_valid(endpoint_url):
+            if "endpoints" in self.service:
+                self.service["endpoints"].append(endpoint_url)
+            else:
+                self.service["endpoints"] = [endpoint_url]
+
+    def set_data(self, flow, classification, name="", description=""):
+        # Allow multiple entries
+        data_entry = {"flow" : self._flow_type(flow), 'classification': classification}
         if len(name) > 0:
-            self.service["originator_type"] = self._validate_supplier_type(type.strip())
-            self.service["originator"] = name
+            data_entry['name'] = name
+        if len(description) > 0:
+            data_entry['description'] = description
+        if "data" in self.service:
+            self.service["data"].append(data_entry)
+        else:
+            self.service["data"] = [data_entry]
 
     def set_property(self, name, value):
         # Allow multiple entries
@@ -89,54 +102,70 @@ class SBOMService:
         else:
             self.service["property"] = [property_entry]
 
-    def set_licenseconcluded(self, license):
-        self.service["licenseconcluded"] = license
-
-    def set_licensedeclared(self, license, name=None):
-        self.service["licensedeclared"] = license
-        if name is not None:
-            # Use name if not SPDX license. license is then assumed to be the license text
-            self.service["licensename"] = name
-
-    def set_licensecomments(self, comment):
-        self.service["licensecomments"] = self._text(comment)
-
-    def set_licenseinfoinfiles(self, license_info):
+    def set_license(self, license_info):
         # Validate license
         license_id = self.license.find_license(license_info)
         # Only include if valid license
         if license_id != "UNKNOWN":
-            if "licenseinfoinfile" in self.service:
-                self.service["licenseinfoinfiles"].append(license_info)
+            if "licenseinfo" in self.service:
+                self.service["licenseinfo"].append(license_info)
             else:
-                self.service["licenseinfoinfiles"] = [license_info]
+                self.service["licenseinfo"] = [license_info]
 
-        self.service["licenseinfoinfiles"] = license_info
+    def _validate_type(self, type):
+        external_ref_types = [
+            "vcs", # Version Control System
+            "issue-tracker", # Issue or defect tracking system, or an Application Lifecycle Management (ALM) system
+            "website", # Website
+            "advisories", # Security advisories
+            "bom", # Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)
+            "mailing-list", # Mailing list or discussion group
+            "social", # Social media account
+            "chat", # Real-time chat platform
+            "documentation", # Documentation, guides, or how-to instructions
+            "support", # Community or commercial support
+            "distribution", # Direct or repository download location
+            "distribution-intake", # The location where a component was published to. This is often the same as "distribution" but may also include specialized publishing processes that act as an intermediary
+            "license", # The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness
+            "build-meta", # Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)
+            "build-system", # URL to an automated build system
+            "release-notes", # URL to release notes
+            "security-contact", # Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501) that specifies the records containing DNS Security TXT
+            "model-card", # A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency
+            "log", # A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations
+            "configuration", # Parameters or settings that may be used by other components or services
+            "evidence", # Information used to substantiate a claim
+            "formulation", # Describes how a component or service was manufactured or deployed
+            "attestation", # Human or machine-readable statements containing facts, evidence, or testimony
+            "threat-model", # An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format
+            "adversary-model", # The defined assumptions, goals, and capabilities of an adversary.
+            "risk-assessment", # Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.
+            "vulnerability-assertion", # A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.
+            "exploitability-statement", # A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.
+            "pentest-report", # Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test
+            "static-analysis-report", # SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code
+            "dynamic-analysis-report", # Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations
+            "runtime-analysis-report",  # Report generated by analyzing the call stack of a running application
+            "component-analysis-report", # Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis
+            "maturity-report", # Report containing a formal assessment of an organization, business unit, or team against a maturity model
+            "certification-report", # Industry, regulatory, or other certification from an accredited (if applicable) certification body
+            "quality-metrics", # Report or system in which quality metrics can be obtained
+            "codified-infrastructure", # Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)
+            "poam", # Plans of Action and Milestones (POAM) compliment an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".
+            "other", # Use this if no other types accurately describe the purpose of the external reference
+        ]
+        if type.lower() in external_ref_types:
+            return type.lower()
+        return "other"
 
-    def set_attribution(self, value):
+    def set_externalreference(self, url, type, comment=""):
         # Allow multiple entries
-        attribution_entry = [value]
-        if "attribution" in self.service:
-            self.service["attribution"].append(attribution_entry)
-        else:
-            self.service["attribution"] = [attribution_entry]
-
-    def set_externalreference(self, category, type, locator):
-        # Allow multiple entries
-        reference_entry = [category, type.strip(), locator]
-        if "externalreference" in self.service:
-            self.service["externalreference"].append(reference_entry)
-        else:
-            self.service["externalreference"] = [reference_entry]
-
-    def set_copyrighttext(self, text):
-        self.service["copyrighttext"] = self._text(text)
-
-    def set_comment(self, comment):
-        self.service["comment"] = self._text(comment)
-
-    def set_summary(self, summary):
-        self.service["summary"] = self._text(summary)
+        if self._url_valid(url):
+            reference_entry = [url, self._validate_type(type), comment]
+            if "externalreference" in self.service:
+                self.service["externalreference"].append(reference_entry)
+            else:
+                self.service["externalreference"] = [reference_entry]
 
     def set_description(self, description):
         self.service["description"] = self._text(description)
@@ -167,9 +196,4 @@ class SBOMService:
     def _semantic_version(self, version):
         return version.split("-")[0] if "-" in version else version
 
-    def _valid_checksum(self, value):
-        # Checksum length is either 32, 40, 64, 96 or 128 characters
-        if len(value) not in [32,48,64,96,128]:
-            return False
-        # Only allow valid hex or decimal digits
-        return all(c in string.hexdigits for c in value.lower())
+

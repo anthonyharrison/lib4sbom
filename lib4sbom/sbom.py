@@ -86,7 +86,7 @@ class SBOM:
         return self.sbom.get("vulnerabilities", [])
 
     def get_services(self) -> Dict:
-        return self.sbom.get("vservices", [])
+        return self.sbom.get("services", [])
 
     def get_version(self) -> str:
         return self.sbom.get("version", "")

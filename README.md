@@ -15,6 +15,7 @@ The following facilities are provided:
 - Create and manipulate a SBOM package object
 - Create and manipulate a SBOM dependency relationship object
 - Create and manipulate a Vulnerability object
+- Create and manipulate a Software Service object
 - Generated SBOM can be output to a file or to the console
 
 ## Installation
@@ -96,6 +97,12 @@ Returns a list of packages elements from within a parsed SBOM
 
 get_relationships()
 Returns the relationship elements from within a parsed SBOM
+
+get_vulnerabilities()
+Returns the vulnerability elements from within a parsed SBOM
+
+get_services()
+Returns the software service elements from within a parsed SBOM
 
 get_type()
 Returns the type of SBOM (either spdx or cyclonedx)
@@ -368,9 +375,11 @@ e.g. set_type(). Unless indicated, the method just takes a single parameter for 
 
 **Note**
 
-1 This relates to the version of the specification of SBOM specified by the type atrribute. e.g. 1.4 for CycloneDX, SPDX-2.3 for SPDX.
-2 This refers to the type of SBOM either SPDX or CycloneDX.
-3 This relates to the unique identifier for the SBOM.
+1. This relates to the version of the specification of SBOM specified by the type atrribute. e.g. 1.4 for CycloneDX, SPDX-2.3 for SPDX.
+
+2. This refers to the type of SBOM either SPDX or CycloneDX.
+
+3. This relates to the unique identifier for the SBOM.
 
 **_Getter Methods_**
 
@@ -423,7 +432,7 @@ indicated, the method just takes a single parameter for the value. Where indicat
 
 **Note**
 
-1 This relates to the type of component which the SBOM is describing. This is attribute is only used for CycloneDX SBOMs.
+1. This relates to the type of component which the SBOM is describing. This is attribute is only used for CycloneDX SBOMs.
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
@@ -488,7 +497,7 @@ indicated, the method just takes a single parameter for the value. Where indicat
 
 **Note**
 
-1 The set_checksum method takes two parameters, the checksum algorithm (e.g. SHA256) and the actual checksum value (as a string)
+1. The set_checksum method takes two parameters, the checksum algorithm (e.g. SHA256) and the actual checksum value (as a string)
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
@@ -506,7 +515,7 @@ Returns the name of the SBOMFile object or None if the 'name' attribute does not
 get_value(attribute)
 Returns the value of the attribute. A default value is returned if the attribute does not exist within the instance of the SBOMFile object.
 
-Utility Methods
+_**Utility Methods**_
 
 initialise() Reinitialises a SBOMFile Object. All data associated with the object is deleted.
 
@@ -565,21 +574,29 @@ indicated, the method just takes a single parameter for the value. Where indicat
 | Supplier          | No       |      |
 | Version           | No       |      |
 | Homepage          | No       |      |
-| Property          | Yes      |      |
+| Property          | Yes      | (4)  |
 | DownloadLocation  | No       |      |
 | Description       | No       |      |
-| ExternalReference | Yes      |      |
+| ExternalReference | Yes      | (5)  |
+| Cpe               | No       |      |
+| Purl              | No       | (6)  |
 | Summary           | No       |      |
 | SourceInfo        | No       |      |
 | Filename          | No       |      |
 
 **Note**
 
-1 The set_type method is used to indicate the purpose of the package (e.g. Application, Library, Operating-System).
+1. The set_type method is used to indicate the purpose of the package (e.g. Application, Library, Operating-System).
 
-2 The set_checksum method takes two parameters, the checksum algorithm (e.g. SHA256) and the actual checksum value (as a string)
+2. The set_checksum method takes two parameters, the checksum algorithm (e.g. SHA256) and the actual checksum value (as a string)
 
-3 The set_licensedeclared method takes an optional second parameter which is the license name. In this case the first parameter, license, is assumed to be the license text rather than the license identity.
+3. The set_licensedeclared method takes an optional second parameter which is the license name. In this case the first parameter, license, is assumed to be the license text rather than the license identity.
+
+4. The set_property method takes two parameters which are the property name and value.
+
+5. The set_externalreference method takes three parameters which are the category (SECURITY or PACKAGE_MANAGER), type (cpe22Type, cpe23Type or purl) and the element corresponding to the tyoe.
+
+6. The set_cpe takes an optional second parameter which is the CPE type (default is cpeType23).
 
 There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
 
@@ -592,12 +609,18 @@ Returns the SBOMPackage object as a dictionary. The value of an attribute is ret
 case the value of the attribute is returned as a List.
 
 get_name()
-Returns the name of the SBOM File object or None if the 'name' attribute does not exist within the instance of the SBOMPackage object.
+Returns the name of the SBOMPackage object or None if the 'name' attribute does not exist within the instance of the SBOMPackage object.
 
 get_value(attribute)
 Returns the value of the attribute. A default value is returned if the attribute does not exist within the instance of the SBOMPackage object.
 
-Utility Methods
+get_purl()
+Returns the PURL identifier as a string for the package or None if no PURL element is defined.
+
+get_cpe()
+Returns the CPE identifier as a string for the package or None if no CPE element is defined.
+
+**_Utility Methods_**
 
 initialise() Reinitialises a SBOMPackage Object. All data associated with the object is deleted.
 
@@ -722,6 +745,81 @@ Returns the vulnerability object as a dictionary.
 >>> from lib4sbom.sbom import SBOM
 >>> my_sbom = SBOM()
 >>> my_sbom.add_vulnerabilities(vulnerabilities)
+```
+
+### Services Object
+
+_class_ **SBOMService**(validation = None)
+
+This creates a simple software service object which is used to define the details of a software service. As there are multiple ways of specifying the status of a vulnerability, it is left to the
+application manipulating the Vulnerability object to apply validation as appropriate to ensure the semantics of the vulnerability are correct.
+
+**NOTE** Services objects are only included in CyclonedDX SBOMs
+
+**_Setter Methods_**
+
+For the following attributes, a method **_set_attribute(value)_** is provided. Note that the attribute name is always in _lowercase_.
+e.g. set_release(). Each method takes a single parameter for the value. Multiple instances of the attribute are not allowed.
+
+
+| Attribute        | Multiple | Note |
+|------------------|----------|------|
+| Name             | No       |      |
+| Id               | No       | (1)  |
+| Version          | No       |      |
+| Provider         | No       | (2)  |
+| Endpoint         | Yes      |      |
+| Data             | Yes      | (3)  |
+| Property         | Yes      | (4)  |
+| License          | Yes      |      |
+| Exernalreference | Yes      | (5)  |
+| Description      | No       |      |
+
+
+**Note**
+
+1. The set_id method is used to indicate the identity of the service. If this is not specified, an id will be automatically generated.
+
+2. The set_provider is used to specify details of the service provider. There are multiple parameters which can be specified (name, url, contactname, email address and phone) at least one must be specified.
+
+3. The set_data method is used to provide additional information to describe the data being exhanged. There are two mandatatory parameters flow type ("Inbound", "Outbound", "Bi-directional" or "Unknown") and classification, and two optional paramters name and description.
+
+4. The set_property method takes two parameters which are the property name and value.
+
+5. The set_externalreference method takes three parameters, the URL, the type of information being referenced and an optional comment.
+
+There is an additional setter method, **set_value**(_attribute, value_) which allows the setting of any attribute.
+
+`set_value("trustzone", "Data_DMZ")`
+
+**_Getter Methods_**
+
+get_service()
+Returns the service object as a dictionary.
+
+**Example**
+
+```python
+>>> from lib4sbom.data.service import SBOMService
+>>> sbom_services = {}
+>>> my_service=SBOMService()
+>>> my_service.set_name("Microsoft 365")
+>>> my_service.set_version("2022.04")
+>>> my_service.set_provider(name="Microsoft Inc.", contact="Fred Flintstone", email="fred@micrsoft.com")
+>>> my_service.set_description("Business productivity suite")
+>>> my_service.set_value("authenticated",True)
+>>> my_service.set_endpoint("www.microsoft.com")
+>>> my_service.set_endpoint("www.microsoft.com/owa")
+>>> my_service.set_data("Bi-directional","None",description="document")
+>>> my_service.set_data("outbound","PII",name="User information")
+>>> my_service.set_license("Apache-2.0")
+>>> my_service.set_license("MIT")
+>>> my_service.set_property("Data_Location","EU")
+>>> my_service.set_externalreference("https://www.microsoft.com","Website", "Company website")
+>>> sbom_services[(my_service.get_name(), my_service.get_value('version'))] = my_service.get_service()
+>>> from lib4sbom.sbom import SBOM
+>>> my_sbom = SBOM()
+>>> my_sbom.add_services(sbom_services)
 ```
 
 ## Examples

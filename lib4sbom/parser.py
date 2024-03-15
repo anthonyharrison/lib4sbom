@@ -30,6 +30,7 @@ class SBOMParser:
         self.packages = None
         self.relationships = None
         self.vulnerabilities = None
+        self.services = None
         self.sbom = SBOM(self.sbom_type)
 
     def parse_file(self, filename: str) -> None:
@@ -71,6 +72,7 @@ class SBOMParser:
                     self.packages,
                     self.relationships,
                     self.vulnerabilities,
+                    self.services,
                 ) = self.parser.parse(filename)
                 # but if no packages or files found, assume it must be CycloneDX
                 if len(self.packages) == 0 and len(self.files) == 0:
@@ -82,6 +84,7 @@ class SBOMParser:
                         self.packages,
                         self.relationships,
                         self.vulnerabilities,
+                        self.services,
                     ) = self.parser.parse(filename)
             else:
                 (
@@ -90,6 +93,7 @@ class SBOMParser:
                     self.packages,
                     self.relationships,
                     self.vulnerabilities,
+                    self.services,
                 ) = self.parser.parse(filename)
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
@@ -98,6 +102,8 @@ class SBOMParser:
                 self.sbom.add_document(self.document.get_document())
             if len(self.vulnerabilities) > 0:
                 self.sbom.add_vulnerabilities(self.vulnerabilities)
+            if len(self.services) > 0:
+                self.sbom.add_services(self.services)
             self.sbom.set_type(self.sbom_type)
         except KeyError:
             pass
@@ -167,3 +173,12 @@ class SBOMParser:
 
         """
         return self.sbom.get_vulnerabilities()
+
+    def get_services(self) -> List[Dict]:
+        """Returns the service elements from within a parsed SBOM
+        Returns
+        -------
+        relationships : list of SBOMService objects
+
+        """
+        return self.sbom.get_services()

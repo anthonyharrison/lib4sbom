@@ -701,4 +701,85 @@ class CycloneDXGenerator:
         self.vulnerability = statements
 
     def generate_service_data(self, services):
-        pass
+        service_definitions = []
+        service_number=1
+        sbom_services = [x for x in services.values()]
+        for serv in sbom_services:
+            service = {}
+            if 'id' in serv:
+                service['bom-ref'] = serv['id']
+            else:
+                service['bom-ref'] = f"Service-{service_number}"
+            service['name'] = serv['name']
+            if 'version' in serv:
+                service['version'] = serv['version']
+            if 'description' in serv:
+                service['description'] = serv['description']
+            if "provider" in serv:
+                provider = {}
+                if "name" in serv['provider']:
+                    provider['name'] = serv['provider']['name']
+                if "url" in serv['provider']:
+                    provider['url'] = serv['provider']['url']
+                contact = {}
+                if "contact" in serv['provider']:
+                    contact['name'] = serv['provider']['contact']
+                if "email" in serv['provider']:
+                    contact['email'] = serv['provider']['email']
+                if "phone" in serv['provider']:
+                    contact['email'] = serv['provider']['phone']
+                if len(contact) > 0:
+                    provider['contact'] = contact
+                service["provider"] = provider
+            if "endpoints" in serv:
+                service["endpoints"] = serv['endpoints']
+            if "authenticated" in serv:
+                service["authenticated"] = serv['authenticated']
+            if "x-trust-boundary" in serv:
+                service["x-trust-boundary"] = serv['x-trust-boundary']
+            if "trustZone" in serv:
+                service["trustZone"] = serv['trustZone']
+            if "data" in serv:
+                data = []
+                for data_item in serv['data']:
+                    data_element = {}
+                    data_element['flow'] = data_item.get('flow')
+                    data_element['classification'] = data_item.get('classification')
+                    if 'name' in data_item:
+                        data_element['name'] = data_item.get('name')
+                    if 'description' in data_item:
+                        data_element['description'] = data_item.get('description')
+                    data.append(data_element)
+                service['data'] = data
+            if "licenseinfo" in serv:
+                licenses = []
+                for license_item in serv["licenseinfo"]:
+                    licenses.append({"license": license_item})
+                service["licenses"] = licenses
+            if "property" in serv:
+                for property in serv["property"]:
+                    property_entry = dict()
+                    property_entry["name"] = property[0]
+                    property_entry["value"] = property[1]
+                    if "properties" in service:
+                        service["properties"].append(property_entry)
+                    else:
+                        service["properties"] = [property_entry]
+            if "externalreference" in serv:
+                # Potentially multiple entries
+                for reference in serv["externalreference"]:
+                    url = reference[0]
+                    ref_type = reference[1]
+                    ref_comment = reference[2]
+                    externalReference = dict()
+                    externalReference["url"] = url
+                    externalReference["type"] = ref_type
+                    if len(ref_comment) > 0:
+                        externalReference["comment"] = ref_comment
+                    if "externalReferences" in service:
+                        service["externalReferences"].append(externalReference)
+                    else:
+                        service["externalReferences"] = [externalReference]
+            service_definitions.append(service)
+            service_number += 1
+        self.service = service_definitions

@@ -8,7 +8,7 @@ import sys
 from lib4sbom.parser import SBOMParser
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.package import SBOMPackage
-
+from lib4sbom.data.service import SBOMService
 
 test_parser = SBOMParser()
 # Load SBOM
@@ -21,6 +21,7 @@ try:
 
     packages = test_parser.get_packages()
     files = test_parser.get_files()
+    services = test_parser.get_services()
     print ("Summary")
     print ("=" * len("summary"))
     print (f"SBOM Type    {document.get_type()}")
@@ -45,6 +46,15 @@ try:
             print (f"{package['name']:30} {package.get('version','MISSING'):15} {package['type']:20}")
             print (f"PURL {thepackage.get_purl()}")
             print (f"CPE {thepackage.get_cpe()}")
+    print (f"\nServices     {len(services)}")
+    if len(services) > 0:
+        print (f"\n{'Name':30} {'Version':15} {'Id':20}")
+        print ("-" * 70)
+        theservice=SBOMService()
+        for service in services:
+            theservice.copy_service(service)
+            print (f"{service['name']:30} {service.get('version','MISSING'):15} {service['id']:20}")
+            print (f"Endpoints {theservice.get_value('endpoints')}")
 
 except FileNotFoundError:
     print (f"{sys.argv[1]} not found")
