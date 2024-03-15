@@ -159,13 +159,21 @@ class SBOMPackage:
         else:
             self.package["attribution"] = [attribution_entry]
 
-    def set_externalreference(self, category, type, locator):
+    def set_externalreference(self, category, ref_type, locator):
         # Allow multiple entries
-        reference_entry = [category, type.strip(), locator]
-        if "externalreference" in self.package:
-            self.package["externalreference"].append(reference_entry)
-        else:
-            self.package["externalreference"] = [reference_entry]
+        if category in ["SECURITY", "PACKAGE_MANAGER"] and ref_type in ["cpe22Type", "cpe23Type", "purl"]:
+            reference_entry = [category, ref_type.strip(), locator]
+            if "externalreference" in self.package:
+                self.package["externalreference"].append(reference_entry)
+            else:
+                self.package["externalreference"] = [reference_entry]
+
+    def set_cpe(self, vector, cpetype="cpe23Type"):
+        if cpetype in ['cpe22Type', 'cpe23Type']:
+            self.set_externalreference("SECURITY", cpetype, vector)
+
+    def set_purl(self, purl_value):
+        self.set_externalreference("PACKAGE_MANAGER", "purl", purl_value)
 
     def set_copyrighttext(self, text):
         self.package["copyrighttext"] = self._text(text)
