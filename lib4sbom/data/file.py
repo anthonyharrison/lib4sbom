@@ -117,7 +117,7 @@ class SBOMFile:
 
     def _valid_checksum(self, value):
         # Checksum length is either 32, 40, 64, 96 or 128 characters
-        if len(value) not in [32,48,64,96,128]:
+        if len(value) not in [32,40,64,96,128]:
             return False
         # Only allow valid hex or decimal digits
         return all(c in string.hexdigits for c in value.lower())
