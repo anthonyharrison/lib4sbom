@@ -337,6 +337,8 @@ class SPDXParser:
                             spdx_file.set_licenseconcluded(d["licenseConcluded"])
                         if "copyrightText" in d:
                             spdx_file.set_copyrighttext(d["copyrightText"])
+                        if "fileComment" in d:
+                            spdx_file.set_comment(d["fileComment"])
                         if filename not in files:
                             # Save file metadata
                             files[filename] = spdx_file.get_file()
