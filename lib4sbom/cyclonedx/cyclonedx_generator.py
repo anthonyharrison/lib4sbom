@@ -655,7 +655,8 @@ class CycloneDXGenerator:
             vulnerability = {}
             vuln_info = Vulnerability(validation="cyclonedx")
             vuln_info.copy_vulnerability(vuln)
-            vulnerability["bom-ref"] = vuln_info.get_value("bom-ref")
+            if "bom-ref" in vulnerability:
+                vulnerability["bom-ref"] = vuln_info.get_value("bom-ref")
             vulnerability["id"] = vuln_info.get_value("id")
             if vulnerability["id"].startswith("CVE-"):
                 # NVD Data source
