@@ -278,6 +278,11 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_purl(d["purl"])
             if "group" in d:
                 self.cyclonedx_package.set_value("group", d["group"])
+            if "evidence" in d:
+                evidence = d["evidence"]
+                if evidence.get("occurrences") is not None:
+                    for occurrence in evidence["occurrences"]:
+                        self.cyclonedx_package.set_evidence(occurrence["location"])
             if "properties" in d:
                 # Potentially multiple entries
                 for property in d["properties"]:

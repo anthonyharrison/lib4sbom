@@ -217,6 +217,12 @@ class SBOMPackage:
     def set_description(self, description):
         self.package["description"] = self._text(description)
 
+    def set_evidence(self, evidence):
+        if "evidence" in self.package:
+            self.package["evidence"].append(evidence)
+        else:
+            self.package["evidence"] = [evidence]
+
     def set_value(self, key, value):
         self.package[key] = value
 
