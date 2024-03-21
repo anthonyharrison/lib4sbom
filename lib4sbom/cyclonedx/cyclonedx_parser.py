@@ -329,6 +329,7 @@ class CycloneDXParser:
             cyclonedx_version = data["specVersion"]
             cyclonedx_document.set_version(cyclonedx_version)
             cyclonedx_document.set_type("cyclonedx")
+            cyclonedx_document.set_value("uuid",data["serialNumber"])
             if "metadata" in data:
                 if "timestamp" in data["metadata"]:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])

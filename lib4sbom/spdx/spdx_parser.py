@@ -83,6 +83,9 @@ class SPDXParser:
                 if not document_element:
                     # ID can come before name
                     elements[spdx_id] = element_name
+            elif line_elements[0] == "DocumentNamespace":
+                namespace = line_elements[1].strip().rstrip("\n")
+                spdx_document.set_value("uuid", namespace)
             elif line_elements[0] == "Created":
                 # Capture all data after tag
                 created = line[len("Created:") :].strip().rstrip("\n")
@@ -309,6 +312,7 @@ class SPDXParser:
                 spdx_document.set_licenselist(data["licenseListVersion"])
             spdx_document.set_type("spdx")
             spdx_document.set_name(data["name"])
+            spdx_document.set_value("uuid", data["documentNamespace"])
             # Process Creation Info
             spdx_document.set_created(data["creationInfo"]["created"])
             # Potentially multiple entries
