@@ -662,8 +662,15 @@ class CycloneDXGenerator:
             vulnerability = {}
             vuln_info = Vulnerability(validation="cyclonedx")
             vuln_info.copy_vulnerability(vuln)
-            if "bom-ref" in vulnerability:
+            if "bom-ref" in vuln:
                 vulnerability["bom-ref"] = vuln_info.get_value("bom-ref")
+            else:
+                # Assume ref is based on product
+                if "release" in vuln:
+                    vulnerability["bom-ref"] = f'{vuln_info.get_value("product")}@{vuln_info.get_value("release")}'
+                else:
+                    # assume it is a PURL
+                    vulnerability["bom-ref"] = vuln_info.get_value("purl")
             vulnerability["id"] = vuln_info.get_value("id")
             if vulnerability["id"].startswith("CVE-"):
                 # NVD Data source
@@ -675,11 +682,11 @@ class CycloneDXGenerator:
                 vulnerability["source"] = source
             if "description" in vuln:
                 vulnerability["description"] = vuln_info.get_value("description")
-            vulnerability["updated"] = self.doc["metadata"]["timestamp"]
             if "created" in vuln:
-                vulnerability["created"] = vuln_info.get_value("created")
+                vulnerability["published"] = vuln_info.get_value("created")
             else:
-                vulnerability["created"] = vulnerability["updated"]
+                vulnerability["published"] = self.doc["metadata"]["timestamp"]
+            vulnerability["updated"] = self.doc["metadata"]["timestamp"]
             analysis = {}
             analysis["state"] = vuln_info.get_value("status")
             if analysis["state"] is None or not vuln_info.validate_status(
@@ -691,20 +698,20 @@ class CycloneDXGenerator:
             if "justification" in vuln:
                 analysis["justification"] = vuln_info.get_value("justification")
             vulnerability["analysis"] = analysis
-            affects = []
-            affected = {}
-            affected["ref"] = vulnerability["bom-ref"]
-            version_info = {}
-            version_info["version"] = vuln_info.get_value("release")
-            if analysis["state"] == "not_affected":
-                version_info["status"] = "unaffected"
-            elif analysis["state"] == "in_triage":
-                version_info["status"] = "unknown"
-            else:
-                version_info["status"] = "affected"
-            affected["versions"] = version_info
-            affects.append(affected)
-            vulnerability["affects"] = affects
+            if "bom_link" in vuln:
+                affects = []
+                affected = {}
+                affected["ref"] = vuln_info.get_value("bom_link")
+                version_info = {}
+                if analysis["state"] == "not_affected":
+                    version_info["status"] = "unaffected"
+                elif analysis["state"] == "in_triage":
+                    version_info["status"] = "unknown"
+                else:
+                    version_info["status"] = "affected"
+                affected["versions"] = version_info
+                affects.append(affected)
+                vulnerability["affects"] = affects
             statements.append(vulnerability)
         self.vulnerability = statements
 

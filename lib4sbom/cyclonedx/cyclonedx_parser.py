@@ -330,6 +330,7 @@ class CycloneDXParser:
             cyclonedx_document.set_version(cyclonedx_version)
             cyclonedx_document.set_type("cyclonedx")
             cyclonedx_document.set_value("uuid",data["serialNumber"])
+            cyclonedx_document.set_value("bom_version", data["version"])
             if "metadata" in data:
                 if "timestamp" in data["metadata"]:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])
@@ -418,8 +419,10 @@ class CycloneDXParser:
                         vuln_info.set_value("source-url", vuln["source"]["url"])
                     if "description" in vuln:
                         vuln_info.set_description(vuln["description"])
-                    if "created" in vuln:
-                        vuln_info.set_value("created", vuln["created"])
+                    if "published" in vuln:
+                        vuln_info.set_value("created", vuln["published"])
+                    if "updated" in vuln:
+                        vuln_info.set_value("updated", vuln["updated"])
                     if "analysis" in vuln:
                         if "state" in vuln["analysis"]:
                             vuln_info.set_value("status", vuln["analysis"]["state"])
@@ -429,6 +432,8 @@ class CycloneDXParser:
                             vuln_info.set_value(
                                 "justification", vuln["analysis"]["justification"]
                             )
+                    if "affects" in vuln:
+                        vuln_info.set_value("bom_link", vuln["affects"][0]["ref"])
                     vulnerabilities.append(vuln_info.get_vulnerability())
                 if self.debug:
                     print(vulnerabilities)
