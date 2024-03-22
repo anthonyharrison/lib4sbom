@@ -96,3 +96,6 @@ class SBOM:
 
     def get_uuid(self):
         return self.sbom.get("uuid", None)
+
+    def get_bom_version(self):
+        return self.sbom.get("bom_version", None)
