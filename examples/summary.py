@@ -22,6 +22,7 @@ try:
     packages = test_parser.get_packages()
     files = test_parser.get_files()
     services = test_parser.get_services()
+    vulnerabilities = test_parser.get_vulnerabilities()
     print ("Summary")
     print ("=" * len("summary"))
     print (f"SBOM Type    {document.get_type()}")
@@ -46,6 +47,11 @@ try:
             print (f"{package['name']:30} {package.get('version','MISSING'):15} {package['type']:20}")
             print (f"PURL {thepackage.get_purl()}")
             print (f"CPE {thepackage.get_cpe()}")
+    print (f"\nVulnerabilities    {len(vulnerabilities)}")
+    if len(vulnerabilities) > 0:
+        print ("-" * 70)
+        for vuln in vulnerabilities:
+            print(vuln)
     print (f"\nServices     {len(services)}")
     if len(services) > 0:
         print (f"\n{'Name':30} {'Version':15} {'Id':20}")
