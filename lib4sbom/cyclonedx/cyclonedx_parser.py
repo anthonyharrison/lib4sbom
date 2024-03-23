@@ -3,6 +3,7 @@
 
 import json
 import os
+import uuid
 
 import defusedxml.ElementTree as ET
 
@@ -329,7 +330,7 @@ class CycloneDXParser:
             cyclonedx_version = data["specVersion"]
             cyclonedx_document.set_version(cyclonedx_version)
             cyclonedx_document.set_type("cyclonedx")
-            cyclonedx_document.set_value("uuid",data["serialNumber"])
+            cyclonedx_document.set_value("uuid",data.get("serialNumber","urn:uuid:" + str(uuid.uuid4())))
             cyclonedx_document.set_value("bom_version", data["version"])
             if "metadata" in data:
                 if "timestamp" in data["metadata"]:
