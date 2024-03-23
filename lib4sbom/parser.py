@@ -3,6 +3,7 @@
 
 from pathlib import Path
 from typing import Dict, List
+import os
 
 from lib4sbom.cyclonedx.cyclonedx_parser import CycloneDXParser
 from lib4sbom.sbom import SBOM, SBOMData
@@ -24,6 +25,7 @@ class SBOMParser:
     """
 
     def __init__(self, sbom_type: str = "auto"):
+        self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
         self.sbom_type = sbom_type
         self.document = None
         self.files = None
@@ -106,9 +108,11 @@ class SBOMParser:
                 self.sbom.add_services(self.services)
             self.sbom.set_type(self.sbom_type)
         except KeyError:
-            pass
+            if self.debug:
+                print ("Key Error")
         except TypeError:
-            pass
+            if self.debug:
+                print ("Type Error")
 
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type
