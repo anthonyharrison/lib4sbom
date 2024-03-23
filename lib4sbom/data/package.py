@@ -161,7 +161,7 @@ class SBOMPackage:
 
     def set_externalreference(self, category, ref_type, locator):
         # Allow multiple entries
-        if category in ["SECURITY", "PACKAGE_MANAGER"] and ref_type in ["cpe22Type", "cpe23Type", "purl"]:
+        if category in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER"] and ref_type in ["cpe22Type", "cpe23Type", "purl"]:
             reference_entry = [category, ref_type.strip(), locator]
             if "externalreference" in self.package:
                 self.package["externalreference"].append(reference_entry)
@@ -190,7 +190,6 @@ class SBOMPackage:
             # Validate vector
             elements = vector.replace('\\:','$').split(':')
             if cpetype == 'cpe23Type':
-                # cpe:2.3:a:{component_supplier.replace(' ', '_').lower()}:{package}:{cpe_version}:*:*:*:*:*:*:*"
                 supplier=self._escape(elements[3].replace(' ', '_').lower())
                 package=self._escape(elements[4])
                 version=self._escape(elements[5])
