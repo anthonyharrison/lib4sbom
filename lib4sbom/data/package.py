@@ -161,7 +161,11 @@ class SBOMPackage:
 
     def set_externalreference(self, category, ref_type, locator):
         # Allow multiple entries
-        if category in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER"] and ref_type in ["cpe22Type", "cpe23Type", "purl"]:
+        if category in [
+            "SECURITY",
+            "PACKAGE-MANAGER",
+            "PACKAGE_MANAGER",
+        ] and ref_type in ["cpe22Type", "cpe23Type", "purl"]:
             reference_entry = [category, ref_type.strip(), locator]
             if "externalreference" in self.package:
                 self.package["externalreference"].append(reference_entry)
@@ -173,7 +177,7 @@ class SBOMPackage:
         escape_char = False
         for i in range(0, len(str)):
             char = str[i]
-            if escape_char or char.isalnum() or char in ['.', '_', '-']:
+            if escape_char or char.isalnum() or char in [".", "_", "-"]:
                 escaped = f"{escaped}{char}"
                 escape_char = False
             elif char == "\\":
@@ -182,23 +186,23 @@ class SBOMPackage:
             elif char == "$":
                 escaped = f"{escaped}\\:"
             else:
-                escaped = f"{escaped}\{char}"
+                escaped = f"{escaped}\\{char}"
         return escaped
 
     def set_cpe(self, vector, cpetype="cpe23Type"):
-        if cpetype in ['cpe22Type', 'cpe23Type']:
+        if cpetype in ["cpe22Type", "cpe23Type"]:
             # Validate vector
-            elements = vector.replace('\\:','$').split(':')
-            if cpetype == 'cpe23Type':
-                supplier=self._escape(elements[3].replace(' ', '_').lower())
-                package=self._escape(elements[4])
-                version=self._escape(elements[5])
-                new_vector=f"cpe:2.3:a:{supplier}:{package}:{version}:*:*:*:*:*:*:*"
+            elements = vector.replace("\\:", "$").split(":")
+            if cpetype == "cpe23Type":
+                supplier = self._escape(elements[3].replace(" ", "_").lower())
+                package = self._escape(elements[4])
+                version = self._escape(elements[5])
+                new_vector = f"cpe:2.3:a:{supplier}:{package}:{version}:*:*:*:*:*:*:*"
             else:
-                supplier=self._escape(elements[2].replace(' ', '_').lower())
-                package=self._escape(elements[3])
-                version=self._escape(elements[4])
-                new_vector=f"cpe:{elements[1]}:{supplier}:{package}:{version}"
+                supplier = self._escape(elements[2].replace(" ", "_").lower())
+                package = self._escape(elements[3])
+                version = self._escape(elements[4])
+                new_vector = f"cpe:{elements[1]}:{supplier}:{package}:{version}"
             self.set_externalreference("SECURITY", cpetype, new_vector)
 
     def set_purl(self, purl_value):
@@ -236,7 +240,7 @@ class SBOMPackage:
         if "externalreference" in self.package:
             for e in self.package["externalreference"]:
                 category, element, value = e
-                if element == 'purl':
+                if element == "purl":
                     return value
         return None
 
@@ -245,7 +249,7 @@ class SBOMPackage:
         if "externalreference" in self.package:
             for e in self.package["externalreference"]:
                 category, element, value = e
-                if element in ['cpe22Type', 'cpe23Type']:
+                if element in ["cpe22Type", "cpe23Type"]:
                     return value
         return None
 
@@ -268,7 +272,7 @@ class SBOMPackage:
 
     def _valid_checksum(self, value):
         # Checksum length is either 32, 40, 64, 96 or 128 characters
-        if len(value) not in [32,40,64,96,128]:
+        if len(value) not in [32, 40, 64, 96, 128]:
             return False
         # Only allow valid hex or decimal digits
         return all(c in string.hexdigits for c in value.lower())

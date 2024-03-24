@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import re
-import string
 
 from lib4sbom.license import LicenseScanner
+
 
 class SBOMService:
     def __init__(self):
@@ -59,17 +59,17 @@ class SBOMService:
             self.set_id(self.get_name() + "_" + str(self.service["version"]))
 
     def set_provider(self, name="", url="", contact="", email="", phone=""):
-        provider={}
+        provider = {}
         if len(name) > 0:
-            provider['name'] = name
+            provider["name"] = name
         if len(url) > 0 and self._url_valid(url):
-            provider['url'] = url
+            provider["url"] = url
         if len(contact) > 0:
-            provider['contact'] = contact
+            provider["contact"] = contact
         if len(email) > 0:
-            provider['email'] = email
+            provider["email"] = email
         if len(phone) > 0:
-            provider['phone'] = phone
+            provider["phone"] = phone
         # Make sure at least one parameter has been provided
         if len(provider) > 0:
             self.service["provider"] = provider
@@ -84,11 +84,11 @@ class SBOMService:
 
     def set_data(self, flow, classification, name="", description=""):
         # Allow multiple entries
-        data_entry = {"flow" : self._flow_type(flow), 'classification': classification}
+        data_entry = {"flow": self._flow_type(flow), "classification": classification}
         if len(name) > 0:
-            data_entry['name'] = name
+            data_entry["name"] = name
         if len(description) > 0:
-            data_entry['description'] = description
+            data_entry["description"] = description
         if "data" in self.service:
             self.service["data"].append(data_entry)
         else:
@@ -114,45 +114,45 @@ class SBOMService:
 
     def _validate_type(self, type):
         external_ref_types = [
-            "vcs", # Version Control System
-            "issue-tracker", # Issue or defect tracking system, or an Application Lifecycle Management (ALM) system
-            "website", # Website
-            "advisories", # Security advisories
-            "bom", # Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)
-            "mailing-list", # Mailing list or discussion group
-            "social", # Social media account
-            "chat", # Real-time chat platform
-            "documentation", # Documentation, guides, or how-to instructions
-            "support", # Community or commercial support
-            "distribution", # Direct or repository download location
-            "distribution-intake", # The location where a component was published to. This is often the same as "distribution" but may also include specialized publishing processes that act as an intermediary
-            "license", # The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness
-            "build-meta", # Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)
-            "build-system", # URL to an automated build system
-            "release-notes", # URL to release notes
-            "security-contact", # Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501) that specifies the records containing DNS Security TXT
-            "model-card", # A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency
-            "log", # A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations
-            "configuration", # Parameters or settings that may be used by other components or services
-            "evidence", # Information used to substantiate a claim
-            "formulation", # Describes how a component or service was manufactured or deployed
-            "attestation", # Human or machine-readable statements containing facts, evidence, or testimony
-            "threat-model", # An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format
-            "adversary-model", # The defined assumptions, goals, and capabilities of an adversary.
-            "risk-assessment", # Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.
-            "vulnerability-assertion", # A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.
-            "exploitability-statement", # A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.
-            "pentest-report", # Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test
-            "static-analysis-report", # SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code
-            "dynamic-analysis-report", # Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations
+            "vcs",  # Version Control System
+            "issue-tracker",  # Issue or defect tracking system, or an Application Lifecycle Management (ALM) system
+            "website",  # Website
+            "advisories",  # Security advisories
+            "bom",  # Bill of Materials (SBOM, OBOM, HBOM, SaaSBOM, etc)
+            "mailing-list",  # Mailing list or discussion group
+            "social",  # Social media account
+            "chat",  # Real-time chat platform
+            "documentation",  # Documentation, guides, or how-to instructions
+            "support",  # Community or commercial support
+            "distribution",  # Direct or repository download location
+            "distribution-intake",  # The location where a component was published to. This is often the same as "distribution" but may also include specialized publishing processes that act as an intermediary
+            "license",  # The URL to the license file. If a license URL has been defined in the license node, it should also be defined as an external reference for completeness
+            "build-meta",  # Build-system specific meta file (i.e. pom.xml, package.json, .nuspec, etc)
+            "build-system",  # URL to an automated build system
+            "release-notes",  # URL to release notes
+            "security-contact",  # Specifies a way to contact the maintainer, supplier, or provider in the event of a security incident. Common URIs include links to a disclosure procedure, a mailto (RFC-2368) that specifies an email address, a tel (RFC-3966) that specifies a phone number, or dns (RFC-4501) that specifies the records containing DNS Security TXT
+            "model-card",  # A model card describes the intended uses of a machine learning model, potential limitations, biases, ethical considerations, training parameters, datasets used to train the model, performance metrics, and other relevant data useful for ML transparency
+            "log",  # A record of events that occurred in a computer system or application, such as problems, errors, or information on current operations
+            "configuration",  # Parameters or settings that may be used by other components or services
+            "evidence",  # Information used to substantiate a claim
+            "formulation",  # Describes how a component or service was manufactured or deployed
+            "attestation",  # Human or machine-readable statements containing facts, evidence, or testimony
+            "threat-model",  # An enumeration of identified weaknesses, threats, and countermeasures, dataflow diagram (DFD), attack tree, and other supporting documentation in human-readable or machine-readable format
+            "adversary-model",  # The defined assumptions, goals, and capabilities of an adversary.
+            "risk-assessment",  # Identifies and analyzes the potential of future events that may negatively impact individuals, assets, and/or the environment. Risk assessments may also include judgments on the tolerability of each risk.
+            "vulnerability-assertion",  # A Vulnerability Disclosure Report (VDR) which asserts the known and previously unknown vulnerabilities that affect a component, service, or product including the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on a component, service, or product.
+            "exploitability-statement",  # A Vulnerability Exploitability eXchange (VEX) which asserts the known vulnerabilities that do not affect a product, product family, or organization, and optionally the ones that do. The VEX should include the analysis and findings describing the impact (or lack of impact) that the reported vulnerability has on the product, product family, or organization.
+            "pentest-report",  # Results from an authorized simulated cyberattack on a component or service, otherwise known as a penetration test
+            "static-analysis-report",  # SARIF or proprietary machine or human-readable report for which static analysis has identified code quality, security, and other potential issues with the source code
+            "dynamic-analysis-report",  # Dynamic analysis report that has identified issues such as vulnerabilities and misconfigurations
             "runtime-analysis-report",  # Report generated by analyzing the call stack of a running application
-            "component-analysis-report", # Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis
-            "maturity-report", # Report containing a formal assessment of an organization, business unit, or team against a maturity model
-            "certification-report", # Industry, regulatory, or other certification from an accredited (if applicable) certification body
-            "quality-metrics", # Report or system in which quality metrics can be obtained
-            "codified-infrastructure", # Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)
-            "poam", # Plans of Action and Milestones (POAM) compliment an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".
-            "other", # Use this if no other types accurately describe the purpose of the external reference
+            "component-analysis-report",  # Report generated by Software Composition Analysis (SCA), container analysis, or other forms of component analysis
+            "maturity-report",  # Report containing a formal assessment of an organization, business unit, or team against a maturity model
+            "certification-report",  # Industry, regulatory, or other certification from an accredited (if applicable) certification body
+            "quality-metrics",  # Report or system in which quality metrics can be obtained
+            "codified-infrastructure",  # Code or configuration that defines and provisions virtualized infrastructure, commonly referred to as Infrastructure as Code (IaC)
+            "poam",  # Plans of Action and Milestones (POAM) compliment an "attestation" external reference. POAM is defined by NIST as a "document that identifies tasks needing to be accomplished. It details resources required to accomplish the elements of the plan, any milestones in meeting the tasks and scheduled completion dates for the milestones".
+            "other",  # Use this if no other types accurately describe the purpose of the external reference
         ]
         if type.lower() in external_ref_types:
             return type.lower()
@@ -195,5 +195,3 @@ class SBOMService:
 
     def _semantic_version(self, version):
         return version.split("-")[0] if "-" in version else version
-
-
