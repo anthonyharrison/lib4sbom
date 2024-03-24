@@ -500,7 +500,14 @@ class SPDXParser:
                     continue
                 version = version_match.group(1)
                 packages[(package, version)] = {"name": package, "version": version}
-        return ({}, {}, packages, [], self.vulnerabilities, self.services,)
+        return (
+            {},
+            {},
+            packages,
+            [],
+            self.vulnerabilities,
+            self.services,
+        )
 
     def parse_spdx_xml(self, sbom_file):
         # parses SPDX XML BOM file extracting package name and version ONLY
@@ -526,4 +533,11 @@ class SPDXParser:
             if version is None:
                 continue
             packages[(package, version)] = {"name": package, "version": version}
-        return ({}, {}, packages, [], self.vulnerabilities, self.services,)
+        return (
+            {},
+            {},
+            packages,
+            [],
+            self.vulnerabilities,
+            self.services,
+        )
