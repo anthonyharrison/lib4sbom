@@ -61,6 +61,14 @@ class SBOM:
     def set_bom_version(self, version):
         self.sbom["bom_version"] = version
 
+    def set_property(self, name, value):
+        # Allow multiple entries
+        property_entry = [name.strip(), value]
+        if "property" in self.sbom:
+            self.sbom["property"].append(property_entry)
+        else:
+            self.sbom["property"] = [property_entry]
+
     def get_sbom(self) -> SBOMData:
         return self.sbom
 
