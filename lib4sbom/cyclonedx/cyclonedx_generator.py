@@ -92,7 +92,7 @@ class CycloneDXGenerator:
         return self.cyclonedx_version in ["1.5"]
 
     def generateDocumentHeader(
-        self, project_name, component_type, uuid=None, bom_version="1"
+        self, project_name, component_type, uuid=None, bom_version="1", property = None
     ):
         # Assume a new document being created
         self.relationship = []
@@ -104,14 +104,13 @@ class CycloneDXGenerator:
             self.doc = {}
             self.component = []
             return self.generateJSONDocumentHeader(
-                project_name, component_type, uuid, bom_version
-            )
+                project_name, component_type, uuid, bom_version, property)
 
     def _generate_urn(self):
         return "urn:uuid:" + str(uuid.uuid4())
 
     def generateJSONDocumentHeader(
-        self, project_name, component_type, uuid=None, bom_version="1"
+        self, project_name, component_type, uuid=None, bom_version="1", property = None
     ):
         if uuid is None:
             urn = self._generate_urn()
@@ -172,6 +171,14 @@ class CycloneDXGenerator:
         else:
             component["bom-ref"] = project_id
         component["name"] = project_name
+        if property is not None:
+            metadata_property=[]
+            for p in property:
+                property_entry = dict()
+                property_entry["name"] = p[0]
+                property_entry["value"] = p[1]
+                metadata_property.append(property_entry)
+            metadata["properties"]=metadata_property
         metadata["component"] = component
         self.doc["metadata"] = metadata
         return component["bom-ref"]
@@ -560,7 +567,7 @@ class CycloneDXGenerator:
             occurrences = []
             evidence_info = {}
             for evidence in package["evidence"]:
-                occurrences.append({"location" : evidence})
+                occurrences.append({"location": evidence})
             evidence_info["occurrences"] = occurrences
             component["evidence"] = evidence_info
         if "externalreference" in package:
@@ -569,7 +576,10 @@ class CycloneDXGenerator:
                 ref_category = reference[0]
                 ref_type = reference[1]
                 ref_value = reference[2]
-                if ref_category == "SECURITY" and ref_type in ["cpe22Type", "cpe23Type"]:
+                if ref_category == "SECURITY" and ref_type in [
+                    "cpe22Type",
+                    "cpe23Type",
+                ]:
                     component["cpe"] = ref_value
                 elif (
                     ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
@@ -647,7 +657,10 @@ class CycloneDXGenerator:
                 ref_category = reference[0]
                 ref_type = reference[1]
                 ref_value = reference[2]
-                if ref_category == "SECURITY" and ref_type in ["cpe22Type", "cpe23Type"]:
+                if ref_category == "SECURITY" and ref_type in [
+                    "cpe22Type",
+                    "cpe23Type",
+                ]:
                     self.store(f"<cpe>{ref_value}</cpe>")
                 if (
                     ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
@@ -667,7 +680,9 @@ class CycloneDXGenerator:
             else:
                 # Assume ref is based on product
                 if "release" in vuln:
-                    vulnerability["bom-ref"] = f'{vuln_info.get_value("product")}@{vuln_info.get_value("release")}'
+                    vulnerability[
+                        "bom-ref"
+                    ] = f'{vuln_info.get_value("product")}@{vuln_info.get_value("release")}'
                 else:
                     # assume it is a PURL
                     vulnerability["bom-ref"] = vuln_info.get_value("purl")
@@ -717,55 +732,55 @@ class CycloneDXGenerator:
 
     def generate_service_data(self, services):
         service_definitions = []
-        service_number=1
+        service_number = 1
         sbom_services = [x for x in services.values()]
         for serv in sbom_services:
             service = {}
-            if 'id' in serv:
-                service['bom-ref'] = serv['id']
+            if "id" in serv:
+                service["bom-ref"] = serv["id"]
             else:
-                service['bom-ref'] = f"Service-{service_number}"
-            service['name'] = serv['name']
-            if 'version' in serv:
-                service['version'] = serv['version']
-            if 'description' in serv:
-                service['description'] = serv['description']
+                service["bom-ref"] = f"Service-{service_number}"
+            service["name"] = serv["name"]
+            if "version" in serv:
+                service["version"] = serv["version"]
+            if "description" in serv:
+                service["description"] = serv["description"]
             if "provider" in serv:
                 provider = {}
-                if "name" in serv['provider']:
-                    provider['name'] = serv['provider']['name']
-                if "url" in serv['provider']:
-                    provider['url'] = serv['provider']['url']
+                if "name" in serv["provider"]:
+                    provider["name"] = serv["provider"]["name"]
+                if "url" in serv["provider"]:
+                    provider["url"] = serv["provider"]["url"]
                 contact = {}
-                if "contact" in serv['provider']:
-                    contact['name'] = serv['provider']['contact']
-                if "email" in serv['provider']:
-                    contact['email'] = serv['provider']['email']
-                if "phone" in serv['provider']:
-                    contact['email'] = serv['provider']['phone']
+                if "contact" in serv["provider"]:
+                    contact["name"] = serv["provider"]["contact"]
+                if "email" in serv["provider"]:
+                    contact["email"] = serv["provider"]["email"]
+                if "phone" in serv["provider"]:
+                    contact["email"] = serv["provider"]["phone"]
                 if len(contact) > 0:
-                    provider['contact'] = contact
+                    provider["contact"] = contact
                 service["provider"] = provider
             if "endpoints" in serv:
-                service["endpoints"] = serv['endpoints']
+                service["endpoints"] = serv["endpoints"]
             if "authenticated" in serv:
-                service["authenticated"] = serv['authenticated']
+                service["authenticated"] = serv["authenticated"]
             if "x-trust-boundary" in serv:
-                service["x-trust-boundary"] = serv['x-trust-boundary']
+                service["x-trust-boundary"] = serv["x-trust-boundary"]
             if "trustZone" in serv:
-                service["trustZone"] = serv['trustZone']
+                service["trustZone"] = serv["trustZone"]
             if "data" in serv:
                 data = []
-                for data_item in serv['data']:
+                for data_item in serv["data"]:
                     data_element = {}
-                    data_element['flow'] = data_item.get('flow')
-                    data_element['classification'] = data_item.get('classification')
-                    if 'name' in data_item:
-                        data_element['name'] = data_item.get('name')
-                    if 'description' in data_item:
-                        data_element['description'] = data_item.get('description')
+                    data_element["flow"] = data_item.get("flow")
+                    data_element["classification"] = data_item.get("classification")
+                    if "name" in data_item:
+                        data_element["name"] = data_item.get("name")
+                    if "description" in data_item:
+                        data_element["description"] = data_item.get("description")
                     data.append(data_element)
-                service['data'] = data
+                service["data"] = data
             if "licenseinfo" in serv:
                 licenses = []
                 for license_item in serv["licenseinfo"]:

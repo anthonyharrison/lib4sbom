@@ -11,8 +11,8 @@ from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
-from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.data.service import SBOMService
+from lib4sbom.data.vulnerability import Vulnerability
 
 
 class CycloneDXParser:
@@ -330,7 +330,9 @@ class CycloneDXParser:
             cyclonedx_version = data["specVersion"]
             cyclonedx_document.set_version(cyclonedx_version)
             cyclonedx_document.set_type("cyclonedx")
-            cyclonedx_document.set_value("uuid",data.get("serialNumber","urn:uuid:" + str(uuid.uuid4())))
+            cyclonedx_document.set_value(
+                "uuid", data.get("serialNumber", "urn:uuid:" + str(uuid.uuid4()))
+            )
             cyclonedx_document.set_value("bom_version", data["version"])
             if "metadata" in data:
                 if "timestamp" in data["metadata"]:
@@ -348,7 +350,10 @@ class CycloneDXParser:
                             if self.debug:
                                 print("Legacy tool(s) specification still being used.")
                             name = data["metadata"]["tools"][0]["components"][0]["name"]
-                            if "version" in data["metadata"]["tools"][0]["components"][0]:
+                            if (
+                                "version"
+                                in data["metadata"]["tools"][0]["components"][0]
+                            ):
                                 name = f'{name}#{data["metadata"]["tools"][0]["components"][0]["version"]}'
                             cyclonedx_document.set_creator("tool", name)
                     else:
@@ -379,6 +384,10 @@ class CycloneDXParser:
                         cyclonedx_document.set_value(
                             "metadata_version", component_version
                         )
+                if "properties" in data["metadata"]:
+                    cyclonedx_document.set_value(
+                        "property", data["metadata"]["properties"]
+                    )
             if "components" in data:
                 for d in data["components"]:
                     self._cyclondex_component(d)
@@ -444,37 +453,49 @@ class CycloneDXParser:
                     service_info.initialise()
                     service_info.set_id(service["bom-ref"])
                     service_info.set_name(service["name"])
-                    if 'version' in service:
-                        service_info.set_version(service['version'])
+                    if "version" in service:
+                        service_info.set_version(service["version"])
                     if "description" in service:
                         service_info.set_description(service["description"])
                     if "provider" in service:
-                        name=service["provider"].get("name","")
-                        url=service["provider"].get("url","")
-                        contact=email=phone=""
+                        name = service["provider"].get("name", "")
+                        url = service["provider"].get("url", "")
+                        contact = email = phone = ""
                         if "contact" in service["provider"]:
-                            contact=service["provider"]["contact"].get('name',"")
-                            email=service["provider"]["contact"].get('email',"")
-                            phone=service["provider"]["contact"].get('phone',"")
-                        service_info.set_provider(name=name, url=url, contact=contact, email=email, phone=phone)
+                            contact = service["provider"]["contact"].get("name", "")
+                            email = service["provider"]["contact"].get("email", "")
+                            phone = service["provider"]["contact"].get("phone", "")
+                        service_info.set_provider(
+                            name=name,
+                            url=url,
+                            contact=contact,
+                            email=email,
+                            phone=phone,
+                        )
                     if "endpoints" in service:
-                        for endpoint in service['endpoints']:
+                        for endpoint in service["endpoints"]:
                             service_info.set_endpoint(endpoint)
                     if "authenticated" in service:
-                        service_info.set_value("authenticated",service['authenticated'])
+                        service_info.set_value(
+                            "authenticated", service["authenticated"]
+                        )
                     if "x-trust-boundary" in service:
-                        service_info.set_value("x-trust-boundary", service['x-trust-boundary'])
+                        service_info.set_value(
+                            "x-trust-boundary", service["x-trust-boundary"]
+                        )
                     if "trustZone" in service:
-                        service_info.set_value("trustZone", service['trustZone'])
+                        service_info.set_value("trustZone", service["trustZone"])
                     if "data" in service:
-                        for data_element in service['data']:
-                            flow=data_element.get("flow")
-                            classification=data_element.get("classification")
-                            name=data_element.get("name","")
-                            description=data_element.get("description","")
-                            service_info.set_data(flow,classification,name=name,description=description)
+                        for data_element in service["data"]:
+                            flow = data_element.get("flow")
+                            classification = data_element.get("classification")
+                            name = data_element.get("name", "")
+                            description = data_element.get("description", "")
+                            service_info.set_data(
+                                flow, classification, name=name, description=description
+                            )
                     if "licenses" in service:
-                        for license in service['licenses']:
+                        for license in service["licenses"]:
                             service_info.set_license(license["license"])
                     if "properties" in service:
                         for property in service["properties"]:
@@ -483,14 +504,23 @@ class CycloneDXParser:
                             )
                     if "externalreference" in service:
                         for reference in service["externalreference"]:
-                            url = reference.get('url')
-                            external_type = reference.get('type')
-                            comment = reference.get('comment',"")
-                            service_info.set_externalreference(url, external_type, comment=comment)
+                            url = reference.get("url")
+                            external_type = reference.get("type")
+                            comment = reference.get("comment", "")
+                            service_info.set_externalreference(
+                                url, external_type, comment=comment
+                            )
                     services.append(service_info.get_service())
                 if self.debug:
                     print(services)
-        return cyclonedx_document, files, self.packages, relationships, vulnerabilities, services
+        return (
+            cyclonedx_document,
+            files,
+            self.packages,
+            relationships,
+            vulnerabilities,
+            services,
+        )
 
     def _parse_component(self, component_element):
         """Parses a CycloneDX component element and returns a dictionary of its contents."""
@@ -603,7 +633,7 @@ class CycloneDXParser:
             if cpe.lower().startswith("cpe:2.3"):
                 self.cyclonedx_package.set_cpe(cpe)
             elif cpe.lower().startswith("cpe:/"):
-                self.cyclonedx_package.set_cpe(cpe,cpetype="cpe22Type")
+                self.cyclonedx_package.set_cpe(cpe, cpetype="cpe22Type")
         purl = self._xml_component(component, "purl")
         if purl != "":
             self.cyclonedx_package.set_purl(purl)
