@@ -6,6 +6,7 @@ import textwrap
 def generate_out(text):
     print(text)
 
+
 argv = sys.argv
 app_name = "pytestgen"
 parser = argparse.ArgumentParser(
@@ -36,20 +37,20 @@ with open(filename) as f:
 for line in lines:
     line = line.strip()
     if line.startswith("class"):
-        classname = filename.replace(".py","").capitalize()
+        classname = filename.replace(".py", "").capitalize()
         generate_out("import pytest\n")
         generate_out("import <module> as test_module\n")
         generate_out(f"class Test{classname}:\n")
     elif line.startswith("def") and "__init__" not in line:
         # Generate test function
         function = line.split(" ")[1].split("(")[0]
-        generate_out (f"\tdef test_{function}(self):")
+        generate_out(f"\tdef test_{function}(self):")
         if function.startswith("set"):
-            attribute = function.replace("set_","")
-            generate_out ("\t\ttest_item = test_module()")
-            generate_out (f"\t\ttest_item.{function}('test_{attribute}')")
-            generate_out (f"\t\tassert test_item.get_value('{attribute}') == 'test_{attribute}'\n\n")
+            attribute = function.replace("set_", "")
+            generate_out("\t\ttest_item = test_module()")
+            generate_out(f"\t\ttest_item.{function}('test_{attribute}')")
+            generate_out(
+                f"\t\tassert test_item.get_value('{attribute}') == 'test_{attribute}'\n\n"
+            )
         else:
-            generate_out ("\t\tassert False\n\n")
-
-
+            generate_out("\t\tassert False\n\n")
