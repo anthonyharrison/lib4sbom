@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import sys
-from lib4sbom.parser import SBOMParser
+
 from lib4sbom.generator import SBOMGenerator
+from lib4sbom.parser import SBOMParser
 
 # Simple SPDX SBOM to CycloneDX converter
 
@@ -16,4 +17,3 @@ test_parser.parse_file(sys.argv[1])
 test_generator = SBOMGenerator(False, sbom_type="cyclonedx", format="json")
 # Generate sbom in JSON format to console (default)
 test_generator.generate("ACMEApp", test_parser.get_sbom())
-

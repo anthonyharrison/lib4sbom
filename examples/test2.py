@@ -1,27 +1,27 @@
 import sys
 
 # sys.path.append('C:\\Users\\russh\\git\\lib4sbom\\build\\lib')
-sys.path.append('C:\\Users\\russh\\git\\lib4sbom')
-from lib4sbom.data.file import SBOMFile
-from lib4sbom.data.package import SBOMPackage
-from lib4sbom.data.document import SBOMDocument
-from lib4sbom.generator import SBOMGenerator
-from lib4sbom.sbom import SBOMData, SBOM
-from lib4sbom.data.relationship import SBOMRelationship
-
+sys.path.append("C:\\Users\\russh\\git\\lib4sbom")
 import hashlib
 from uuid import uuid4
+
+from lib4sbom.data.document import SBOMDocument
+from lib4sbom.data.file import SBOMFile
+from lib4sbom.data.package import SBOMPackage
+from lib4sbom.data.relationship import SBOMRelationship
+from lib4sbom.generator import SBOMGenerator
+from lib4sbom.sbom import SBOM, SBOMData
 
 
 def generate_clinician_sbom():
     sbom = SBOM()
-    sbom.set_type(sbom_type='cyclonedx')
+    sbom.set_type(sbom_type="cyclonedx")
     sbom.set_version("1.4")
     sbom.set_uuid(str(uuid4()))
     sbom.set_bom_version("2")
 
     sbom_doc = SBOMDocument()
-    #sbom_doc.set_name("Clientware_ans_01")
+    # sbom_doc.set_name("Clientware_ans_01")
     sbom_doc.set_metadata_version("1.7.9")
     sbom_doc.set_metadata_type("firmware")
 
@@ -37,10 +37,11 @@ def generate_clinician_sbom():
     iosapp_pkg.set_supplier("Author", "RH")
     iosapp_pkg.set_type("Application")
     iosapp_pkg.set_licensedeclared("Apache-2.0")
-    parent_id="Clientware-ans-01"
+    parent_id = "Clientware-ans-01"
     iosapp_pkg.set_id(parent_id)
-    sbom_packages[(iosapp_pkg.get_name(), iosapp_pkg.get_value('version'))] = \
-        iosapp_pkg.get_package()
+    sbom_packages[
+        (iosapp_pkg.get_name(), iosapp_pkg.get_value("version"))
+    ] = iosapp_pkg.get_package()
 
     # NordicSemi Drivers
     nsdrivers_pkg = SBOMPackage()
@@ -49,8 +50,14 @@ def generate_clinician_sbom():
     nsdrivers_pkg.set_supplier("Author", "Nordic Semiconductor")
     nsdrivers_pkg.set_homepage("https://nordicsemi.com/")
     nsdrivers_pkg.set_licensedeclared("MIT")
-    nsdrivers_pkg.set_id(nsdrivers_pkg.get_name().lower() + "nordicsemi@" + nsdrivers_pkg.get_value('version'))
-    sbom_packages[(nsdrivers_pkg.get_name(), nsdrivers_pkg.get_value('version'))] = nsdrivers_pkg.get_package()
+    nsdrivers_pkg.set_id(
+        nsdrivers_pkg.get_name().lower()
+        + "nordicsemi@"
+        + nsdrivers_pkg.get_value("version")
+    )
+    sbom_packages[
+        (nsdrivers_pkg.get_name(), nsdrivers_pkg.get_value("version"))
+    ] = nsdrivers_pkg.get_package()
 
     # NordicSemi Softdevice
     nssoftdev_pkg = SBOMPackage()
@@ -60,8 +67,14 @@ def generate_clinician_sbom():
     nssoftdev_pkg.set_supplier("Author", "Nordic Semiconductor")
     nssoftdev_pkg.set_homepage("https://nordicsemi.com/")
     nssoftdev_pkg.set_licensedeclared("MIT")
-    nssoftdev_pkg.set_id(nssoftdev_pkg.get_name().lower() + "nordicsemi@" + nssoftdev_pkg.get_value('version'))
-    sbom_packages[(nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value('version'))] = nssoftdev_pkg.get_package()
+    nssoftdev_pkg.set_id(
+        nssoftdev_pkg.get_name().lower()
+        + "nordicsemi@"
+        + nssoftdev_pkg.get_value("version")
+    )
+    sbom_packages[
+        (nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value("version"))
+    ] = nssoftdev_pkg.get_package()
 
     # NordicSemi Bootloader
     nssoftdev_pkg = SBOMPackage()
@@ -71,8 +84,14 @@ def generate_clinician_sbom():
     nssoftdev_pkg.set_supplier("Author", "Nordic Semiconductor")
     nssoftdev_pkg.set_homepage("https://nordicsemi.com/")
     nssoftdev_pkg.set_licensedeclared("MIT")
-    nssoftdev_pkg.set_id(nssoftdev_pkg.get_name().lower() + "nordicsemi@" + nssoftdev_pkg.get_value('version'))
-    sbom_packages[(nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value('version'))] = nssoftdev_pkg.get_package()
+    nssoftdev_pkg.set_id(
+        nssoftdev_pkg.get_name().lower()
+        + "nordicsemi@"
+        + nssoftdev_pkg.get_value("version")
+    )
+    sbom_packages[
+        (nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value("version"))
+    ] = nssoftdev_pkg.get_package()
 
     sbom_file = SBOMFile()
     sbom_files = {}
@@ -81,7 +100,7 @@ def generate_clinician_sbom():
     # sbom_file.set_filename("Clientware-ans-01_settings.hex")
     file_hash = "49108A02F3FAF3DDBFF489B2A9E0D252B7F91289"
     sbom_file.set_checksum("SHA-1", file_hash)
-    #sbom_file.set_id("Hello"+sbom_file.get_name().lower())
+    # sbom_file.set_id("Hello"+sbom_file.get_name().lower())
     sbom_files[sbom_file.get_name()] = sbom_file.get_file()
 
     sbom.add_files(sbom_files)
@@ -95,21 +114,20 @@ def generate_clinician_sbom():
         sbom_relationship.initialise()
         if package["name"] == parent_app:
             # Parent component
-            sbom_relationship.set_relationship(
-                parent_id, "DESCRIBES", parent_app
-            )
+            sbom_relationship.set_relationship(parent_id, "DESCRIBES", parent_app)
             sbom_relationship.set_relationship_id(None, parent_id)
         else:
             sbom_relationship.set_relationship(
-                    parent_app, "DEPENDS_ON", package["name"]
+                parent_app, "DEPENDS_ON", package["name"]
             )
             sbom_relationship.set_relationship_id(parent_id, package["id"])
         relationships.append(sbom_relationship.get_relationship())
     sbom.add_relationships(relationships)
 
-    sbg = SBOMGenerator(format='tag', sbom_type='cyclonedx')
+    sbg = SBOMGenerator(format="tag", sbom_type="cyclonedx")
 
     sbg.generate(parent_id, sbom.get_sbom())
     # sbg.generate("Clientware-ans-01", sbom.get_sbom(), "mybomy-bom.json")
+
 
 generate_clinician_sbom()

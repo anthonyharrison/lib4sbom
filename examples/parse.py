@@ -5,15 +5,15 @@
 ### format to a SPDX SBOM in JSON format (and shown on console) and
 ### a CycloneDX file in JSON format (stored in a file)
 
-from lib4sbom.parser import SBOMParser
 from lib4sbom.generator import SBOMGenerator
 from lib4sbom.output import SBOMOutput
+from lib4sbom.parser import SBOMParser
 
 # Set up SBOM parser
 test_parser = SBOMParser()
 # Load SBOM - will autodetect SBOM type
 test_parser.parse_file("test/data/test2_sbom.spdx")
-#test_parser.parse_file("test/data/spdx_test.spdx")
+# test_parser.parse_file("test/data/spdx_test.spdx")
 
 # Show relationships
 # rel = test_parser.get_sbom()['relationships']
@@ -30,4 +30,3 @@ test_parser.parse_file("test/data/test2_sbom.spdx")
 test_generator = SBOMGenerator(False, sbom_type="cyclonedx", format="json")
 # Generate sbom in JSON format to console (default)
 test_generator.generate("TestApp", test_parser.get_sbom())
-
