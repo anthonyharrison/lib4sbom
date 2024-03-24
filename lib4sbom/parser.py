@@ -1,9 +1,9 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from pathlib import Path
 from typing import Dict, List
-import os
 
 from lib4sbom.cyclonedx.cyclonedx_parser import CycloneDXParser
 from lib4sbom.sbom import SBOM, SBOMData
@@ -109,10 +109,10 @@ class SBOMParser:
             self.sbom.set_type(self.sbom_type)
         except KeyError:
             if self.debug:
-                print ("Key Error")
+                print("Key Error")
         except TypeError:
             if self.debug:
-                print ("Type Error")
+                print("Type Error")
 
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type

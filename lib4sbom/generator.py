@@ -284,6 +284,10 @@ class SBOMGenerator:
             bom_version = sbom_data["bom_version"]
         else:
             bom_version = "1"
+        if "property" in sbom_data:
+            property = sbom_data["property"]
+        else:
+            property = None
         component_data = {
             "type": "application",
             "supplier": None,
@@ -305,12 +309,12 @@ class SBOMGenerator:
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(
-                name, component_data, uuid, bom_version
+                name, component_data, uuid, bom_version, property
             )
             self._save_element(name, project_id)
         else:
             project_id = self.bom.generateDocumentHeader(
-                project_name, component_data, uuid, bom_version
+                project_name, component_data, uuid, bom_version, property
             )
             self._save_element(project_name, project_id)
         parent = project_name
@@ -361,5 +365,6 @@ class SBOMGenerator:
             self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
         if "services" in sbom_data:
             self.bom.generate_service_data(sbom_data["services"])
+
 
 # End of file
