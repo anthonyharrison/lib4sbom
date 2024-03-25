@@ -225,6 +225,8 @@ SBOMs can be generated in the following formats
 
 The default version for CycloneDX is version 1.5. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4" if required.
 
+The default version for SPDX is version 2.3. However, the version can be overridden by setting the environment variable LIB4SBOM_SPDX_VERSION to "SPDX-2.2" if required.
+
 _class_ **SBOMGenerator**(_validate_license: True, sbom_type="spdx", format="tag", application="lib4sbom", version="0.1"_)
 
 This creates a simple SBOM Generator object. The following optional parameters can be specified:
