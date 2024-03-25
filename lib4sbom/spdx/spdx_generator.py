@@ -46,7 +46,10 @@ class SPDXGenerator:
             self.licenses = []
         self.include_purl = False
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
-        self.spdx_version = self.SPDX_VERSION
+        # Can specify version of SPDX through environment variable
+        self.spdx_version = os.getenv("LIB4SBOM_SPDX_VERSION")
+        if self.spdx_version is None or self.spdx_version not in ["SPDX-2.2"]:
+            self.spdx_version = self.SPDX_VERSION
         self.license_info = []
         self.license_id = 1
 
