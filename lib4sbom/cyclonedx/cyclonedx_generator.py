@@ -16,7 +16,7 @@ class CycloneDXGenerator:
     Generate CycloneDX SBOM.
     """
 
-    CYCLONEDX_VERSION = "1.5"
+    CYCLONEDX_VERSION = "1.6"
     DATA_LICENCE = "CC0-1.0"
     PROJECT_ID = "CDXRef-DOCUMENT"
     PACKAGE_PREAMBLE = "CDXRef-Package-"
@@ -84,12 +84,12 @@ class CycloneDXGenerator:
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def spec_version(self, version):
-        if version in ["1.3", "1.4", "1.5"]:
+        if version in ["1.3", "1.4", "1.5", "1.6"]:
             self.cyclonedx_version = version
 
     def _cyclonedx_15(self):
         # utility for features introduced in version 1.5
-        return self.cyclonedx_version in ["1.5"]
+        return self.cyclonedx_version in ["1.5", "1.6"]
 
     def generateDocumentHeader(
         self, project_name, component_type, uuid=None, bom_version="1", property = None
