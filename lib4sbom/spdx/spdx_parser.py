@@ -273,7 +273,7 @@ class SPDXParser:
         if file is not None and file not in files:
             # Save file metadata
             files[file] = spdx_file.get_file()
-        if package is not None and package not in packages:
+        if package is not None:
             # Save package metadata
             # packages[package] = spdx_package.get_package()
             package_tuple = (package, version)
@@ -430,9 +430,8 @@ class SPDXParser:
                                     ext_ref["referenceType"],
                                     ext_ref["referenceLocator"],
                                 )
-                        if package not in packages:
-                            # Save package metadata
-                            packages[package] = spdx_package.get_package()
+                        package_tuple = (package, version)
+                        packages[package_tuple] = spdx_package.get_package()
 
                     except KeyError as e:
                         print(f"{e} Unable to store package info: {package}")
