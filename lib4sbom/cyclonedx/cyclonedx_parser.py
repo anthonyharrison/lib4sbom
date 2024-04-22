@@ -337,6 +337,8 @@ class CycloneDXParser:
             if "metadata" in data:
                 if "timestamp" in data["metadata"]:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])
+                if "lifecycles" in data["metadata"]:
+                    cyclonedx_document.set_value("lifecycle", data["metadata"]["lifecycles"]["phase"])
                 if "tools" in data["metadata"]:
                     if cyclonedx_version in ["1.5", "1.6"]:
                         if "components" in data["metadata"]["tools"]:

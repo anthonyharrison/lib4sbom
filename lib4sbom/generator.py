@@ -295,6 +295,7 @@ class SBOMGenerator:
             "bom-ref": None,
             "timestamp": None,
             "creator": None,
+            "lifecycle": None,
         }
         if "document" in sbom_data:
             doc = SBOMDocument()
@@ -304,6 +305,7 @@ class SBOMGenerator:
             component_data["supplier"] = doc.get_value("metadata_supplier")
             component_data["version"] = doc.get_value("metadata_version")
             component_data["bom-ref"] = doc.get_value("bom-ref")
+            component_data["lifecycle"] = doc.get_value("lifecycle")
             component_data["timestamp"] = doc.get_created()
             component_data["creator"] = doc.get_creator()
         if name is not None and name != "NOT DEFINED":

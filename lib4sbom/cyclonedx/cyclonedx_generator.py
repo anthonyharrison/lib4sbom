@@ -130,6 +130,12 @@ class CycloneDXGenerator:
             metadata["timestamp"] = self.generateTime()
         else:
             metadata["timestamp"] = component_type["timestamp"]
+        if component_type.get("lifecycle") is not None:
+            # Validate lifecycle phase
+            if component_type["lifecycle"].lower() in ["design","pre-build","build","post-build","operations","discovery","decommission"]:
+                lifecycle = {}
+                lifecycle["phase"] = component_type["lifecycle"].lower()
+                metadata["lifecyles"] = lifecycle
         tool = {}
         author = {}
         if component_type["creator"] is not None:
