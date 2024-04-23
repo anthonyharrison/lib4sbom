@@ -399,8 +399,8 @@ class SPDXParser:
                                 spdx_package.set_checksum(
                                     checksum["algorithm"], checksum["checkumValue"]
                                 )
-                        if "sourceinfo" in d:
-                            spdx_package.set_sourceInfo(d["sourceinfo"])
+                        if "sourceInfo" in d:
+                            spdx_package.set_sourceinfo(d["sourceInfo"])
                         if "licenseConcluded" in d:
                             spdx_package.set_licenseconcluded(d["licenseConcluded"])
                         if "licenseDeclared" in d:
