@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Anthony Harrison
+# Copyright (C) 2024 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -24,6 +24,7 @@ class LicenseScanner:
         type_file = os.path.join(license_dir, "license_data", "license_type.txt")
         self.license_type = {}
         self.synonym_setup(type_file, self.license_type)
+        self.license_text_path = os.path.join(license_dir, "license_data", "text")
 
     def synonym_setup(self, filename, data_list):
         with open(filename, "r", encoding="utf-8") as f:
@@ -73,6 +74,24 @@ class LicenseScanner:
             elif lic["name"].lower() == license.lower():
                 return lic["licenseId"]
         return self.DEFAULT_LICENSE
+
+    def get_license_text(self, license_id):
+        license_text=""
+        filename = f"{self.license_text_path}/{license_id}.txt"
+        # check filename exists
+        if os.path.exists(filename):
+            license_text_file = open(filename, "r", encoding="utf-8")
+            license_text = license_text_file.read()
+            license_text_file.close()
+        return license_text
+
+    def get_license_name(self, license_id):
+        # Assume that license_id is a valid SPDX id
+        if license_id != self.DEFAULT_LICENSE:
+            for lic in self.licenses["licenses"]:
+                if lic["licenseId"] == license_id:
+                    return lic["name"]
+        return "" # License not found
 
     def get_license_url(self, license_id):
         # Assume that license_id is a valid SPDX id
