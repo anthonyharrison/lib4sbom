@@ -44,6 +44,7 @@ setup_kwargs = dict(
     package_data={
         "lib4sbom": [
             "license_data/*.*",
+            "license_data/text/*.*",
         ],
     },
 )
