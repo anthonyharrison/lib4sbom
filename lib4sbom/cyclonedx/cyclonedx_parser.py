@@ -440,12 +440,17 @@ class CycloneDXParser:
                             vuln_info.set_value("status", vuln["analysis"]["state"])
                         if "detail" in vuln["analysis"]:
                             vuln_info.set_comment(vuln["analysis"]["detail"])
+                        if "response" in vuln["analysis"]:
+                            for r in vuln["analysis"]["response"]:
+                                vuln_info.set_remediation(r)
                         if "justification" in vuln["analysis"]:
                             vuln_info.set_value(
                                 "justification", vuln["analysis"]["justification"]
                             )
                     if "affects" in vuln:
                         vuln_info.set_value("bom_link", vuln["affects"][0]["ref"])
+                        if "versions" in vuln["affects"][0]:
+                            vuln_info.set_release(vuln["affects"][0]["versions"]["version"])
                     vulnerabilities.append(vuln_info.get_vulnerability())
                 if self.debug:
                     print(vulnerabilities)

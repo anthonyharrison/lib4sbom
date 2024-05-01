@@ -718,19 +718,28 @@ class CycloneDXGenerator:
                 analysis["detail"] = vuln_info.get_value("comment")
             if "justification" in vuln:
                 analysis["justification"] = vuln_info.get_value("justification")
+            if "remediation" in vuln:
+                analysis["response"] = []
+                analysis["response"].append(vuln_info.get_value("remediation"))
+                analysis["detail"] = vuln_info.get_value("action")
             vulnerability["analysis"] = analysis
             if "bom_link" in vuln:
                 affects = []
                 affected = {}
                 affected["ref"] = vuln_info.get_value("bom_link")
                 version_info = {}
-                if analysis["state"] == "not_affected":
+                component_version = vuln_info.get_value("release")
+                if component_version is None and vuln_info.get_value("purl") is not None:
+                    # Could be a PURL - just extract version of component
+                    component_version = vuln_info.get_value("purl").split("@")[1]
+                if analysis["state"] in ["not_affected","false_positive"]:
+                    version_info["version"] = component_version
                     version_info["status"] = "unaffected"
-                elif analysis["state"] == "in_triage":
-                    version_info["status"] = "unknown"
-                else:
+                elif analysis["state"] != "in_triage":
+                    version_info["version"] = component_version
                     version_info["status"] = "affected"
-                affected["versions"] = version_info
+                if len(version_info) > 0:
+                    affected["versions"] = version_info
                 affects.append(affected)
                 vulnerability["affects"] = affects
             statements.append(vulnerability)
