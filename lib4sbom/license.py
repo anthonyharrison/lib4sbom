@@ -39,6 +39,9 @@ class LicenseScanner:
                     # Store all synonyms in upper case
                     data_list[line.strip().upper()] = license
 
+    def get_license_list(self):
+        return self.licenses["licenses"]
+
     def get_license_version(self):
         return self.licenses.get("licenseListVersion", self.SPDX_LICENSE_VERSION)
 
