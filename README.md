@@ -753,8 +753,9 @@ Returns the vulnerability object as a dictionary.
 
 _class_ **SBOMService**(validation = None)
 
-This creates a simple software service object which is used to define the details of a software service. As there are multiple ways of specifying the status of a vulnerability, it is left to the
-application manipulating the Vulnerability object to apply validation as appropriate to ensure the semantics of the vulnerability are correct.
+This creates a simple software service object which is used to define the details of a software service.
+As there are multiple ways of specifying a service, it is left to the
+application manipulating the service object to apply validation as appropriate to ensure the semantics of the service are correct.
 
 **NOTE** Services objects are only included in CyclonedDX SBOMs
 
