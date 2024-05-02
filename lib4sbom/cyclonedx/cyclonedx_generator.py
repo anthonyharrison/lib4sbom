@@ -135,7 +135,7 @@ class CycloneDXGenerator:
             if component_type["lifecycle"].lower() in ["design","pre-build","build","post-build","operations","discovery","decommission"]:
                 lifecycle = {}
                 lifecycle["phase"] = component_type["lifecycle"].lower()
-                metadata["lifecyles"] = lifecycle
+                metadata["lifecyles"] = [lifecycle]
         tool = {}
         author = {}
         if component_type["creator"] is not None:
