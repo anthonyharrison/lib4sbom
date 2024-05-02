@@ -333,12 +333,16 @@ class CycloneDXParser:
             cyclonedx_document.set_value(
                 "uuid", data.get("serialNumber", "urn:uuid:" + str(uuid.uuid4()))
             )
-            cyclonedx_document.set_value("bom_version", data["version"])
+            if "version" in data:
+                cyclonedx_document.set_value("bom_version", data["version"])
+            else:
+                cyclonedx_document.set_value("bom_version", 1)
             if "metadata" in data:
                 if "timestamp" in data["metadata"]:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])
                 if "lifecycles" in data["metadata"]:
-                    cyclonedx_document.set_value("lifecycle", data["metadata"]["lifecycles"]["phase"])
+                    for l in data["metadata"]["lifecycles"]:
+                        cyclonedx_document.set_value("lifecycle", l["phase"])
                 if "tools" in data["metadata"]:
                     if cyclonedx_version in ["1.5", "1.6"]:
                         if "components" in data["metadata"]["tools"]:
