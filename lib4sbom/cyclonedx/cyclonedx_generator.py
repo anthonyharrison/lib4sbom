@@ -525,8 +525,10 @@ class CycloneDXGenerator:
         if "licenseconcluded" in package or "licensedeclared" in package:
             if "licenseconcluded" in package:
                 license_definition = package["licenseconcluded"]
+                acknowledgement = "concluded"
             else:
                 license_definition = package["licensedeclared"]
+                acknowledgement = "declared"
             license_id = self.license.find_license(license_definition)
             if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # A valid SPDX license
@@ -540,6 +542,8 @@ class CycloneDXGenerator:
                     license_url = self.license.get_license_url(license["id"])
                     if license_url is not None:
                         license["url"] = license_url
+                    if self._cyclonedx_16():
+                        license["acknowledgement"] = acknowledgement
                     item = dict()
                     item["license"] = license
                     component["licenses"] = [item]
