@@ -91,6 +91,10 @@ class CycloneDXGenerator:
         # utility for features introduced in version 1.5
         return self.cyclonedx_version in ["1.5", "1.6"]
 
+    def _cyclonedx_16(self):
+        # utility for features introduced in version 1.6
+        return self.cyclonedx_version in ["1.6"]
+
     def generateDocumentHeader(
         self, project_name, component_type, uuid=None, bom_version="1", property = None
     ):
@@ -469,6 +473,9 @@ class CycloneDXGenerator:
             component["bom-ref"] = id
         else:
             component["bom-ref"] = package.get("bom-ref")
+        # Crypto asset only for 1.6
+        if component["type"] == "cryptographic-asset" and not self._cyclonedx_16():
+            return
         name = package["name"]
         component["name"] = name
         if "version" in package:
