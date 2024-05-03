@@ -56,6 +56,7 @@ class SBOMPackage:
             "DATA",
             "DEVICE-DRIVER",
             "PLATFORM",
+            "CRYPTOGRAPHIC-ASSET",
         ]:
             self.package["type"] = package_type
         else:
@@ -111,7 +112,7 @@ class SBOMPackage:
 
     def set_checksum(self, type, value):
         # Only store valid checksums
-        if self._valid_checksum(value):
+        if self._valid_checksum(value) and self._valid_algorithm(type):
             # Allow multiple entries
             checksum_entry = [type.strip(), value.lower()]
             if "checksum" in self.package:
@@ -276,3 +277,7 @@ class SBOMPackage:
             return False
         # Only allow valid hex or decimal digits
         return all(c in string.hexdigits for c in value.lower())
+
+    def _valid_algorithm(self, algorithm):
+        algorithms = ["MD5", "SHA1", "SHA256", "SHA384", "SHA512", "BLAKE2b-256", "BLAKE2b-384", "BLAKE2b-512", "BLAKE3"]
+        return algorithm in algorithms
