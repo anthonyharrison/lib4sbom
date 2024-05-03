@@ -23,6 +23,7 @@ class CycloneDXParser:
         self.id = {}
         self.component_id = 0
         self.model_card = SBOMModelCard()
+        self.cyclonedx_version = None
 
     def parse(self, sbom_file):
         """parses CycloneDX BOM file extracting package name, version and license"""
@@ -46,6 +47,10 @@ class CycloneDXParser:
             if len(entry) > 0:
                 elements.append(entry)
         return elements
+
+    def _cyclonedx_16(self):
+        # utility for features introduced in version 1.6
+        return self.cyclonedx_version in ["1.6"]
 
     def _cyclonedx_mlmodel(self, d):
         # Machine learning model data
@@ -245,6 +250,7 @@ class CycloneDXParser:
                         checksum["alg"].replace("SHA-", "SHA"), checksum["content"]
                     )
             license_data = None
+            acknowledgement = None
             # Multiple ways of defining license data
             if "licenses" in d and len(d["licenses"]) > 0:
                 license_data = d["licenses"][0]
@@ -262,12 +268,25 @@ class CycloneDXParser:
                         license = license_data["license"]["name"]
                     elif "expression" in license_data["license"]:
                         license = license_data["license"]["expression"]
+                    if "acknowledgement" in license_data["license"]:
+                        acknowledgement = license_data["license"]["acknowledgement"]
                 elif "expression" in license_data:
                     license = license_data["expression"]
                 if license is not None:
                     # Assume License concluded is same as license declared
-                    self.cyclonedx_package.set_licenseconcluded(license)
-                    self.cyclonedx_package.set_licensedeclared(license)
+                    # CycloneDX distinquishes between concluded and declared
+                    if self._cyclonedx_16():
+                        if acknowledgement is not None:
+                            if acknowledgement == "concluded":
+                                self.cyclonedx_package.set_licenseconcluded(license)
+                            else:
+                                self.cyclonedx_package.set_licensedeclared(license)
+                        else:
+                            self.cyclonedx_package.set_licenseconcluded(license)
+                            self.cyclonedx_package.set_licensedeclared(license)
+                    else:
+                        self.cyclonedx_package.set_licenseconcluded(license)
+                        self.cyclonedx_package.set_licensedeclared(license)
             if "copyright" in d:
                 self.cyclonedx_package.set_copyrighttext(d["copyright"])
             if "cpe" in d:
