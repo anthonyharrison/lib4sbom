@@ -314,10 +314,11 @@ class SPDXGenerator:
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
-                self.generateTag(
-                    "ExternalRef",
-                    reference[0] + " " + reference[1] + " " + reference[2],
-                )
+                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER"]:
+                    self.generateTag(
+                        "ExternalRef",
+                        reference[0] + " " + reference[1] + " " + reference[2],
+                    )
 
     def generateJSONPackageDetails(
         self, package, id, package_info, parent_id, relationship
@@ -422,14 +423,15 @@ class SPDXGenerator:
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
-                reference_data = dict()
-                reference_data["referenceCategory"] = reference[0]
-                reference_data["referenceType"] = reference[1]
-                reference_data["referenceLocator"] = reference[2]
-                if "externalRefs" in component:
-                    component["externalRefs"].append(reference_data)
-                else:
-                    component["externalRefs"] = [reference_data]
+                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER"]:
+                    reference_data = dict()
+                    reference_data["referenceCategory"] = reference[0]
+                    reference_data["referenceType"] = reference[1]
+                    reference_data["referenceLocator"] = reference[2]
+                    if "externalRefs" in component:
+                        component["externalRefs"].append(reference_data)
+                    else:
+                        component["externalRefs"] = [reference_data]
         self.component.append(component)
 
     def generateTagFileDetails(self, file, id, file_info, parent_id, relationship):
