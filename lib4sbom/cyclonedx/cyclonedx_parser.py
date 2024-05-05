@@ -319,6 +319,8 @@ class CycloneDXParser:
                         self.cyclonedx_package.set_homepage(ref_url)
                     elif ref_type == "distribution":
                         self.cyclonedx_package.set_downloadlocation(ref_url)
+                    else:
+                        self.cyclonedx_package.set_externalreference("OTHER", ref_type, ref_url)
             if "modelCard" in d:
                 self._cyclonedx_mlmodel(d)
                 self.cyclonedx_package.set_value(
@@ -471,9 +473,11 @@ class CycloneDXParser:
                                 "justification", vuln["analysis"]["justification"]
                             )
                     if "affects" in vuln:
-                        vuln_info.set_value("bom_link", vuln["affects"][0]["ref"])
+                        if "ref" in vuln["affects"][0]:
+                            vuln_info.set_value("bom_link", vuln["affects"][0]["ref"])
                         if "versions" in vuln["affects"][0]:
-                            vuln_info.set_release(vuln["affects"][0]["versions"]["version"])
+                            if "version" in vuln["affects"][0]["versions"]:
+                                vuln_info.set_release(vuln["affects"][0]["versions"]["version"])
                     vulnerabilities.append(vuln_info.get_vulnerability())
                 if self.debug:
                     print(vulnerabilities)
