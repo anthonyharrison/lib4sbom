@@ -607,7 +607,7 @@ class CycloneDXGenerator:
                     externalReference = dict()
                     externalReference["url"] = ref_value
                     externalReference["type"] = ref_type
-                    externalReference["comment"] = ref_category
+                    #externalReference["comment"] = ref_category
                     if "externalReferences" in component:
                         component["externalReferences"].append(externalReference)
                     else:

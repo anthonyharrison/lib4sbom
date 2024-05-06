@@ -168,10 +168,13 @@ class SBOMPackage:
             "PACKAGE_MANAGER",
         ] and ref_type in ["cpe22Type", "cpe23Type", "purl"]:
             reference_entry = [category, ref_type.strip(), locator]
-            if "externalreference" in self.package:
-                self.package["externalreference"].append(reference_entry)
-            else:
-                self.package["externalreference"] = [reference_entry]
+        else:
+            # CycloneDX has many more reference types
+            reference_entry = [category, ref_type.lower.strip(), locator]
+        if "externalreference" in self.package:
+            self.package["externalreference"].append(reference_entry)
+        else:
+            self.package["externalreference"] = [reference_entry]
 
     def _escape(self, str):
         escaped = ""
