@@ -167,7 +167,7 @@ class CycloneDXGenerator:
             tools.append(tool)
         metadata["tools"] = tools
         if len(author) > 0:
-            metadata["authors"] = author
+            metadata["authors"] = [author]
         component = {}
         component["type"] = component_type["type"]
         if component_type["supplier"] is not None:
