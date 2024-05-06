@@ -41,6 +41,8 @@ my_package.set_name("tomcat")
 my_package.set_version("9.0.46")
 my_package.set_supplier("organisation", "apache")
 my_package.set_licensedeclared("Apache-2.0")
+# Not a real hash value!
+my_package.set_checksum("SHA256", "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF")
 sbom_packages[
     (my_package.get_name(), my_package.get_value("version"))
 ] = my_package.get_package()
