@@ -402,7 +402,7 @@ class SPDXGenerator:
                         component["licenseInfoInFiles"].append(self.license_ident(info))
                     else:
                         component["licenseInfoInFiles"] = [self.license_ident(info)]
-        component["copyrightText"] = package_info.get("copyrightText", "NOASSERTION")
+        component["copyrightText"] = package_info.get("copyrighttext", "NOASSERTION")
         if "description" in package_info:
             component["description"] = package_info["description"]
         if "comment" in package_info:
