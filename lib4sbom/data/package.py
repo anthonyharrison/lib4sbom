@@ -170,7 +170,7 @@ class SBOMPackage:
             reference_entry = [category, ref_type.strip(), locator]
         else:
             # CycloneDX has many more reference types
-            reference_entry = [category, ref_type.lower.strip(), locator]
+            reference_entry = [category, ref_type.lower().strip(), locator]
         if "externalreference" in self.package:
             self.package["externalreference"].append(reference_entry)
         else:
