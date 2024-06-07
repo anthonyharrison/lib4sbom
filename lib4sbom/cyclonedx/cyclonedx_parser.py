@@ -245,9 +245,11 @@ class CycloneDXParser:
                         checksum["alg"].replace("SHA-", "SHA"), checksum["content"]
                     )
             license_data = None
+            multi_license_data = None
             # Multiple ways of defining license data
             if "licenses" in d and len(d["licenses"]) > 0:
                 license_data = d["licenses"][0]
+                multi_license_data = d["licenses"]
             elif "evidence" in d:
                 if "licenses" in d["evidence"]:
                     if len(d["evidence"]["licenses"]) > 0:
@@ -268,6 +270,8 @@ class CycloneDXParser:
                     # Assume License concluded is same as license declared
                     self.cyclonedx_package.set_licenseconcluded(license)
                     self.cyclonedx_package.set_licensedeclared(license)
+            if multi_license_data is not None:
+                self.cyclonedx_package.set_licenselist(multi_license_data)
             if "copyright" in d:
                 self.cyclonedx_package.set_copyrighttext(d["copyright"])
             if "cpe" in d:

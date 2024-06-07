@@ -136,6 +136,9 @@ class SBOMPackage:
             # Use name if not SPDX license. license is then assumed to be the license text
             self.package["licensename"] = name
 
+    def set_licenselist(self, list):
+        self.package["licenselist"] = list
+
     def set_licensecomments(self, comment):
         self.package["licensecomments"] = self._text(comment)
 

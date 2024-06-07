@@ -69,6 +69,27 @@
       },
       "cpe": "cpe:/a:Unknown:platformdirs:2.5.4",
       "purl": "pkg:pypi/platformdirs@2.5.4"
+    },
+    {
+      "type": "library",
+      "bom-ref": "5-multi-license",
+      "name": "multi-license",
+      "version": "20.16.7",
+      "author": "Bernat_Gabor",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+          }
+        },
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/multi-license@20.16.7"
     }
   ],
   "dependencies": [
