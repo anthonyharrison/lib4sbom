@@ -88,7 +88,7 @@ class CycloneDXParser:
                             dataset_info.set_contents(url=dataset["contents"]["url"])
                         if "properties" in dataset["contents"]:
                             for property in dataset["contents"]["properties"]:
-                                dataset_info.set_conent_property(
+                                dataset_info.set_content_property(
                                     property["name"], property["value"]
                                 )
                     dataset_info.set_classification(dataset["classification"])
