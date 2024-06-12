@@ -481,9 +481,10 @@ class CycloneDXParser:
                     print(vulnerabilities)
             if "services" in data:
                 service_info = SBOMService()
+                service_id=1
                 for service in data["services"]:
                     service_info.initialise()
-                    service_info.set_id(service["bom-ref"])
+                    service_info.set_id(service.get("bom-ref",f"CycloneDX-Service-{service_id}"))
                     service_info.set_name(service["name"])
                     if "version" in service:
                         service_info.set_version(service["version"])
@@ -491,7 +492,9 @@ class CycloneDXParser:
                         service_info.set_description(service["description"])
                     if "provider" in service:
                         name = service["provider"].get("name", "")
-                        url = service["provider"].get("url", "")
+                        if "url" in service["provider"]:
+                            for u in service["provider"]["url"]:
+                                url = u
                         contact = email = phone = ""
                         if "contact" in service["provider"]:
                             contact = service["provider"]["contact"].get("name", "")
@@ -543,6 +546,7 @@ class CycloneDXParser:
                                 url, external_type, comment=comment
                             )
                     services.append(service_info.get_service())
+                    service_id = service_id + 1
                 if self.debug:
                     print(services)
         return (
