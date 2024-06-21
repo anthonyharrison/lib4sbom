@@ -231,13 +231,16 @@ class CycloneDXParser:
             self.cyclonedx_package.set_value("bom-ref", bom_ref)
             if "supplier" in d:
                 # Assume that this refers to an organisation
-                supplier_name = d["supplier"]["name"]
+                supplier_name = ""
+                if "name" in d["supplier"]:
+                    supplier_name = d["supplier"]["name"]
                 # Check for contact details (email)
                 if "contact" in d["supplier"]:
                     for contact in d["supplier"]["contact"]:
                         if "email" in contact:
                             supplier_name = f'{supplier_name} ({contact["email"]})'
-                self.cyclonedx_package.set_supplier("Organisation", supplier_name)
+                if len(supplier_name) > 0:
+                    self.cyclonedx_package.set_supplier("Organisation", supplier_name)
             if "author" in d:
                 # Assume that this refers to an individual
                 self.cyclonedx_package.set_originator("Person", d["author"])
