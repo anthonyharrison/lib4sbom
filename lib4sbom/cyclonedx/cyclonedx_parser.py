@@ -234,6 +234,9 @@ class CycloneDXParser:
                 supplier_name = ""
                 if "name" in d["supplier"]:
                     supplier_name = d["supplier"]["name"]
+                elif "url" in d["supplier"]:
+                    for u in d["supplier"]["url"]:
+                        supplier_name = u
                 # Check for contact details (email)
                 if "contact" in d["supplier"]:
                     for contact in d["supplier"]["contact"]:
