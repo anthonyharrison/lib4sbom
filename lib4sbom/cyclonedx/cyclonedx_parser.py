@@ -457,7 +457,7 @@ class CycloneDXParser:
                         if "@" in vuln["bom-ref"]:
                             component_info = vuln['bom-ref'].split('@')
                             vuln_info.set_value("product", component_info[0])
-                            vuln_info.set_value("version", component_info[1])
+                            vuln_info.set_value("release", component_info[1])
                     vuln_info.set_id(vuln["id"])
                     if "source" in vuln:
                         vuln_info.set_value("source-name", vuln["source"]["name"])
