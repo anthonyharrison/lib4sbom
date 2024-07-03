@@ -11,6 +11,7 @@ from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.file import SBOMFile
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
+from lib4sbom.data.license import SBOMLicense
 
 
 class SPDXParser:
@@ -19,6 +20,7 @@ class SPDXParser:
         self.vulnerabilities = []
         # Services not in SPDX
         self.services = []
+        self.user_licences=[]
 
     def parse(self, sbom_file):
         """parses SPDX SBOM file"""
@@ -36,7 +38,7 @@ class SPDXParser:
         elif sbom_file.endswith(".spdx.xml"):
             return self.parse_spdx_xml(sbom_file)
         else:
-            return {}, {}, {}, [], self.vulnerabilities, self.services
+            return {}, {}, {}, [], self.vulnerabilities, self.services, self.user_licences
 
     def parse_spdx_tag(self, sbom_file):
         """parses SPDX tag value file extracting all SBOM data"""
@@ -63,6 +65,9 @@ class SPDXParser:
         relationships = []
         spdx_relationship = SBOMRelationship()
         spdx_relationship.initialise()
+        spdx_licenses = SBOMLicense()
+        spdx_licenses.initialise()
+
         for line in lines:
             line_elements = line.split(":")
             if line_elements[0] == "SPDXVersion":
@@ -156,13 +161,11 @@ class SPDXParser:
                 # Is this a new package?
                 if package is not None:
                     # Save package metadata
-                    # if package in packages:
-                    #    print (f"Duplicate package detected {package}")
-                    # packages[package] = spdx_package.get_package()
-                    package_tuple = (package, version)
+                    package_tuple = (package, version, spdx_id)
                     if package_tuple in packages:
                         print(f"Duplicate package detected {package} {version}")
-                    packages[package_tuple] = spdx_package.get_package()
+                    else:
+                        packages[package_tuple] = spdx_package.get_package()
                     version = DEFAULT_VERSION
                 package = line_elements[1].strip().rstrip("\n")
                 # Reset all variables
@@ -269,15 +272,35 @@ class SPDXParser:
                 spdx_relationship.initialise()
                 spdx_relationship.set_relationship(source, type, target)
                 relationships.append(spdx_relationship.get_relationship())
-        # Save last package/file
+            elif line_elements[0] == "LicenseID":
+                # check if currently
+                if spdx_licenses.get_id() is not None:
+                    self.user_licences.append(spdx_licenses.get_license())
+                    spdx_licenses.initialise()
+                license_id = line_elements[1].strip().rstrip("\n")
+                spdx_licenses.set_id(license_id)
+            elif line_elements[0] == "LicenseName":
+                license_name = line_elements[1].strip().rstrip("\n")
+                spdx_licenses.set_name(license_name)
+            elif line_elements[0] == "LicenseComment":
+                license_comment = line_elements[1].strip().rstrip("\n")
+                spdx_licenses.set_value("comment", license_comment)
+            elif line_elements[0] == "ExtractedText":
+                license_text = line[14:].strip().rstrip("\n")
+                spdx_licenses.set_value("text", license_text)
+        # Save last package/file/license
         if file is not None and file not in files:
             # Save file metadata
             files[file] = spdx_file.get_file()
         if package is not None:
             # Save package metadata
-            # packages[package] = spdx_package.get_package()
-            package_tuple = (package, version)
-            packages[package_tuple] = spdx_package.get_package()
+            package_tuple = (package, version, spdx_id)
+            if package_tuple in packages:
+                print(f"Duplicate package detected {package} {version}")
+            else:
+                packages[package_tuple] = spdx_package.get_package()
+        if spdx_licenses.get_id() is not None:
+            self.user_licences.append(spdx_licenses.get_license())
         return (
             spdx_document,
             files,
@@ -285,6 +308,7 @@ class SPDXParser:
             self._transform_relationship(relationships, elements),
             self.vulnerabilities,
             self.services,
+            self.user_licences,
         )
 
     def parse_spdx_json(self, sbom_file):
@@ -299,6 +323,8 @@ class SPDXParser:
         spdx_file = SBOMFile()
         relationships = []
         spdx_relationship = SBOMRelationship()
+        spdx_licenses = SBOMLicense()
+        spdx_licenses.initialise()
         # Maintain mapping of document/file/package ids to names
         elements = {}
         spdx_document = SBOMDocument()
@@ -320,12 +346,24 @@ class SPDXParser:
                 creator_entry = creator.split(":")
                 spdx_document.set_creator(creator_entry[0], creator_entry[1])
             elements[data["SPDXID"]] = data["name"]
+            if "hasExtractedLicensingInfos" in data:
+                for e in data["hasExtractedLicensingInfos"]:
+                    spdx_licenses.initialise()
+                    spdx_licenses.set_name(e["name"])
+                    spdx_licenses.set_id(e["licenseId"])
+                    if "extractedText" in e:
+                        spdx_licenses.set_value("text", e["extractedText"])
+                    if "comment" in e:
+                        spdx_licenses.set_value("comment", e["comment"])
+                    self.user_licences.append(spdx_licenses.get_license())
             if "files" in data:
                 for d in data["files"]:
                     spdx_file.initialise()
                     filename = d["fileName"]
                     spdx_file.set_name(filename)
-                    elements[d["SPDXID"]] = filename
+                    id = d["SPDXID"]
+                    spdx_file.set_id(id)
+                    elements[id] = filename
                     try:
                         if "checksum" in d:
                             # Potentially multiple entries
@@ -353,7 +391,9 @@ class SPDXParser:
                     spdx_package.initialise()
                     package = d["name"]
                     spdx_package.set_name(package)
-                    elements[d["SPDXID"]] = package
+                    id = d["SPDXID"]
+                    spdx_package.set_id(id)
+                    elements[id] = package
                     # Default type of component
                     spdx_package.set_type("library")
                     try:
@@ -430,8 +470,11 @@ class SPDXParser:
                                     ext_ref["referenceType"],
                                     ext_ref["referenceLocator"],
                                 )
-                        package_tuple = (package, version)
-                        packages[package_tuple] = spdx_package.get_package()
+                        package_tuple = (package, version, id)
+                        if package_tuple in packages:
+                            print(f"Duplicate package detected {package} {version}")
+                        else:
+                            packages[package_tuple] = spdx_package.get_package()
 
                     except KeyError as e:
                         print(f"{e} Unable to store package info: {package}")
@@ -451,6 +494,7 @@ class SPDXParser:
             self._transform_relationship(relationships, elements),
             self.vulnerabilities,
             self.services,
+            self.user_licences,
         )
 
     def parse_spdx_yaml(self, sbom_file):
@@ -506,6 +550,7 @@ class SPDXParser:
             [],
             self.vulnerabilities,
             self.services,
+            self.user_licences,
         )
 
     def parse_spdx_xml(self, sbom_file):
@@ -539,4 +584,5 @@ class SPDXParser:
             [],
             self.vulnerabilities,
             self.services,
+            self.user_licences,
         )
