@@ -64,7 +64,8 @@ class SBOMPackage:
             self.package["type"] = "FILE"
 
     def set_version(self, version):
-        self.package["version"] = self._semantic_version(version)
+        # self.package["version"] = self._semantic_version(version)
+        self.package["version"] = version
         my_id = self.package.get("id")
         my_name = self.get_name()
         if my_id is None and my_name is not None:
