@@ -111,6 +111,9 @@ class SBOMGenerator:
         else:
             project_id = self.bom.generateDocumentHeader(project_name, uuid)
             self._save_element(project_name, project_id)
+        if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
+            # Load user defined licences
+            self.bom.addLicenseDetails(sbom_data["licenses"])
         if "files" in sbom_data:
             # Process list of files
             if len(sbom_data["files"]) is not None:
@@ -320,6 +323,9 @@ class SBOMGenerator:
             )
             self._save_element(project_name, project_id)
         parent = project_name
+        if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
+            # Load user defined licences
+            print ("User defined licences available")
         # Process list of files
         if "files" in sbom_data:
             # Process list of files

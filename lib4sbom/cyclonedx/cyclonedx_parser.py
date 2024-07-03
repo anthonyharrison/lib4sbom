@@ -21,6 +21,7 @@ class CycloneDXParser:
         self.cyclonedx_package = SBOMPackage()
         self.packages = {}
         self.id = {}
+        self.licences = []
         self.component_id = 0
         self.model_card = SBOMModelCard()
         self.cyclonedx_version = None
@@ -32,7 +33,7 @@ class CycloneDXParser:
         elif sbom_file.endswith((".bom.xml", ".cdx.xml", ".xml")):
             return self.parse_cyclonedx_xml(sbom_file)
         else:
-            return {}, {}, {}, [], [], []
+            return {}, {}, {}, [], [], [], []
 
     def _governance_element(self, element):
         elements = []
@@ -573,6 +574,7 @@ class CycloneDXParser:
             relationships,
             vulnerabilities,
             services,
+            self.licences
         )
 
     def _parse_component(self, component_element):
@@ -768,4 +770,4 @@ class CycloneDXParser:
         dependencies = self.parse_dependencies_xml()
         vulnerabilities = self.parse_vulnerabilities_xml()
         services = self.parse_services_xml()
-        return document, {}, self.packages, dependencies, vulnerabilities, services
+        return document, {}, self.packages, dependencies, vulnerabilities, services, self.licences

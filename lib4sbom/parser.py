@@ -33,6 +33,7 @@ class SBOMParser:
         self.relationships = None
         self.vulnerabilities = None
         self.services = None
+        self.licenses = None
         self.sbom = SBOM(self.sbom_type)
 
     def parse_file(self, filename: str) -> None:
@@ -75,6 +76,7 @@ class SBOMParser:
                     self.relationships,
                     self.vulnerabilities,
                     self.services,
+                    self.licenses,
                 ) = self.parser.parse(filename)
                 # but if no packages or files found, assume it must be CycloneDX
                 if len(self.packages) == 0 and len(self.files) == 0 and len(self.vulnerabilities) == 0:
@@ -87,6 +89,7 @@ class SBOMParser:
                         self.relationships,
                         self.vulnerabilities,
                         self.services,
+                        self.licenses,
                     ) = self.parser.parse(filename)
             else:
                 (
@@ -96,6 +99,7 @@ class SBOMParser:
                     self.relationships,
                     self.vulnerabilities,
                     self.services,
+                    self.licenses,
                 ) = self.parser.parse(filename)
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
@@ -106,6 +110,8 @@ class SBOMParser:
                 self.sbom.add_vulnerabilities(self.vulnerabilities)
             if len(self.services) > 0:
                 self.sbom.add_services(self.services)
+            if len(self.licenses) > 0:
+                self.sbom.add_licenses(self.licenses)
             self.sbom.set_type(self.sbom_type)
         except KeyError:
             if self.debug:
@@ -182,7 +188,16 @@ class SBOMParser:
         """Returns the service elements from within a parsed SBOM
         Returns
         -------
-        relationships : list of SBOMService objects
+        services : list of SBOMService objects
 
         """
         return self.sbom.get_services()
+
+    def get_licenses(self) -> List[Dict]:
+        """Returns the license elements from within a parsed SBOM
+        Returns
+        -------
+        licenses : list of SBOMLicense objects
+
+        """
+        return self.sbom.get_licenses()
