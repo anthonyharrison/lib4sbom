@@ -17,9 +17,10 @@ class SPDXGenerator:
     SPDX_VERSION = "SPDX-2.3"
     DATA_LICENSE = "CC0-1.0"
     SPDX_NAMESPACE = "http://spdx.org/spdxdocs/"
-    SPDX_PROJECT_ID = "SPDXRef-DOCUMENT"
-    PACKAGE_PREAMBLE = "SPDXRef-Package-"
-    FILE_PREAMBLE = "SPDXRef-File-"
+    SPDX_PREAMBLE = "SPDXRef-"
+    SPDX_PROJECT_ID = f"{SPDX_PREAMBLE}DOCUMENT"
+    PACKAGE_PREAMBLE = f"{SPDX_PREAMBLE}Package-"
+    FILE_PREAMBLE = f"{SPDX_PREAMBLE}File-"
     LICENSE_PREAMBLE = "LicenseRef-"
 
     def __init__(
@@ -165,6 +166,9 @@ class SPDXGenerator:
                 else:
                     # Invalid charcters are replaced
                     spdx_id = spdx_id + "-"
+            # Check preamble not present
+            if spdx_id.startswith(self.SPDX_PREAMBLE):
+                return spdx_id
             return self.PACKAGE_PREAMBLE + spdx_id
         return str(id)
 
@@ -514,16 +518,22 @@ class SPDXGenerator:
                     component["fileContributor"] = [contributor]
         self.file_component.append(component)
 
-    def generateTagLicenseDetails(self, id, name, license_text):
+    def generateTagLicenseDetails(self, id, name, license_text, comment):
         self.generateTag("LicenseID", id)
         self.generateTag("LicenseName", name)
-        self.generateTag("ExtractedText", self._text(license_text))
+        if len(license_text) > 0:
+            self.generateTag("ExtractedText", self._text(license_text))
+        if len (comment) > 0:
+            self.generateTag("LicenseComment", comment)
 
-    def generateJSONLicenseDetails(self, id, name, license_text):
+    def generateJSONLicenseDetails(self, id, name, license_text, comment):
         extractedlicense = {}
         extractedlicense["licenseId"] = id
         extractedlicense["name"] = name
-        extractedlicense["extractedText"] = license_text
+        if len(license_text) > 0:
+            extractedlicense["extractedText"] = license_text
+        if len (comment) > 0:
+            extractedlicense["comment"] = comment
         self.licenses.append(extractedlicense)
 
     def generatePackageDetails(
@@ -544,15 +554,27 @@ class SPDXGenerator:
         else:
             self.generateJSONFileDetails(file, id, file_info, parent_id, relationship)
 
+    def addLicenseDetails(self, user_licenses):
+        for license in user_licenses:
+            self.license_info.append(
+                {
+                    "id": license['id'],
+                    "name": license.get("name",""),
+                    "text": license.get("text",""),
+                    "comment": license.get("comment", "")
+                }
+            )
+
     def generateLicenseDetails(self):
         for license_info in self.license_info:
             if self.format == "tag":
+                self.generateComment("\n")
                 self.generateTagLicenseDetails(
-                    license_info["id"], license_info["name"], license_info["text"]
+                    license_info["id"], license_info["name"], license_info["text"], license_info.get("comment","")
                 )
             else:
                 self.generateJSONLicenseDetails(
-                    license_info["id"], license_info["name"], license_info["text"]
+                    license_info["id"], license_info["name"], license_info["text"], license_info.get("comment","")
                 )
 
     def generateRelationship(self, from_id, to_id, relationship_type):
