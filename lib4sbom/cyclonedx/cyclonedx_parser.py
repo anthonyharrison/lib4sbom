@@ -199,6 +199,39 @@ class CycloneDXParser:
             for property in d["modelCard"]["properties"]:
                 self.model_card.set_property(property["name"], property["value"])
 
+    def process_license(self, license_element):
+        license_info = []
+        for l in license_element:
+            if "license" in l:
+                # Potentially multiple licenses
+                # At least one of id or name must be specified
+                id = name = None
+                if "id" in l["license"]:
+                    # A valid SPDX Id
+                    id = l["license"]["id"]
+                if "name" in l["license"]:
+                    name = l["license"]["name"]
+                if id is None and name is None:
+                    print (f"[ERROR] Invalid license specified {l} - missing id or name.")
+                else:
+                    license_info.append(l["license"])
+            else:
+                # SPDX License expression - can only have one instance
+                if len (license_info) > 0:
+                    print (f"[ERROR] Invalid license specified {l}  - only one SPDX expression allowed.")
+                else:
+                    type = "declared"
+                    license = None
+                    if "expression" in l:
+                        license = l["expression"]
+                    if "acknowledgement" in l:
+                        type = l["acknowledgement"]
+                    if license is None:
+                        print(f"[ERROR] Invalid license specified {l}  - expression missing.")
+                    else:
+                        license_info.append({"expression": license, "acknowledgement": type})
+        return license_info
+
     def _cyclondex_component(self, d):
         self.cyclonedx_package.initialise()
         self.component_id = self.component_id + 1
@@ -257,47 +290,87 @@ class CycloneDXParser:
                         checksum["alg"].replace("SHA-", "SHA"), checksum["content"]
                     )
             license_data = None
-            acknowledgement = None
-            multi_license_data = None
             # Multiple ways of defining license data
-            if "licenses" in d and len(d["licenses"]) > 0:
-                license_data = d["licenses"][0]
-                multi_license_data = d["licenses"]
+            if "licenses" in d:
+                license_data = self.process_license(d["licenses"])
             elif "evidence" in d:
-                if "licenses" in d["evidence"]:
-                    if len(d["evidence"]["licenses"]) > 0:
-                        license_data = d["evidence"]["licenses"][0]
-            if license_data is not None:
+                license_data = self.process_license(d["evidence"])
+            if license_data is not None and len(license_data) > 0:
                 # Multiple ways of defining licenses
-                license = None
-                if "license" in license_data:
-                    if "id" in license_data["license"]:
-                        license = license_data["license"]["id"]
-                    elif "name" in license_data["license"]:
-                        license = license_data["license"]["name"]
-                    elif "expression" in license_data["license"]:
-                        license = license_data["license"]["expression"]
-                    if "acknowledgement" in license_data["license"]:
-                        acknowledgement = license_data["license"]["acknowledgement"]
-                elif "expression" in license_data:
-                    license = license_data["expression"]
-                if license is not None:
-                    # Assume License concluded is same as license declared
-                    # CycloneDX distinquishes between concluded and declared
-                    if self._cyclonedx_16():
-                        if acknowledgement is not None:
-                            if acknowledgement == "concluded":
-                                self.cyclonedx_package.set_licenseconcluded(license)
+                for license_info in license_data:
+                    license = license_info.get("expression")
+                    if license is None:
+                        license = license_info.get("id")
+                        if license is None:
+                            license = license_info.get("name")
+                    acknowledgement = license_info.get("acknowledgement")
+                    if license is not None:
+                        # CycloneDX 1.6 distinguishes between concluded and declared
+                        if self._cyclonedx_16():
+                            if acknowledgement is not None:
+                                if acknowledgement == "concluded":
+                                    self.cyclonedx_package.set_licenseconcluded(license)
+                                else:
+                                    self.cyclonedx_package.set_licensedeclared(license)
                             else:
+                                self.cyclonedx_package.set_licenseconcluded(license)
                                 self.cyclonedx_package.set_licensedeclared(license)
                         else:
+                            # Assume License concluded is same as license declared
                             self.cyclonedx_package.set_licenseconcluded(license)
                             self.cyclonedx_package.set_licensedeclared(license)
-                    else:
-                        self.cyclonedx_package.set_licenseconcluded(license)
-                        self.cyclonedx_package.set_licensedeclared(license)
-            if multi_license_data is not None:
-                self.cyclonedx_package.set_licenselist(multi_license_data)
+                if license_data is not None and len(license_data) > 1:
+                    self.cyclonedx_package.set_licenselist(license_data)
+            # acknowledgement = None
+            # multi_license_data = None
+            # if "licenses" in d and len(d["licenses"]) > 0:
+            #     license_data = d["licenses"][0]
+            #     multi_license_data = d["licenses"]
+            #     for l in d["licenses"]:
+            #         id = name = text = url = ""
+            #         if "id" in l["license"]:
+            #             id = l["license"]["id"]
+            #         if "name" in l["license"]:
+            #             name = l["license"]["name"]
+            #         if "text" in l["license"]:
+            #             name = l["license"]["text"]["content"]
+            #         if "url" in l["license"]:
+            #             url = l["license"]["url"]
+            # elif "evidence" in d:
+            #     if "licenses" in d["evidence"]:
+            #         if len(d["evidence"]["licenses"]) > 0:
+            #             license_data = d["evidence"]["licenses"][0]
+            # if license_data is not None:
+            #     # Multiple ways of defining licenses
+            #     license = None
+            #     if "license" in license_data:
+            #         if "id" in license_data["license"]:
+            #             license = license_data["license"]["id"]
+            #         elif "name" in license_data["license"]:
+            #             license = license_data["license"]["name"]
+            #         elif "expression" in license_data["license"]:
+            #             license = license_data["license"]["expression"]
+            #         if "acknowledgement" in license_data["license"]:
+            #             acknowledgement = license_data["license"]["acknowledgement"]
+            #     elif "expression" in license_data:
+            #         license = license_data["expression"]
+            #     if license is not None:
+            #         # Assume License concluded is same as license declared
+            #         # CycloneDX distinguishes between concluded and declared
+            #         if self._cyclonedx_16():
+            #             if acknowledgement is not None:
+            #                 if acknowledgement == "concluded":
+            #                     self.cyclonedx_package.set_licenseconcluded(license)
+            #                 else:
+            #                     self.cyclonedx_package.set_licensedeclared(license)
+            #             else:
+            #                 self.cyclonedx_package.set_licenseconcluded(license)
+            #                 self.cyclonedx_package.set_licensedeclared(license)
+            #         else:
+            #             self.cyclonedx_package.set_licenseconcluded(license)
+            #             self.cyclonedx_package.set_licensedeclared(license)
+            # if multi_license_data is not None:
+            #     self.cyclonedx_package.set_licenselist(multi_license_data)
             if "copyright" in d:
                 self.cyclonedx_package.set_copyrighttext(d["copyright"])
             if "cpe" in d:
