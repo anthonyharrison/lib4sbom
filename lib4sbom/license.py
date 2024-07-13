@@ -193,12 +193,15 @@ class LicenseScanner:
 
     def get_license_category(self, license_list):
         # For each license
+        if license_list is None or len (license_list) == 0:
+            return "UNKNOWN"
         license_category = {}
         for license in license_list:
             # License may be an expression
-            for license_element in self._expression_split(license):
-                category = self.get_license_type(license_element)
-                license_category[category] = license_category.get(category, 0) + 1
+            if license is not None:
+                for license_element in self._expression_split(license):
+                    category = self.get_license_type(license_element)
+                    license_category[category] = license_category.get(category, 0) + 1
         category = (
             "maximalcopyleft",
             "networkcopyleft",
