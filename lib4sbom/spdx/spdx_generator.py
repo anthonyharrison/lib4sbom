@@ -528,8 +528,10 @@ class SPDXGenerator:
 
     def generateJSONLicenseDetails(self, id, name, license_text, comment):
         extractedlicense = {}
-        extractedlicense["licenseId"] = id
-        extractedlicense["name"] = name
+        if len(id) > 0:
+            extractedlicense["licenseId"] = id
+        if len(name) > 0:
+            extractedlicense["name"] = name
         if len(license_text) > 0:
             extractedlicense["extractedText"] = license_text
         if len (comment) > 0:
@@ -570,11 +572,11 @@ class SPDXGenerator:
             if self.format == "tag":
                 self.generateComment("\n")
                 self.generateTagLicenseDetails(
-                    license_info["id"], license_info["name"], license_info["text"], license_info.get("comment","")
+                    license_info.get("id",""), license_info.get("name",""), license_info["text"], license_info.get("comment","")
                 )
             else:
                 self.generateJSONLicenseDetails(
-                    license_info["id"], license_info["name"], license_info["text"], license_info.get("comment","")
+                    license_info.get("id",""), license_info.get("name",""), license_info["text"], license_info.get("comment","")
                 )
 
     def generateRelationship(self, from_id, to_id, relationship_type):

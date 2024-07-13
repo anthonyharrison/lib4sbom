@@ -349,8 +349,10 @@ class SPDXParser:
             if "hasExtractedLicensingInfos" in data:
                 for e in data["hasExtractedLicensingInfos"]:
                     spdx_licenses.initialise()
-                    spdx_licenses.set_name(e["name"])
-                    spdx_licenses.set_id(e["licenseId"])
+                    if "name" in e:
+                        spdx_licenses.set_name(e["name"])
+                    if "licenseId":
+                        spdx_licenses.set_id(e["licenseId"])
                     if "extractedText" in e:
                         spdx_licenses.set_value("text", e["extractedText"])
                     if "comment" in e:
