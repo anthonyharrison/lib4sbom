@@ -60,6 +60,8 @@ SBOMs are supported in the following formats
 | CycloneDX | 1.4     | XML      |
 | CycloneDX | 1.5     | JSON     |
 | CycloneDX | 1.5     | XML      |
+| CycloneDX | 1.6     | JSON     |
+| CycloneDX | 1.6     | XML      |
 
 **Note** that support for SPDX RDF and XML formats is limited to a few package attributes.
 
@@ -222,8 +224,9 @@ SBOMs can be generated in the following formats
 | SPDX      | 2.3     | YAML      |
 | CycloneDX | 1.4     | JSON      |
 | CycloneDX | 1.5     | JSON      |
+| CycloneDX | 1.6     | JSON      |
 
-The default version for CycloneDX is version 1.5. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4" if required.
+The default version for CycloneDX is version 1.6. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4" if required.
 
 The default version for SPDX is version 2.3. However, the version can be overridden by setting the environment variable LIB4SBOM_SPDX_VERSION to "SPDX-2.2" if required.
 
