@@ -139,7 +139,7 @@ class CycloneDXGenerator:
             if component_type["lifecycle"].lower() in ["design","pre-build","build","post-build","operations","discovery","decommission"]:
                 lifecycle = {}
                 lifecycle["phase"] = component_type["lifecycle"].lower()
-                metadata["lifecyles"] = [lifecycle]
+                metadata["lifecycles"] = [lifecycle]
         tool = {}
         author = {}
         if component_type["creator"] is not None:
@@ -156,7 +156,7 @@ class CycloneDXGenerator:
             tool["name"] = self.application
             tool["version"] = self.application_version
         # Tools format changed in version 1.5
-        if self.cyclonedx_version == self.CYCLONEDX_VERSION:
+        if self._cyclonedx_15():
             tools = {}
             tool["type"] = "application"
             components = []
@@ -522,7 +522,13 @@ class CycloneDXGenerator:
                     component["hashes"].append(checksum_entry)
                 else:
                     component["hashes"] = [checksum_entry]
-        if "licenseconcluded" in package or "licensedeclared" in package:
+        if "licenselist" in package:
+            # Multiple licenses declared for component
+            licenses = []
+            for license in package["licenselist"]:
+                licenses.append(license)
+            component["licenses"] = licenses
+        elif "licenseconcluded" in package or "licensedeclared" in package:
             if "licenseconcluded" in package:
                 license_definition = package["licenseconcluded"]
                 acknowledgement = "concluded"
