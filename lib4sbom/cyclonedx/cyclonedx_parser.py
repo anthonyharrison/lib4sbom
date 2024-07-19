@@ -49,6 +49,10 @@ class CycloneDXParser:
                 elements.append(entry)
         return elements
 
+    def _cyclonedx_15(self):
+        # utility for features introduced in version 1.5
+        return self.cyclonedx_version in ["1.5", "1.6"]
+
     def _cyclonedx_16(self):
         # utility for features introduced in version 1.6
         return self.cyclonedx_version in ["1.6"]
@@ -220,7 +224,7 @@ class CycloneDXParser:
                 if len (license_info) > 0:
                     print (f"[ERROR] Invalid license specified {l}  - only one SPDX expression allowed.")
                 else:
-                    type = "declared"
+                    type = None
                     license = None
                     if "expression" in l:
                         license = l["expression"]
@@ -432,8 +436,8 @@ class CycloneDXParser:
         # Check valid CycloneDX JSON file (and not SPDX)
         cyclonedx_json_file = data.get("bomFormat", False)
         if cyclonedx_json_file:
-            cyclonedx_version = data["specVersion"]
-            cyclonedx_document.set_version(cyclonedx_version)
+            self.cyclonedx_version = data["specVersion"]
+            cyclonedx_document.set_version(self.cyclonedx_version)
             cyclonedx_document.set_type("cyclonedx")
             cyclonedx_document.set_value(
                 "uuid", data.get("serialNumber", "urn:uuid:" + str(uuid.uuid4()))
@@ -449,7 +453,7 @@ class CycloneDXParser:
                     for l in data["metadata"]["lifecycles"]:
                         cyclonedx_document.set_value("lifecycle", l["phase"])
                 if "tools" in data["metadata"]:
-                    if cyclonedx_version in ["1.5", "1.6"]:
+                    if self._cyclonedx_15():
                         if "components" in data["metadata"]["tools"]:
                             for component in data["metadata"]["tools"]["components"]:
                                 name = component["name"]
