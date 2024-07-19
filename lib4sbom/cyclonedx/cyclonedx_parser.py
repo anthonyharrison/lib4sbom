@@ -496,6 +496,11 @@ class CycloneDXParser:
                         cyclonedx_document.set_value(
                             "metadata_version", component_version
                         )
+                    if "supplier" in data["metadata"]["component"]:
+                        supplier = data["metadata"]["component"]["supplier"]
+                        cyclonedx_document.set_value(
+                            "metadata_supplier", supplier['name']
+                        )
                 if "properties" in data["metadata"]:
                     cyclonedx_document.set_value(
                         "property", data["metadata"]["properties"]
