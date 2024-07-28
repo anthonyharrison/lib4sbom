@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 from lib4sbom.cyclonedx.cyclonedx_parser import CycloneDXParser as test_module
@@ -23,9 +24,16 @@ class TestCcycloneDX_parser:
         test_parser = test_module()
         result = test_parser.parse(self.get_test_filepath("testapp2.json"))
 
-        cyclonedx_document, files, packages, relationships, vulnerabilities, services = result
+        (
+            cyclonedx_document,
+            files,
+            packages,
+            relationships,
+            vulnerabilities,
+            services,
+        ) = result
         multi_license = None
-        for (p, v) in packages:
+        for p, v in packages:
             if p == "multi-license":
                 multi_license = packages[(p, v)]
                 break

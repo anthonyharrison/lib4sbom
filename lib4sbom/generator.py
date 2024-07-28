@@ -325,7 +325,7 @@ class SBOMGenerator:
         parent = project_name
         if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
             # Load user defined licences
-            print ("User defined licences available")
+            print("User defined licences available")
         # Process list of files
         if "files" in sbom_data:
             # Process list of files

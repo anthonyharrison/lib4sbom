@@ -79,7 +79,7 @@ class LicenseScanner:
         return self.DEFAULT_LICENSE
 
     def get_license_text(self, license_id):
-        license_text=""
+        license_text = ""
         filename = f"{self.license_text_path}/{license_id}.txt"
         # check filename exists
         if os.path.exists(filename):
@@ -94,7 +94,7 @@ class LicenseScanner:
             for lic in self.licenses["licenses"]:
                 if lic["licenseId"] == license_id:
                     return lic["name"]
-        return "" # License not found
+        return ""  # License not found
 
     def get_license_url(self, license_id):
         # Assume that license_id is a valid SPDX id
@@ -193,7 +193,7 @@ class LicenseScanner:
 
     def get_license_category(self, license_list):
         # For each license
-        if license_list is None or len (license_list) == 0:
+        if license_list is None or len(license_list) == 0:
             return "UNKNOWN"
         license_category = {}
         for license in license_list:

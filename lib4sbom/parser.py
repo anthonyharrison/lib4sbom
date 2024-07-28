@@ -79,7 +79,11 @@ class SBOMParser:
                     self.licenses,
                 ) = self.parser.parse(filename)
                 # but if no packages or files found, assume it must be CycloneDX
-                if len(self.packages) == 0 and len(self.files) == 0 and len(self.vulnerabilities) == 0:
+                if (
+                    len(self.packages) == 0
+                    and len(self.files) == 0
+                    and len(self.vulnerabilities) == 0
+                ):
                     self.sbom_type = "cyclonedx"
                     self.parser = CycloneDXParser()
                     (
