@@ -3,8 +3,8 @@
 
 ### Example to show use of lib4sbom to create a CycloneDX SBOM in JSON format
 
-from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.document import SBOMDocument
+from lib4sbom.data.package import SBOMPackage
 from lib4sbom.generator import SBOMGenerator
 from lib4sbom.output import SBOMOutput
 from lib4sbom.sbom import SBOM
@@ -64,7 +64,7 @@ my_sbom = SBOM()
 my_sbom.set_type(sbom_type="cyclonedx")
 my_sbom.set_version("1.6")
 my_doc = SBOMDocument()
-my_doc.set_value("lifecycle","build")
+my_doc.set_value("lifecycle", "build")
 my_sbom.add_document(my_doc.get_document())
 my_sbom.add_packages(sbom_packages)
 # print(my_sbom.get_sbom())
