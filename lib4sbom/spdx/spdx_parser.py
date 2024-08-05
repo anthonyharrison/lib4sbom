@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Anthony Harrison
+# Copyright (C) 2024 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
 import json
@@ -89,7 +89,9 @@ class SPDXParser:
                     # ID can come before name
                     elements[spdx_id] = element_name
             elif line_elements[0] == "DocumentNamespace":
-                namespace = line_elements[1].strip().rstrip("\n")
+                # Capture all data after tag
+                namespace = line[len("DocumentNamespace:") :].strip().rstrip("\n")
+                line.find(namespace)
                 spdx_document.set_value("uuid", namespace)
             elif line_elements[0] == "Created":
                 # Capture all data after tag
