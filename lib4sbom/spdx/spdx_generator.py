@@ -370,7 +370,7 @@ class SPDXGenerator:
             for checksum in package_info["checksum"]:
                 checksum_entry = dict()
                 checksum_entry["algorithm"] = checksum[0]
-                checksum_entry["checkumValue"] = checksum[1]
+                checksum_entry["checksumValue"] = checksum[1]
                 if "checksums" in component:
                     component["checksums"].append(checksum_entry)
                 else:
@@ -501,7 +501,7 @@ class SPDXGenerator:
             for checksum in file_info["checksum"]:
                 checksum_entry = dict()
                 checksum_entry["algorithm"] = checksum[0]
-                checksum_entry["checkumValue"] = checksum[1]
+                checksum_entry["checksumValue"] = checksum[1]
                 if "checksums" in component:
                     component["checksums"].append(checksum_entry)
                 else:

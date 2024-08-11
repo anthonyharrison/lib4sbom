@@ -373,7 +373,7 @@ class SPDXParser:
                             # Potentially multiple entries
                             for checksum in d["checksum"]:
                                 spdx_file.set_checksum(
-                                    checksum["algorithm"], checksum["checkumValue"]
+                                    checksum["algorithm"], checksum["checksumValue"]
                                 )
                         if "fileTypes" in d:
                             # Potentially multiple entries
@@ -441,7 +441,7 @@ class SPDXParser:
                             # Potentially multiple entries
                             for checksum in d["checksum"]:
                                 spdx_package.set_checksum(
-                                    checksum["algorithm"], checksum["checkumValue"]
+                                    checksum["algorithm"], checksum["checksumValue"]
                                 )
                         if "sourceInfo" in d:
                             spdx_package.set_sourceinfo(d["sourceInfo"])
