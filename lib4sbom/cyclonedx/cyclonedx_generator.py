@@ -46,7 +46,9 @@ class CycloneDXGenerator:
         self.include_purl = False
         # Can specify version of CycloneDX through environment variable
         self.cyclonedx_version = os.getenv("LIB4SBOM_CYCLONEDX_VERSION")
-        if self.cyclonedx_version is None or self.cyclonedx_version not in ["1.4"]:
+        # Check valid version
+        self.spec_version(self.cyclonedx_version)
+        if self.cyclonedx_version is None:
             self.cyclonedx_version = self.CYCLONEDX_VERSION
 
     def store(self, message):
@@ -86,6 +88,8 @@ class CycloneDXGenerator:
     def spec_version(self, version):
         if version in ["1.3", "1.4", "1.5", "1.6"]:
             self.cyclonedx_version = version
+        else:
+            self.cyclonedx_version = None
 
     def _cyclonedx_15(self):
         # utility for features introduced in version 1.5
