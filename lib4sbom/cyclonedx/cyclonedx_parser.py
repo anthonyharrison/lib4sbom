@@ -447,6 +447,8 @@ class CycloneDXParser:
             else:
                 cyclonedx_document.set_value("bom_version", 1)
             if "metadata" in data:
+                if self.debug:
+                    print ("Processing Metadata")
                 if "timestamp" in data["metadata"]:
                     cyclonedx_document.set_created(data["metadata"]["timestamp"])
                 if "lifecycles" in data["metadata"]:
@@ -509,10 +511,18 @@ class CycloneDXParser:
                     cyclonedx_document.set_value(
                         "property", data["metadata"]["properties"]
                     )
+                if self.debug:
+                    print (cyclonedx_document)
             if "components" in data:
+                if self.debug:
+                    print ("Processing Components")
                 for d in data["components"]:
                     self._cyclondex_component(d)
+                if self.debug:
+                    print (self.packages)
             if "dependencies" in data:
+                if self.debug:
+                    print ("Processing Dependencies")
                 for d in data["dependencies"]:
                     source_id = d["ref"]
                     # Get source name
@@ -538,7 +548,11 @@ class CycloneDXParser:
                             elif self.debug:
                                 print(f"[ERROR] Unable to find {target_id}")
                     relationship_type = " DEPENDS_ON "
+                if self.debug:
+                    print(relationships)
             if "vulnerabilities" in data:
+                if self.debug:
+                    print ("Processing Vulnerabilities")
                 vuln_info = Vulnerability(validation="cyclonedx")
                 for vuln in data["vulnerabilities"]:
                     vuln_info.initialise()
@@ -580,6 +594,8 @@ class CycloneDXParser:
                 if self.debug:
                     print(vulnerabilities)
             if "services" in data:
+                if self.debug:
+                    print ("Processing Services")
                 service_info = SBOMService()
                 service_id=1
                 for service in data["services"]:
