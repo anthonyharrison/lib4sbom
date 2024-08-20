@@ -298,7 +298,8 @@ class CycloneDXParser:
             if "licenses" in d:
                 license_data = self.process_license(d["licenses"])
             elif "evidence" in d:
-                license_data = self.process_license(d["evidence"])
+                if "licenses" in d["evidence"]:
+                    license_data = self.process_license(d["evidence"]["licenses"])
             if license_data is not None and len(license_data) > 0:
                 # Multiple ways of defining licenses
                 for license_info in license_data:
