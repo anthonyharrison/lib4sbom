@@ -281,7 +281,7 @@ class CycloneDXParser:
                         if "email" in contact:
                             supplier_name = f'{supplier_name} ({contact["email"]})'
                 if len(supplier_name) > 0:
-                    self.cyclonedx_package.set_supplier("Organisation", supplier_name)
+                    self.cyclonedx_package.set_supplier("Organization", supplier_name)
             if "author" in d:
                 # Assume that this refers to an individual
                 self.cyclonedx_package.set_originator("Person", d["author"])
@@ -756,7 +756,7 @@ class CycloneDXParser:
                     # contact_name = self._xml_component(element, "name")
                     supplier_name = f"{supplier_name} ({email})"
                     break
-            self.cyclonedx_package.set_supplier("Organisation", supplier_name)
+            self.cyclonedx_package.set_supplier("Organization", supplier_name)
         author = self._xml_component(component, "author")
         if author != "":
             # Assume that this refers to an individual
