@@ -157,29 +157,32 @@ class SPDXGenerator:
             self.relationships = []
             return self.generateJSONDocumentHeader(project_name, uuid)
 
+    def _validate_spdxid(self, id, preamble):
+        spdx_id = ""
+        # SPDX id can only contain letters, numbers, ., and/or -.
+        for i in id:
+            if i.isalnum():
+                spdx_id = spdx_id + i
+            elif i in [".", "-"]:
+                spdx_id = spdx_id + i
+            else:
+                # Invalid characters are replaced
+                spdx_id = spdx_id + "-"
+        # Check preamble not present
+        if spdx_id.startswith(preamble):
+            return spdx_id
+        return preamble + spdx_id
+
     def package_ident(self, id):
         # Only add preamble if not parent document
         if id != self.SPDX_PROJECT_ID:
-            spdx_id = ""
-            # SPDX id can only contain letters, numbers, ., and/or -.
-            for i in id:
-                if i.isalnum():
-                    spdx_id = spdx_id + i
-                elif i in [".", "-"]:
-                    spdx_id = spdx_id + i
-                else:
-                    # Invalid charcters are replaced
-                    spdx_id = spdx_id + "-"
-            # Check preamble not present
-            if spdx_id.startswith(self.SPDX_PREAMBLE):
-                return spdx_id
-            return self.PACKAGE_PREAMBLE + spdx_id
+            return self._validate_spdxid(id, self.SPDX_PREAMBLE)
         return str(id)
 
     def file_ident(self, id):
         # Only add preamble if not parent document
         if id != self.SPDX_PROJECT_ID:
-            return self.FILE_PREAMBLE + str(id).replace(" ", "-").replace("_", "-")
+            return self._validate_spdxid(id, self.FILE_PREAMBLE)
         return str(id)
 
     def license_ref(self):
