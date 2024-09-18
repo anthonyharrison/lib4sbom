@@ -425,7 +425,6 @@ class CycloneDXParser:
 
     def parse_cyclonedx_json(self, sbom_file):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
-        data = json.load(open(sbom_file, "r", encoding="utf-8"))
         files = {}
         relationships = []
         # First relationship is assumed to be the root element
@@ -434,238 +433,244 @@ class CycloneDXParser:
         services = []
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
-        # Check valid CycloneDX JSON file (and not SPDX)
-        cyclonedx_json_file = data.get("bomFormat", False)
-        if cyclonedx_json_file:
-            self.cyclonedx_version = data["specVersion"]
-            cyclonedx_document.set_version(self.cyclonedx_version)
-            cyclonedx_document.set_type("cyclonedx")
-            cyclonedx_document.set_value(
-                "uuid", data.get("serialNumber", "urn:uuid:" + str(uuid.uuid4()))
-            )
-            if "version" in data:
-                cyclonedx_document.set_value("bom_version", data["version"])
-            else:
-                cyclonedx_document.set_value("bom_version", 1)
-            if "metadata" in data:
-                if self.debug:
-                    print ("Processing Metadata")
-                if "timestamp" in data["metadata"]:
-                    cyclonedx_document.set_created(data["metadata"]["timestamp"])
-                if "lifecycles" in data["metadata"]:
-                    for l in data["metadata"]["lifecycles"]:
-                        cyclonedx_document.set_value("lifecycle", l["phase"])
-                if "tools" in data["metadata"]:
-                    if self._cyclonedx_15():
-                        if "components" in data["metadata"]["tools"]:
-                            for component in data["metadata"]["tools"]["components"]:
-                                name = component["name"]
-                                if "version" in component:
-                                    name = f'{name}#{component["version"]}'
-                                cyclonedx_document.set_creator("tool", name)
+        try:
+            data = json.load(open(sbom_file, "r", encoding="utf-8"))
+            # Check valid CycloneDX JSON file (and not SPDX)
+            cyclonedx_json_file = data.get("bomFormat", False)
+            if cyclonedx_json_file:
+                self.cyclonedx_version = data["specVersion"]
+                cyclonedx_document.set_version(self.cyclonedx_version)
+                cyclonedx_document.set_type("cyclonedx")
+                cyclonedx_document.set_value(
+                    "uuid", data.get("serialNumber", "urn:uuid:" + str(uuid.uuid4()))
+                )
+                if "version" in data:
+                    cyclonedx_document.set_value("bom_version", data["version"])
+                else:
+                    cyclonedx_document.set_value("bom_version", 1)
+                if "metadata" in data:
+                    if self.debug:
+                        print ("Processing Metadata")
+                    if "timestamp" in data["metadata"]:
+                        cyclonedx_document.set_created(data["metadata"]["timestamp"])
+                    if "lifecycles" in data["metadata"]:
+                        for l in data["metadata"]["lifecycles"]:
+                            cyclonedx_document.set_value("lifecycle", l["phase"])
+                    if "tools" in data["metadata"]:
+                        if self._cyclonedx_15():
+                            if "components" in data["metadata"]["tools"]:
+                                for component in data["metadata"]["tools"]["components"]:
+                                    name = component["name"]
+                                    if "version" in component:
+                                        name = f'{name}#{component["version"]}'
+                                    cyclonedx_document.set_creator("tool", name)
+                            else:
+                                # This is the legacy interface which is deprecated.
+                                if self.debug:
+                                    print("Legacy tool(s) specification still being used.")
+                                if "components" in data["metadata"]["tools"][0]:
+                                    name = ""
+                                    if "name" in data["metadata"]["tools"][0]["components"][0]:
+                                        name = data["metadata"]["tools"][0]["components"][0]["name"]
+                                    if (
+                                        "version"
+                                        in data["metadata"]["tools"][0]["components"][0]
+                                    ):
+                                        name = f'{name}#{data["metadata"]["tools"][0]["components"][0]["version"]}'
+                                    cyclonedx_document.set_creator("tool", name)
                         else:
-                            # This is the legacy interface which is deprecated.
-                            if self.debug:
-                                print("Legacy tool(s) specification still being used.")
-                            if "components" in data["metadata"]["tools"][0]:
-                                name = ""
-                                if "name" in data["metadata"]["tools"][0]["components"][0]:
-                                    name = data["metadata"]["tools"][0]["components"][0]["name"]
-                                if (
-                                    "version"
-                                    in data["metadata"]["tools"][0]["components"][0]
-                                ):
-                                    name = f'{name}#{data["metadata"]["tools"][0]["components"][0]["version"]}'
-                                cyclonedx_document.set_creator("tool", name)
-                    else:
-                        name = data["metadata"]["tools"][0]["name"]
-                        if "version" in data["metadata"]["tools"]:
-                            name = f'{name}#{data["metadata"]["tools"][0]["name"]}'
-                        cyclonedx_document.set_creator("tool", name)
-                if "authors" in data["metadata"]:
-                    for a in data["metadata"]["authors"]:
-                        name = f'{a.get("name","")}#{a.get("email","")}'
-                        if name != "#":
-                            cyclonedx_document.set_creator("person", name)
-                if "component" in data["metadata"]:
-                    component_name = data["metadata"]["component"]["name"]
-                    cyclonedx_document.set_name(component_name)
-                    component_type = data["metadata"]["component"]["type"]
-                    cyclonedx_document.set_metadata_type(component_type)
-                    if "bom-ref" in data["metadata"]["component"]:
-                        bom_ref = data["metadata"]["component"]["bom-ref"]
-                        cyclonedx_document.set_value("bom-ref", bom_ref)
-                    else:
-                        bom_ref = "CylconeDX-Component-0000"
-                    self.id[bom_ref] = component_name
-                    if "version" in data["metadata"]["component"]:
-                        component_version = data["metadata"]["component"]["version"]
+                            name = data["metadata"]["tools"][0]["name"]
+                            if "version" in data["metadata"]["tools"]:
+                                name = f'{name}#{data["metadata"]["tools"][0]["name"]}'
+                            cyclonedx_document.set_creator("tool", name)
+                    if "authors" in data["metadata"]:
+                        for a in data["metadata"]["authors"]:
+                            name = f'{a.get("name","")}#{a.get("email","")}'
+                            if name != "#":
+                                cyclonedx_document.set_creator("person", name)
+                    if "component" in data["metadata"]:
+                        component_name = data["metadata"]["component"]["name"]
+                        cyclonedx_document.set_name(component_name)
+                        component_type = data["metadata"]["component"]["type"]
+                        cyclonedx_document.set_metadata_type(component_type)
+                        if "bom-ref" in data["metadata"]["component"]:
+                            bom_ref = data["metadata"]["component"]["bom-ref"]
+                            cyclonedx_document.set_value("bom-ref", bom_ref)
+                        else:
+                            bom_ref = "CylconeDX-Component-0000"
+                        self.id[bom_ref] = component_name
+                        if "version" in data["metadata"]["component"]:
+                            component_version = data["metadata"]["component"]["version"]
+                            cyclonedx_document.set_value(
+                                "metadata_version", component_version
+                            )
+                        if "supplier" in data["metadata"]["component"]:
+                            supplier = data["metadata"]["component"]["supplier"]
+                            cyclonedx_document.set_value(
+                                "metadata_supplier", supplier['name']
+                            )
+                    if "properties" in data["metadata"]:
                         cyclonedx_document.set_value(
-                            "metadata_version", component_version
+                            "property", data["metadata"]["properties"]
                         )
-                    if "supplier" in data["metadata"]["component"]:
-                        supplier = data["metadata"]["component"]["supplier"]
-                        cyclonedx_document.set_value(
-                            "metadata_supplier", supplier['name']
-                        )
-                if "properties" in data["metadata"]:
-                    cyclonedx_document.set_value(
-                        "property", data["metadata"]["properties"]
-                    )
-                if self.debug:
-                    print (cyclonedx_document)
-            if "components" in data:
-                if self.debug:
-                    print ("Processing Components")
-                for d in data["components"]:
-                    self._cyclondex_component(d)
-                if self.debug:
-                    print (self.packages)
-            if "dependencies" in data:
-                if self.debug:
-                    print ("Processing Dependencies")
-                for d in data["dependencies"]:
-                    source_id = d["ref"]
-                    # Get source name
-                    source = None
-                    if source_id in self.id:
-                        source = self.id[source_id]
-                    elif self.debug:
-                        print(f"[ERROR] Unable to find {source_id}")
-                    if source is not None and d.get("dependsOn") is not None:
-                        for target_id in d["dependsOn"]:
-                            if target_id in self.id:
-                                target = self.id[target_id]
-                                cyclonedx_relationship.initialise()
-                                cyclonedx_relationship.set_relationship(
-                                    source, relationship_type, target
+                    if self.debug:
+                        print (cyclonedx_document)
+                if "components" in data:
+                    if self.debug:
+                        print ("Processing Components")
+                    for d in data["components"]:
+                        self._cyclondex_component(d)
+                    if self.debug:
+                        print (self.packages)
+                if "dependencies" in data:
+                    if self.debug:
+                        print ("Processing Dependencies")
+                    for d in data["dependencies"]:
+                        source_id = d["ref"]
+                        # Get source name
+                        source = None
+                        if source_id in self.id:
+                            source = self.id[source_id]
+                        elif self.debug:
+                            print(f"[ERROR] Unable to find {source_id}")
+                        if source is not None and d.get("dependsOn") is not None:
+                            for target_id in d["dependsOn"]:
+                                if target_id in self.id:
+                                    target = self.id[target_id]
+                                    cyclonedx_relationship.initialise()
+                                    cyclonedx_relationship.set_relationship(
+                                        source, relationship_type, target
+                                    )
+                                    cyclonedx_relationship.set_relationship_id(
+                                        source_id, target_id
+                                    )
+                                    relationships.append(
+                                        cyclonedx_relationship.get_relationship()
+                                    )
+                                elif self.debug:
+                                    print(f"[ERROR] Unable to find {target_id}")
+                        relationship_type = " DEPENDS_ON "
+                    if self.debug:
+                        print(relationships)
+                if "vulnerabilities" in data:
+                    if self.debug:
+                        print ("Processing Vulnerabilities")
+                    vuln_info = Vulnerability(validation="cyclonedx")
+                    for vuln in data["vulnerabilities"]:
+                        vuln_info.initialise()
+                        if "bom-ref" in vuln:
+                            vuln_info.set_value("bom-ref", vuln["bom-ref"])
+                            if "@" in vuln["bom-ref"]:
+                                component_info = vuln['bom-ref'].split('@')
+                                vuln_info.set_value("product", component_info[0])
+                                vuln_info.set_value("release", component_info[1])
+                        vuln_info.set_id(vuln["id"])
+                        if "source" in vuln:
+                            vuln_info.set_value("source-name", vuln["source"]["name"])
+                            vuln_info.set_value("source-url", vuln["source"]["url"])
+                        if "description" in vuln:
+                            vuln_info.set_description(vuln["description"])
+                        if "published" in vuln:
+                            vuln_info.set_value("created", vuln["published"])
+                        if "updated" in vuln:
+                            vuln_info.set_value("updated", vuln["updated"])
+                        if "analysis" in vuln:
+                            if "state" in vuln["analysis"]:
+                                vuln_info.set_value("status", vuln["analysis"]["state"])
+                            if "detail" in vuln["analysis"]:
+                                vuln_info.set_comment(vuln["analysis"]["detail"])
+                            if "response" in vuln["analysis"]:
+                                for r in vuln["analysis"]["response"]:
+                                    vuln_info.set_remediation(r)
+                            if "justification" in vuln["analysis"]:
+                                vuln_info.set_value(
+                                    "justification", vuln["analysis"]["justification"]
                                 )
-                                cyclonedx_relationship.set_relationship_id(
-                                    source_id, target_id
+                        if "affects" in vuln:
+                            if "ref" in vuln["affects"][0]:
+                                vuln_info.set_value("bom_link", vuln["affects"][0]["ref"])
+                            if "versions" in vuln["affects"][0]:
+                                if "version" in vuln["affects"][0]["versions"]:
+                                    vuln_info.set_release(vuln["affects"][0]["versions"]["version"])
+                        vulnerabilities.append(vuln_info.get_vulnerability())
+                    if self.debug:
+                        print(vulnerabilities)
+                if "services" in data:
+                    if self.debug:
+                        print ("Processing Services")
+                    service_info = SBOMService()
+                    service_id=1
+                    for service in data["services"]:
+                        service_info.initialise()
+                        service_info.set_id(service.get("bom-ref",f"CycloneDX-Service-{service_id}"))
+                        service_info.set_name(service["name"])
+                        if "version" in service:
+                            service_info.set_version(service["version"])
+                        if "description" in service:
+                            service_info.set_description(service["description"])
+                        if "provider" in service:
+                            name = service["provider"].get("name", "")
+                            if "url" in service["provider"]:
+                                for u in service["provider"]["url"]:
+                                    url = u
+                            contact = email = phone = ""
+                            if "contact" in service["provider"]:
+                                contact = service["provider"]["contact"].get("name", "")
+                                email = service["provider"]["contact"].get("email", "")
+                                phone = service["provider"]["contact"].get("phone", "")
+                            service_info.set_provider(
+                                name=name,
+                                url=url,
+                                contact=contact,
+                                email=email,
+                                phone=phone,
+                            )
+                        if "endpoints" in service:
+                            for endpoint in service["endpoints"]:
+                                service_info.set_endpoint(endpoint)
+                        if "authenticated" in service:
+                            service_info.set_value(
+                                "authenticated", service["authenticated"]
+                            )
+                        if "x-trust-boundary" in service:
+                            service_info.set_value(
+                                "x-trust-boundary", service["x-trust-boundary"]
+                            )
+                        if "trustZone" in service:
+                            service_info.set_value("trustZone", service["trustZone"])
+                        if "data" in service:
+                            for data_element in service["data"]:
+                                flow = data_element.get("flow")
+                                classification = data_element.get("classification")
+                                name = data_element.get("name", "")
+                                description = data_element.get("description", "")
+                                service_info.set_data(
+                                    flow, classification, name=name, description=description
                                 )
-                                relationships.append(
-                                    cyclonedx_relationship.get_relationship()
+                        if "licenses" in service:
+                            for license in service["licenses"]:
+                                service_info.set_license(license["license"])
+                        if "properties" in service:
+                            for property in service["properties"]:
+                                service_info.set_property(
+                                    property["name"], property["value"]
                                 )
-                            elif self.debug:
-                                print(f"[ERROR] Unable to find {target_id}")
-                    relationship_type = " DEPENDS_ON "
-                if self.debug:
-                    print(relationships)
-            if "vulnerabilities" in data:
-                if self.debug:
-                    print ("Processing Vulnerabilities")
-                vuln_info = Vulnerability(validation="cyclonedx")
-                for vuln in data["vulnerabilities"]:
-                    vuln_info.initialise()
-                    if "bom-ref" in vuln:
-                        vuln_info.set_value("bom-ref", vuln["bom-ref"])
-                        if "@" in vuln["bom-ref"]:
-                            component_info = vuln['bom-ref'].split('@')
-                            vuln_info.set_value("product", component_info[0])
-                            vuln_info.set_value("release", component_info[1])
-                    vuln_info.set_id(vuln["id"])
-                    if "source" in vuln:
-                        vuln_info.set_value("source-name", vuln["source"]["name"])
-                        vuln_info.set_value("source-url", vuln["source"]["url"])
-                    if "description" in vuln:
-                        vuln_info.set_description(vuln["description"])
-                    if "published" in vuln:
-                        vuln_info.set_value("created", vuln["published"])
-                    if "updated" in vuln:
-                        vuln_info.set_value("updated", vuln["updated"])
-                    if "analysis" in vuln:
-                        if "state" in vuln["analysis"]:
-                            vuln_info.set_value("status", vuln["analysis"]["state"])
-                        if "detail" in vuln["analysis"]:
-                            vuln_info.set_comment(vuln["analysis"]["detail"])
-                        if "response" in vuln["analysis"]:
-                            for r in vuln["analysis"]["response"]:
-                                vuln_info.set_remediation(r)
-                        if "justification" in vuln["analysis"]:
-                            vuln_info.set_value(
-                                "justification", vuln["analysis"]["justification"]
-                            )
-                    if "affects" in vuln:
-                        if "ref" in vuln["affects"][0]:
-                            vuln_info.set_value("bom_link", vuln["affects"][0]["ref"])
-                        if "versions" in vuln["affects"][0]:
-                            if "version" in vuln["affects"][0]["versions"]:
-                                vuln_info.set_release(vuln["affects"][0]["versions"]["version"])
-                    vulnerabilities.append(vuln_info.get_vulnerability())
-                if self.debug:
-                    print(vulnerabilities)
-            if "services" in data:
-                if self.debug:
-                    print ("Processing Services")
-                service_info = SBOMService()
-                service_id=1
-                for service in data["services"]:
-                    service_info.initialise()
-                    service_info.set_id(service.get("bom-ref",f"CycloneDX-Service-{service_id}"))
-                    service_info.set_name(service["name"])
-                    if "version" in service:
-                        service_info.set_version(service["version"])
-                    if "description" in service:
-                        service_info.set_description(service["description"])
-                    if "provider" in service:
-                        name = service["provider"].get("name", "")
-                        if "url" in service["provider"]:
-                            for u in service["provider"]["url"]:
-                                url = u
-                        contact = email = phone = ""
-                        if "contact" in service["provider"]:
-                            contact = service["provider"]["contact"].get("name", "")
-                            email = service["provider"]["contact"].get("email", "")
-                            phone = service["provider"]["contact"].get("phone", "")
-                        service_info.set_provider(
-                            name=name,
-                            url=url,
-                            contact=contact,
-                            email=email,
-                            phone=phone,
-                        )
-                    if "endpoints" in service:
-                        for endpoint in service["endpoints"]:
-                            service_info.set_endpoint(endpoint)
-                    if "authenticated" in service:
-                        service_info.set_value(
-                            "authenticated", service["authenticated"]
-                        )
-                    if "x-trust-boundary" in service:
-                        service_info.set_value(
-                            "x-trust-boundary", service["x-trust-boundary"]
-                        )
-                    if "trustZone" in service:
-                        service_info.set_value("trustZone", service["trustZone"])
-                    if "data" in service:
-                        for data_element in service["data"]:
-                            flow = data_element.get("flow")
-                            classification = data_element.get("classification")
-                            name = data_element.get("name", "")
-                            description = data_element.get("description", "")
-                            service_info.set_data(
-                                flow, classification, name=name, description=description
-                            )
-                    if "licenses" in service:
-                        for license in service["licenses"]:
-                            service_info.set_license(license["license"])
-                    if "properties" in service:
-                        for property in service["properties"]:
-                            service_info.set_property(
-                                property["name"], property["value"]
-                            )
-                    if "externalreference" in service:
-                        for reference in service["externalreference"]:
-                            url = reference.get("url")
-                            external_type = reference.get("type")
-                            comment = reference.get("comment", "")
-                            service_info.set_externalreference(
-                                url, external_type, comment=comment
-                            )
-                    services.append(service_info.get_service())
-                    service_id = service_id + 1
-                if self.debug:
-                    print(services)
+                        if "externalreference" in service:
+                            for reference in service["externalreference"]:
+                                url = reference.get("url")
+                                external_type = reference.get("type")
+                                comment = reference.get("comment", "")
+                                service_info.set_externalreference(
+                                    url, external_type, comment=comment
+                                )
+                        services.append(service_info.get_service())
+                        service_id = service_id + 1
+                    if self.debug:
+                        print(services)
+        except json.JSONDecodeError:
+            # Unable to process file. Probably not a JSON file
+            if self.debug:
+                print ("ERROR] Unable to process file.")
         return (
             cyclonedx_document,
             files,

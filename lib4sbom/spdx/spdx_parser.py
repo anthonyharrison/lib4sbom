@@ -315,8 +315,21 @@ class SPDXParser:
 
     def parse_spdx_json(self, sbom_file):
         """parses SPDX JSON SBOM file extracting SBOM data"""
-        data = json.load(open(sbom_file, "r", encoding="utf-8"))
-        return self._parse_spdx_data(data)
+        try:
+            data = json.load(open(sbom_file, "r", encoding="utf-8"))
+            return self._parse_spdx_data(data)
+        except json.JSONDecodeError:
+            # Unable to process file. Probably not a JSON file
+            # Return Null data
+            return (
+                SBOMDocument(),
+                {},
+                {},
+                [],
+                self.vulnerabilities,
+                self.services,
+                self.user_licences,
+            )
 
     def _parse_spdx_data(self, data):
         packages = {}
