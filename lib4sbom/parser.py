@@ -49,8 +49,8 @@ class SBOMParser:
         if len(filename) > 0:
             # Check path
             filePath = Path(filename)
-            # Check path exists and valid file
-            if filePath.exists() and filePath.is_file():
+            # Check path exists, a valid file and not empty file
+            if filePath.exists() and filePath.is_file() and filePath.stat().st_size > 0:
                 # Assume that processing can proceed
                 invalid_file = False
 
