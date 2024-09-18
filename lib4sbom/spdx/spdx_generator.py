@@ -511,7 +511,7 @@ class SPDXGenerator:
                 else:
                     component["checksums"] = [checksum_entry]
         if "comment" in file_info:
-            component["fileComment"] = file_info["comment"]
+            component["comment"] = file_info["comment"]
         if "notice" in file_info:
             component["fileNotice"] = file_info["notice"]
         if "contributor" in file_info:
