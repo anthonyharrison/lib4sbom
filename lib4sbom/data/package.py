@@ -113,7 +113,7 @@ class SBOMPackage:
 
     def set_checksum(self, type, value):
         # Only store valid checksums
-        if self._valid_checksum(value) and self._valid_algorithm(type):
+        if self._valid_checksum(value) and self._valid_algorithm(type.strip()):
             # Allow multiple entries
             checksum_entry = [type.strip(), value.lower()]
             if "checksum" in self.package:
