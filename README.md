@@ -81,7 +81,11 @@ following filename conventions.
 | SPDX      | RDF      | .spdx.rdf          |
 | SPDX      | XML      | .spdx.xml          |
 | CycloneDX | JSON     | .json              |
+| CycloneDX | JSON     | .cdx.json          |
+| CycloneDX | JSON     | .bom.json          |
 | CycloneDX | XML      | .xml               |
+| CycloneDX | XML      | .cdx.xml           |
+| CycloneDX | XML      | .bom..xml          |
 
 The parser will check that the correct JSON files is being processed by the correct parser.
 A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
@@ -844,6 +848,9 @@ The following design decisions have been made in processing the SBOM files:
 
 4. When processing and validating licenses, the application will use a set of synonyms to attempt to map some license identifiers to the correct [SPDX License Identifiers](https://spdx.org/licenses/). However, the
 user of the tool is reminded that they should assert the quality of any data which is provided by the tool particularly where the license identifier has been modified.
+
+5. When parsing an SBOM with multiple instances of a component with the same name and version, only one instance of the comnponent is retained. If mulitple instances are
+required to be preserved, consider ensuring that the component name is unique.
 
 ## Future Development
 
