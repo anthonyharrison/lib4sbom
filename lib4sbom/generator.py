@@ -171,11 +171,18 @@ class SBOMGenerator:
                     relationship["source"] in self.element_set
                     and relationship["target"] in self.element_set
                 ):
-                    source_ident = self.bom.package_ident(
-                        self._get_element(
-                            relationship["source"], relationship["source_id"]
+                    if relationship.get("source_type") == "file":
+                        source_ident = self.bom.file_ident(
+                            self._get_element(
+                                relationship["source"], relationship["source_id"]
+                            )
                         )
-                    )
+                    else:
+                        source_ident = self.bom.package_ident(
+                            self._get_element(
+                                relationship["source"], relationship["source_id"]
+                            )
+                        )
                     if relationship.get("target_type") == "file":
                         target_ident = self.bom.file_ident(
                             self._get_element(
@@ -188,7 +195,6 @@ class SBOMGenerator:
                                 relationship["target"], relationship["target_id"]
                             )
                         )
-
                     self.bom.generateRelationship(
                         source_ident,
                         target_ident,
