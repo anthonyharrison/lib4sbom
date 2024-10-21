@@ -8,7 +8,7 @@ import os
 
 class LicenseScanner:
     DEFAULT_LICENSE = "UNKNOWN"
-    SPDX_LICENSE_VERSION = "3.22"
+    SPDX_LICENSE_VERSION = "3.25"
 
     def __init__(self):
         # Load licenses
@@ -80,7 +80,7 @@ class LicenseScanner:
 
     def get_license_text(self, license_id):
         license_text = ""
-        filename = f"{self.license_text_path}/{license_id}.txt"
+        filename = f"{self.license_text_path}/{license_id}.html"
         # check filename exists
         if os.path.exists(filename):
             license_text_file = open(filename, "r", encoding="utf-8")
