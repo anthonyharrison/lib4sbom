@@ -566,8 +566,10 @@ class CycloneDXParser:
                                 vuln_info.set_value("release", component_info[1])
                         vuln_info.set_id(vuln["id"])
                         if "source" in vuln:
-                            vuln_info.set_value("source-name", vuln["source"]["name"])
-                            vuln_info.set_value("source-url", vuln["source"]["url"])
+                            if "name" in vuln["source"]:
+                                vuln_info.set_value("source-name", vuln["source"]["name"])
+                            if "url" in vuln["source"]:
+                                vuln_info.set_value("source-url", vuln["source"]["url"])
                         if "description" in vuln:
                             vuln_info.set_description(vuln["description"])
                         if "published" in vuln:
