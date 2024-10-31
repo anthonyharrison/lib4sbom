@@ -18,7 +18,17 @@ class TestCcycloneDX_parser:
         assert False
 
     def test_parse_cyclonedx_xml(self):
-        assert False
+        test_parser = test_module()
+        result = test_parser.parse(self.get_test_filepath('hadoop-aliyun-3.4.1-cyclonedx.xml'))
+        (
+            cyclonedx_document,
+            files,
+            packages,
+            relationships,
+            vulnerabilities,
+            services,
+            licenses
+        ) = result
 
     def test_parse_cyclonedx_multiple_licenses_json(self):
         test_parser = test_module()

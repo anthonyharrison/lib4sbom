@@ -737,7 +737,7 @@ class CycloneDXParser:
 
     def _xml_component(self, item, element):
         data = item.find(self.schema + element)
-        if data is not None:
+        if data is not None and data.text is not None:
             return data.text.strip()
         return ""
 
