@@ -697,6 +697,13 @@ class CycloneDXGenerator:
         self.store("</component>")
 
     def generate_vulnerability_data(self, vulnerabilities):
+        source_url = {
+            "GAD": "https://nvd.nist.gov/vuln/detail/",
+            "NVD": "https://nvd.nist.gov/vuln/detail/",
+            "RSD": "https://nvd.nist.gov/vuln/detail/",
+            "OSV": "https://osv.dev/vulnerability/",
+            "REDHAT": "https://access.redhat.com/security/cve/",
+        }
         statements = []
         for vuln in vulnerabilities:
             vulnerability = {}
@@ -713,15 +720,51 @@ class CycloneDXGenerator:
                 else:
                     # assume it is a PURL
                     vulnerability["bom-ref"] = vuln_info.get_value("purl")
-            vulnerability["id"] = vuln_info.get_value("id")
-            if vulnerability["id"].startswith("CVE-"):
-                # NVD Data source
-                source = {}
-                source["name"] = "NVD"
-                source[
-                    "url"
-                ] = f"https://nvd.nist.gov/vuln/detail/{vulnerability['id']}"
-                vulnerability["source"] = source
+            id = vuln_info.get_value("id")
+            vulnerability["id"] = id
+            source = vuln_info.get_value("source")
+            if source:
+                vulnerability["source"] = {
+                    "name": source,
+                }
+                if source in source_url:
+                    vulnerability["source"]["url"] = source_url[source] + id
+            
+            if "ratings" in vuln:
+                ratings = []
+                for rating in vuln["ratings"]:
+                    cvss_version = rating.get("cvss_version")
+                    cvss_vector = rating.get("cvss_vector")
+                    source = rating.get("source")
+                    
+                    rating_entry = {
+                        "score": rating.get("score"),
+                        "severity": rating.get("severity", "unknown"),
+                        "method": rating.get("method"),
+                        "vector": cvss_vector,
+                        "source": {
+                            "name": source,
+                        }
+                    } 
+
+                    url = None
+                    if source == "NVD" and id.startswith("CVE"):
+                        url = "https://nvd.nist.gov/vuln-metrics/cvss/"
+                        if cvss_version == 3:
+                            url += f"v3-calculator?name={id}&vector={cvss_vector}&version=3.1"
+                        elif cvss_version == 2:
+                            url += f"v2-calculator?name={id}&vector={cvss_vector}&version=2.0"
+                        else:
+                            url = source_url[source] + id
+                    elif source in source_url:
+                        url = source_url[source] + id
+
+                    if url:
+                        rating_entry["source"]["url"] = url
+
+                    ratings.append(rating_entry)
+                vulnerability["ratings"] = ratings
+
             if "description" in vuln:
                 vulnerability["description"] = vuln_info.get_value("description")
             if "created" in vuln:
@@ -760,7 +803,7 @@ class CycloneDXGenerator:
                     version_info["version"] = component_version
                     version_info["status"] = "affected"
                 if len(version_info) > 0:
-                    affected["versions"] = version_info
+                    affected["versions"] = [version_info]
                 affects.append(affected)
                 vulnerability["affects"] = affects
             statements.append(vulnerability)
