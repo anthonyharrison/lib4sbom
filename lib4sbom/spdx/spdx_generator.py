@@ -325,7 +325,7 @@ class SPDXGenerator:
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
-                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER"]:
+                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER", "OTHER"]:
                     self.generateTag(
                         "ExternalRef",
                         reference[0] + " " + reference[1] + " " + reference[2],
@@ -434,7 +434,7 @@ class SPDXGenerator:
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
-                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER"]:
+                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER", "OTHER"]:
                     reference_data = dict()
                     reference_data["referenceCategory"] = reference[0]
                     reference_data["referenceType"] = reference[1]
