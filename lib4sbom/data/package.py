@@ -165,6 +165,52 @@ class SBOMPackage:
             self.package["attribution"] = [attribution_entry]
 
     def set_externalreference(self, category, ref_type, locator):
+        # Valid categories (CycloneDX)
+        valid_categories = [
+            "vcs",
+            "issue-tracker",
+            "website",
+            "advisories",
+            "bom",
+            "mailing-list",
+            "social",
+            "chat",
+            "documentation",
+            "support",
+            "source-distribution",
+            "distribution",
+            "distribution-intake",
+            "license",
+            "build-meta",
+            "build-system",
+            "release-notes",
+            "security-contact",
+            "model-card",
+            "log",
+            "configuration",
+            "evidence",
+            "formulation",
+            "attestation",
+            "threat-model",
+            "adversary-model",
+            "risk-assessment",
+            "vulnerability-assertion",
+            "exploitability-statement",
+            "pentest-report",
+            "static-analysis-report",
+            "dynamic-analysis-report",
+            "runtime-analysis-report",
+            "component-analysis-report",
+            "maturity-report",
+            "certification-report",
+            "codified-infrastructure",
+            "quality-metrics",
+            "poam",
+            "electronic-signature",
+            "digital-signature",
+            "rfc-9116",
+            "other",
+        ]
         # Allow multiple entries
         if category in [
             "SECURITY",
@@ -173,7 +219,9 @@ class SBOMPackage:
         ] and ref_type in ["cpe22Type", "cpe23Type", "purl"]:
             reference_entry = [category, ref_type.strip(), locator]
         else:
-            # CycloneDX has many more reference types
+            # Validate type CycloneDX has many more reference types
+            if ref_type.lower() not in valid_categories:
+                ref_type = "other"
             reference_entry = [category, ref_type.lower().strip(), locator]
         if "externalreference" in self.package:
             self.package["externalreference"].append(reference_entry)
