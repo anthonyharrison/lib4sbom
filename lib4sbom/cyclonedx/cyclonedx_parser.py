@@ -395,9 +395,14 @@ class CycloneDXParser:
             if "properties" in d:
                 # Potentially multiple entries
                 for property in d["properties"]:
-                    self.cyclonedx_package.set_property(
-                        property["name"], property["value"]
-                    )
+                    if property["name"] == "release_date":
+                        self.cyclonedx_package.set_value(
+                            "release_date", property["value"]
+                        )
+                    else:
+                        self.cyclonedx_package.set_property(
+                            property["name"], property["value"]
+                        )
             if "externalReferences" in d:
                 # Potentially multiple entries
                 for reference in d["externalReferences"]:
@@ -805,10 +810,16 @@ class CycloneDXParser:
                 # Handle different ways of specifying property
                 if params.get("value") is not None:
                     # Explicit value specified as attribute
-                    self.cyclonedx_package.set_property(params["name"], params["value"])
+                    value = params.get("value")
                 else:
                     # Implicit value
-                    self.cyclonedx_package.set_property(params["name"], property.text)
+                    value = property.text
+                if params["name"] == "release_date":
+                    self.cyclonedx_package.set_value(
+                        "release_date", value
+                    )
+                else:
+                   self.cyclonedx_package.set_property(params["name"], value)
         for references in component.findall(self.schema + "externalReferences"):
             for reference in references.findall(self.schema + "reference"):
                 params = reference.attrib

@@ -322,6 +322,8 @@ class SPDXGenerator:
             # Potentially multiple entries
             for attribution in package_info["attribution"]:
                 self.generateTag("PackageAttributionText", self._text(attribution))
+        if "release_date" in package_info:
+            self.generateTag("BuiltDate", package_info["release_date"])
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
@@ -431,6 +433,8 @@ class SPDXGenerator:
                     component["attribution"].append(attribution_data)
                 else:
                     component["attribution"] = [attribution_data]
+        if "release_date" in package_info:
+            component["builtdate"] = package_info["release_date"]
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:

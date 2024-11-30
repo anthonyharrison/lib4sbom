@@ -622,6 +622,11 @@ class CycloneDXGenerator:
                         component["externalReferences"].append(externalReference)
                     else:
                         component["externalReferences"] = [externalReference]
+        if "release_date" in package:
+            property_entry = dict()
+            property_entry["name"] = "release_date"
+            property_entry["value"] = package["release_date"]
+            component["properties"] = [property_entry]
         if "property" in package:
             for property in package["property"]:
                 property_entry = dict()
