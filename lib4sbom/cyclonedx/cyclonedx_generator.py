@@ -768,6 +768,17 @@ class CycloneDXGenerator:
                     affected["versions"] = version_info
                 affects.append(affected)
                 vulnerability["affects"] = affects
+            # Add properties for any user defined items
+            for key, value in vuln.items():
+                # Ignore elements already processed
+                if key not in ["bom-link", "bom-ref", "comment", "created", "description", "id", "justification", "product", "release", "remediation", "status"]:
+                    property_entry = dict()
+                    property_entry["name"] = key
+                    property_entry["value"] = value
+                    if "properties" in vulnerability:
+                        vulnerability["properties"].append(property_entry)
+                    else:
+                        vulnerability["properties"] = [property_entry]
             statements.append(vulnerability)
         self.vulnerability = statements
 

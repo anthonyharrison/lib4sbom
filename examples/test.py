@@ -125,6 +125,7 @@ def generate_sbom():
     vulnerability.set_release(swifttrace_pkg.get_value("version"))
     vulnerability.set_value("bom-ref", swifttrace_pkg.get_value("id"))
     vulnerability.set_status("in_triage")
+    vulnerability.set_value("my_info", "This has not been tested")
     vulnerabilities.append(vulnerability.get_vulnerability())
 
     sbom.add_vulnerabilities(vulnerabilities)
