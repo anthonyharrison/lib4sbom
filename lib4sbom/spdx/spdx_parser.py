@@ -12,6 +12,7 @@ from lib4sbom.data.file import SBOMFile
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.license import SBOMLicense
+from lib4sbom.exception import SBOMParserException
 
 
 class SPDXParser:
@@ -323,16 +324,17 @@ class SPDXParser:
             return self._parse_spdx_data(data)
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
-            # Return Null data
-            return (
-                SBOMDocument(),
-                {},
-                {},
-                [],
-                self.vulnerabilities,
-                self.services,
-                self.user_licences,
-            )
+            raise SBOMParserException
+        # Return Null data
+        return (
+            SBOMDocument(),
+            {},
+            {},
+            [],
+            self.vulnerabilities,
+            self.services,
+            self.user_licences,
+        )
 
     def _parse_spdx_data(self, data):
         packages = {}
@@ -406,6 +408,7 @@ class SPDXParser:
                             files[filename] = spdx_file.get_file()
                     except KeyError as e:
                         print(f"{e} Unable to store file info: {filename}")
+                        raise SBOMParserException
             if "packages" in data:
                 for d in data["packages"]:
                     spdx_package.initialise()
@@ -497,9 +500,9 @@ class SPDXParser:
                             print(f"Duplicate package detected {package} {version}")
                         else:
                             packages[package_tuple] = spdx_package.get_package()
-
                     except KeyError as e:
                         print(f"{e} Unable to store package info: {package}")
+                        raise SBOMParserException
             if "relationships" in data:
                 for d in data["relationships"]:
                     spdx_relationship.initialise()

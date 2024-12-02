@@ -8,6 +8,8 @@ from typing import Dict, List
 from lib4sbom.cyclonedx.cyclonedx_parser import CycloneDXParser
 from lib4sbom.sbom import SBOM, SBOMData
 from lib4sbom.spdx.spdx_parser import SPDXParser
+from lib4sbom.exception import SBOMParserException
+
 
 
 class SBOMParser:
@@ -120,9 +122,11 @@ class SBOMParser:
         except KeyError:
             if self.debug:
                 print("Key Error")
+            raise SBOMParserException
         except TypeError:
             if self.debug:
                 print("Type Error")
+            raise SBOMParserException
 
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type

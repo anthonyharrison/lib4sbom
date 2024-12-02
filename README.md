@@ -95,6 +95,8 @@ A SPDX JSON file submitted to the CycloneDX parser will result in no data being 
 parse_file(filename)
 Parses the SBOM file. If the file does not exist, a FileNotFoundError exception is raised.
 
+If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
+
 get_files()
 Returns a list of file elements from within a parsed SBOM
 
@@ -885,6 +887,8 @@ This tool uses information sourced from the [Blue Oak Council's License List](ht
 This tool is meant to support software development. The usefulness of the tool is dependent on the SBOM data
 which is provided to the tool. Unfortunately, the tool is unable to determine the validity or completeness of such a SBOM file; users of the tool
 are therefore reminded that they should assert the quality of any data which is provided to the tool.
+
+Parsing invalid SBOM files may lead to unpredictable results.
 
 ## Feedback and Contributions
 

@@ -13,6 +13,7 @@ from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.service import SBOMService
 from lib4sbom.data.vulnerability import Vulnerability
+from lib4sbom.exception import SBOMParserException
 
 
 class CycloneDXParser:
@@ -677,7 +678,8 @@ class CycloneDXParser:
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
             if self.debug:
-                print ("ERROR] Unable to process file.")
+                print ("[ERROR] Unable to process file.")
+            raise SBOMParserException
         return (
             cyclonedx_document,
             files,
