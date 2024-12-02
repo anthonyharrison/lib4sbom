@@ -291,6 +291,22 @@ class SPDXGenerator:
                 "PackageLicenseConcluded",
                 self.license_ident(package_info["licenseconcluded"]),
             )
+        if "licenselist" in package_info:
+            # Handle multiple licenses from a CycloneDX SBOM
+            license_expression = ""
+            for license in package_info["licenselist"]:
+                if "id" in license:
+                    license_expression = license_expression + license['id'] + " AND "
+            # Remove extraneous " AND "
+            license_expression = license_expression[:-4]
+            self.generateTag(
+                "PackageLicenseDeclared",
+                license_expression
+            )
+            self.generateTag(
+                "PackageLicenseConcluded",
+                license_expression
+            )
         if "licensecomments" in package_info:
             self.generateTag(
                 "PackageLicenseComments",
@@ -406,6 +422,16 @@ class SPDXGenerator:
                 component["licenseDeclared"] = self.license_ident(
                     package_info["licensedeclared"]
                 )
+        if "licenselist" in package_info:
+            # Handle multiple licenses from a CycloneDX SBOM
+            license_expression = ""
+            for license in package_info["licenselist"]:
+                if "id" in license:
+                    license_expression = license_expression + license['id'] + " AND "
+            # Remove extraneous " AND "
+            license_expression = license_expression[:-4]
+            component["licenseDeclared"]= license_expression
+            component["licenseConcluded"]= license_expression
         if "licensecomments" in package_info:
             component["licenseComments"] = package_info["licensecomments"]
         if files_analysed:
