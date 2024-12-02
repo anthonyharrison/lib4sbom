@@ -80,7 +80,7 @@ class LicenseScanner:
 
     def get_license_text(self, license_id):
         license_text = ""
-        filename = f"{self.license_text_path}/{license_id}.html"
+        filename = f"{self.license_text_path}/{license_id.lower()}.html"
         # check filename exists
         if os.path.exists(filename):
             license_text_file = open(filename, "r", encoding="utf-8")
