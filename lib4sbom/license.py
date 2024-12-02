@@ -43,7 +43,13 @@ class LicenseScanner:
         return self.licenses["licenses"]
 
     def get_license_version(self):
-        return self.licenses.get("licenseListVersion", self.SPDX_LICENSE_VERSION)
+        if self.licenses.get("licenseListVersion") is not None:
+            # Ensure string is only of format M.N
+            license_version_release = self.licenses.get("licenseListVersion")
+            if "." in license_version_release:
+                return license_version_release.split(".")[0] + "." + license_version_release.split(".")[1]
+            return license_version_release
+        return self.SPDX_LICENSE_VERSION
 
     def check_synonym(self, license):
         # Look for synonyms. Check done in uppercase to handle mixed case license identifiers
