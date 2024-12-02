@@ -1,6 +1,7 @@
 # Copyright (C) 2024 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+
 class SBOMLicense:
     def __init__(self):
         self.license = {}
@@ -42,4 +43,3 @@ class SBOMLicense:
 
     def get_id(self):
         return self.get_value("id")
-

@@ -334,5 +334,15 @@ class SBOMPackage:
         return all(c in string.hexdigits for c in value.lower())
 
     def _valid_algorithm(self, algorithm):
-        algorithms = ["MD5", "SHA1", "SHA256", "SHA384", "SHA512", "BLAKE2b-256", "BLAKE2b-384", "BLAKE2b-512", "BLAKE3"]
+        algorithms = [
+            "MD5",
+            "SHA1",
+            "SHA256",
+            "SHA384",
+            "SHA512",
+            "BLAKE2b-256",
+            "BLAKE2b-384",
+            "BLAKE2b-512",
+            "BLAKE3",
+        ]
         return algorithm in algorithms

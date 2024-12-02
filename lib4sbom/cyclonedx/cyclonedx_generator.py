@@ -100,7 +100,7 @@ class CycloneDXGenerator:
         return self.cyclonedx_version in ["1.6"]
 
     def generateDocumentHeader(
-        self, project_name, component_type, uuid=None, bom_version="1", property = None
+        self, project_name, component_type, uuid=None, bom_version="1", property=None
     ):
         # Assume a new document being created
         self.relationship = []
@@ -112,13 +112,14 @@ class CycloneDXGenerator:
             self.doc = {}
             self.component = []
             return self.generateJSONDocumentHeader(
-                project_name, component_type, uuid, bom_version, property)
+                project_name, component_type, uuid, bom_version, property
+            )
 
     def _generate_urn(self):
         return "urn:uuid:" + str(uuid.uuid4())
 
     def generateJSONDocumentHeader(
-        self, project_name, component_type, uuid=None, bom_version="1", property = None
+        self, project_name, component_type, uuid=None, bom_version="1", property=None
     ):
         if uuid is None:
             urn = self._generate_urn()
@@ -126,9 +127,9 @@ class CycloneDXGenerator:
             urn = uuid
         project_id = self.PROJECT_ID
         self.doc = {}
-        self.doc[
-            "$schema"
-        ] = f"http://cyclonedx.org/schema/bom-{self.cyclonedx_version}.schema.json"
+        self.doc["$schema"] = (
+            f"http://cyclonedx.org/schema/bom-{self.cyclonedx_version}.schema.json"
+        )
         self.doc["bomFormat"] = "CycloneDX"
         self.doc["specVersion"] = self.cyclonedx_version
         self.doc["serialNumber"] = urn
@@ -140,7 +141,15 @@ class CycloneDXGenerator:
             metadata["timestamp"] = component_type["timestamp"]
         if component_type.get("lifecycle") is not None:
             # Validate lifecycle phase
-            if component_type["lifecycle"].lower() in ["design","pre-build","build","post-build","operations","discovery","decommission"]:
+            if component_type["lifecycle"].lower() in [
+                "design",
+                "pre-build",
+                "build",
+                "post-build",
+                "operations",
+                "discovery",
+                "decommission",
+            ]:
                 lifecycle = {}
                 lifecycle["phase"] = component_type["lifecycle"].lower()
                 metadata["lifecycles"] = [lifecycle]
@@ -186,13 +195,13 @@ class CycloneDXGenerator:
             component["bom-ref"] = project_id
         component["name"] = project_name
         if property is not None:
-            metadata_property=[]
+            metadata_property = []
             for p in property:
                 property_entry = dict()
                 property_entry["name"] = p[0]
                 property_entry["value"] = p[1]
                 metadata_property.append(property_entry)
-            metadata["properties"]=metadata_property
+            metadata["properties"] = metadata_property
         metadata["component"] = component
         self.doc["metadata"] = metadata
         return component["bom-ref"]
@@ -254,7 +263,8 @@ class CycloneDXGenerator:
         # Use RFC-5322 compliant regex (https://regex101.com/library/6EL6YF)
         emails = re.findall(
             r"((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))",
-            supplier_info,re.IGNORECASE
+            supplier_info,
+            re.IGNORECASE,
         )
         # If email found, remove from string
         supplier_name = (
@@ -507,9 +517,9 @@ class CycloneDXGenerator:
                             cpe_type = "/o"
                         else:
                             cpe_type = "/a"
-                        component[
-                            "cpe"
-                        ] = f'cpe:{cpe_type}:{supplier_name.replace(" ", "_")}:{name}:{version}'
+                        component["cpe"] = (
+                            f'cpe:{cpe_type}:{supplier_name.replace(" ", "_")}:{name}:{version}'
+                        )
                 # Alternative is it within external reference
         if "originator" in package:
             component["author"] = package["originator"]
@@ -617,7 +627,7 @@ class CycloneDXGenerator:
                     externalReference = dict()
                     externalReference["url"] = ref_value
                     externalReference["type"] = ref_type
-                    #externalReference["comment"] = ref_category
+                    # externalReference["comment"] = ref_category
                     if "externalReferences" in component:
                         component["externalReferences"].append(externalReference)
                     else:
@@ -712,9 +722,9 @@ class CycloneDXGenerator:
             else:
                 # Assume ref is based on product
                 if "release" in vuln:
-                    vulnerability[
-                        "bom-ref"
-                    ] = f'{vuln_info.get_value("product")}@{vuln_info.get_value("release")}'
+                    vulnerability["bom-ref"] = (
+                        f'{vuln_info.get_value("product")}@{vuln_info.get_value("release")}'
+                    )
                 else:
                     # assume it is a PURL
                     vulnerability["bom-ref"] = vuln_info.get_value("purl")
@@ -723,9 +733,9 @@ class CycloneDXGenerator:
                 # NVD Data source
                 source = {}
                 source["name"] = "NVD"
-                source[
-                    "url"
-                ] = f"https://nvd.nist.gov/vuln/detail/{vulnerability['id']}"
+                source["url"] = (
+                    f"https://nvd.nist.gov/vuln/detail/{vulnerability['id']}"
+                )
                 vulnerability["source"] = source
             if "description" in vuln:
                 vulnerability["description"] = vuln_info.get_value("description")
@@ -755,10 +765,13 @@ class CycloneDXGenerator:
                 affected["ref"] = vuln_info.get_value("bom_link")
                 version_info = {}
                 component_version = vuln_info.get_value("release")
-                if component_version is None and vuln_info.get_value("purl") is not None:
+                if (
+                    component_version is None
+                    and vuln_info.get_value("purl") is not None
+                ):
                     # Could be a PURL - just extract version of component
                     component_version = vuln_info.get_value("purl").split("@")[1]
-                if analysis["state"] in ["not_affected","false_positive"]:
+                if analysis["state"] in ["not_affected", "false_positive"]:
                     version_info["version"] = component_version
                     version_info["status"] = "unaffected"
                 elif analysis["state"] != "in_triage":
@@ -771,7 +784,21 @@ class CycloneDXGenerator:
             # Add properties for any user defined items
             for key, value in vuln.items():
                 # Ignore elements already processed
-                if key not in ["action", "bom-link", "bom-ref", "comment", "created", "description", "id", "justification", "product", "purl", "release", "remediation", "status"]:
+                if key not in [
+                    "action",
+                    "bom-link",
+                    "bom-ref",
+                    "comment",
+                    "created",
+                    "description",
+                    "id",
+                    "justification",
+                    "product",
+                    "purl",
+                    "release",
+                    "remediation",
+                    "status",
+                ]:
                     property_entry = dict()
                     property_entry["name"] = key
                     property_entry["value"] = value

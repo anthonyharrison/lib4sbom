@@ -296,17 +296,11 @@ class SPDXGenerator:
             license_expression = ""
             for license in package_info["licenselist"]:
                 if "id" in license:
-                    license_expression = license_expression + license['id'] + " AND "
+                    license_expression = license_expression + license["id"] + " AND "
             # Remove extraneous " AND "
             license_expression = license_expression[:-4]
-            self.generateTag(
-                "PackageLicenseDeclared",
-                license_expression
-            )
-            self.generateTag(
-                "PackageLicenseConcluded",
-                license_expression
-            )
+            self.generateTag("PackageLicenseDeclared", license_expression)
+            self.generateTag("PackageLicenseConcluded", license_expression)
         if "licensecomments" in package_info:
             self.generateTag(
                 "PackageLicenseComments",
@@ -343,7 +337,12 @@ class SPDXGenerator:
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
-                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER", "OTHER"]:
+                if reference[0] in [
+                    "SECURITY",
+                    "PACKAGE-MANAGER",
+                    "PACKAGE_MANAGER",
+                    "OTHER",
+                ]:
                     self.generateTag(
                         "ExternalRef",
                         reference[0] + " " + reference[1] + " " + reference[2],
@@ -427,11 +426,11 @@ class SPDXGenerator:
             license_expression = ""
             for license in package_info["licenselist"]:
                 if "id" in license:
-                    license_expression = license_expression + license['id'] + " AND "
+                    license_expression = license_expression + license["id"] + " AND "
             # Remove extraneous " AND "
             license_expression = license_expression[:-4]
-            component["licenseDeclared"]= license_expression
-            component["licenseConcluded"]= license_expression
+            component["licenseDeclared"] = license_expression
+            component["licenseConcluded"] = license_expression
         if "licensecomments" in package_info:
             component["licenseComments"] = package_info["licensecomments"]
         if files_analysed:
@@ -464,7 +463,12 @@ class SPDXGenerator:
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
-                if reference[0] in ["SECURITY", "PACKAGE-MANAGER", "PACKAGE_MANAGER", "OTHER"]:
+                if reference[0] in [
+                    "SECURITY",
+                    "PACKAGE-MANAGER",
+                    "PACKAGE_MANAGER",
+                    "OTHER",
+                ]:
                     reference_data = dict()
                     reference_data["referenceCategory"] = reference[0]
                     reference_data["referenceType"] = reference[1]
@@ -560,7 +564,7 @@ class SPDXGenerator:
         self.generateTag("LicenseName", name)
         if len(license_text) > 0:
             self.generateTag("ExtractedText", self._text(license_text))
-        if len (comment) > 0:
+        if len(comment) > 0:
             self.generateTag("LicenseComment", comment)
 
     def generateJSONLicenseDetails(self, id, name, license_text, comment):
@@ -571,7 +575,7 @@ class SPDXGenerator:
             extractedlicense["name"] = name
         if len(license_text) > 0:
             extractedlicense["extractedText"] = license_text
-        if len (comment) > 0:
+        if len(comment) > 0:
             extractedlicense["comment"] = comment
         self.licenses.append(extractedlicense)
 
@@ -597,10 +601,10 @@ class SPDXGenerator:
         for license in user_licenses:
             self.license_info.append(
                 {
-                    "id": license['id'],
-                    "name": license.get("name",""),
-                    "text": license.get("text",""),
-                    "comment": license.get("comment", "")
+                    "id": license["id"],
+                    "name": license.get("name", ""),
+                    "text": license.get("text", ""),
+                    "comment": license.get("comment", ""),
                 }
             )
 
@@ -609,11 +613,17 @@ class SPDXGenerator:
             if self.format == "tag":
                 self.generateComment("\n")
                 self.generateTagLicenseDetails(
-                    license_info.get("id",""), license_info.get("name",""), license_info["text"], license_info.get("comment","")
+                    license_info.get("id", ""),
+                    license_info.get("name", ""),
+                    license_info["text"],
+                    license_info.get("comment", ""),
                 )
             else:
                 self.generateJSONLicenseDetails(
-                    license_info.get("id",""), license_info.get("name",""), license_info["text"], license_info.get("comment","")
+                    license_info.get("id", ""),
+                    license_info.get("name", ""),
+                    license_info["text"],
+                    license_info.get("comment", ""),
                 )
 
     def generateRelationship(self, from_id, to_id, relationship_type):

@@ -206,35 +206,43 @@ class CycloneDXParser:
 
     def process_license(self, license_element):
         license_info = []
-        for l in license_element:
-            if "license" in l:
+        for license in license_element:
+            if "license" in license:
                 # Potentially multiple licenses
                 # At least one of id or name must be specified
                 id = name = None
-                if "id" in l["license"]:
+                if "id" in license["license"]:
                     # A valid SPDX Id
-                    id = l["license"]["id"]
-                if "name" in l["license"]:
-                    name = l["license"]["name"]
+                    id = license["license"]["id"]
+                if "name" in license["license"]:
+                    name = license["license"]["name"]
                 if id is None and name is None:
-                    print (f"[ERROR] Invalid license specified {l} - missing id or name.")
+                    print(
+                        f"[ERROR] Invalid license specified {license} - missing id or name."
+                    )
                 else:
-                    license_info.append(l["license"])
+                    license_info.append(license["license"])
             else:
                 # SPDX License expression - can only have one instance
-                if len (license_info) > 0:
-                    print (f"[ERROR] Invalid license specified {l}  - only one SPDX expression allowed.")
+                if len(license_info) > 0:
+                    print(
+                        f"[ERROR] Invalid license specified {license}  - only one SPDX expression allowed."
+                    )
                 else:
                     type = None
-                    license = None
-                    if "expression" in l:
-                        license = l["expression"]
-                    if "acknowledgement" in l:
-                        type = l["acknowledgement"]
-                    if license is None:
-                        print(f"[ERROR] Invalid license specified {l}  - expression missing.")
+                    license_identity = None
+                    if "expression" in license:
+                        license_identity = license["expression"]
+                    if "acknowledgement" in license:
+                        type = license["acknowledgement"]
+                    if license_identity is None:
+                        print(
+                            f"[ERROR] Invalid license specified {license}  - expression missing."
+                        )
                     else:
-                        license_info.append({"expression": license, "acknowledgement": type})
+                        license_info.append(
+                            {"expression": license_identity, "acknowledgement": type}
+                        )
         return license_info
 
     def _cyclondex_component(self, d):
@@ -415,7 +423,9 @@ class CycloneDXParser:
                     elif ref_type == "distribution":
                         self.cyclonedx_package.set_downloadlocation(ref_url)
                     else:
-                        self.cyclonedx_package.set_externalreference("OTHER", ref_type, ref_url)
+                        self.cyclonedx_package.set_externalreference(
+                            "OTHER", ref_type, ref_url
+                        )
             if "modelCard" in d:
                 self._cyclonedx_mlmodel(d)
                 self.cyclonedx_package.set_value(
@@ -456,16 +466,21 @@ class CycloneDXParser:
                     cyclonedx_document.set_value("bom_version", 1)
                 if "metadata" in data:
                     if self.debug:
-                        print ("Processing Metadata")
+                        print("Processing Metadata")
                     if "timestamp" in data["metadata"]:
                         cyclonedx_document.set_created(data["metadata"]["timestamp"])
                     if "lifecycles" in data["metadata"]:
-                        for l in data["metadata"]["lifecycles"]:
-                            cyclonedx_document.set_value("lifecycle", l["phase"])
+                        for lifecycle in data["metadata"]["lifecycles"]:
+                            if "phase" in lifecycle:
+                                cyclonedx_document.set_value(
+                                    "lifecycle", lifecycle["phase"]
+                                )
                     if "tools" in data["metadata"]:
                         if self._cyclonedx_15():
                             if "components" in data["metadata"]["tools"]:
-                                for component in data["metadata"]["tools"]["components"]:
+                                for component in data["metadata"]["tools"][
+                                    "components"
+                                ]:
                                     name = component["name"]
                                     if "version" in component:
                                         name = f'{name}#{component["version"]}'
@@ -473,11 +488,18 @@ class CycloneDXParser:
                             else:
                                 # This is the legacy interface which is deprecated.
                                 if self.debug:
-                                    print("Legacy tool(s) specification still being used.")
+                                    print(
+                                        "Legacy tool(s) specification still being used."
+                                    )
                                 if "components" in data["metadata"]["tools"][0]:
                                     name = ""
-                                    if "name" in data["metadata"]["tools"][0]["components"][0]:
-                                        name = data["metadata"]["tools"][0]["components"][0]["name"]
+                                    if (
+                                        "name"
+                                        in data["metadata"]["tools"][0]["components"][0]
+                                    ):
+                                        name = data["metadata"]["tools"][0][
+                                            "components"
+                                        ][0]["name"]
                                     if (
                                         "version"
                                         in data["metadata"]["tools"][0]["components"][0]
@@ -513,24 +535,24 @@ class CycloneDXParser:
                         if "supplier" in data["metadata"]["component"]:
                             supplier = data["metadata"]["component"]["supplier"]
                             cyclonedx_document.set_value(
-                                "metadata_supplier", supplier['name']
+                                "metadata_supplier", supplier["name"]
                             )
                     if "properties" in data["metadata"]:
                         cyclonedx_document.set_value(
                             "property", data["metadata"]["properties"]
                         )
                     if self.debug:
-                        print (cyclonedx_document)
+                        print(cyclonedx_document)
                 if "components" in data:
                     if self.debug:
-                        print ("Processing Components")
+                        print("Processing Components")
                     for d in data["components"]:
                         self._cyclondex_component(d)
                     if self.debug:
-                        print (self.packages)
+                        print(self.packages)
                 if "dependencies" in data:
                     if self.debug:
-                        print ("Processing Dependencies")
+                        print("Processing Dependencies")
                     for d in data["dependencies"]:
                         source_id = d["ref"]
                         # Get source name
@@ -560,20 +582,22 @@ class CycloneDXParser:
                         print(relationships)
                 if "vulnerabilities" in data:
                     if self.debug:
-                        print ("Processing Vulnerabilities")
+                        print("Processing Vulnerabilities")
                     vuln_info = Vulnerability(validation="cyclonedx")
                     for vuln in data["vulnerabilities"]:
                         vuln_info.initialise()
                         if "bom-ref" in vuln:
                             vuln_info.set_value("bom-ref", vuln["bom-ref"])
                             if "@" in vuln["bom-ref"]:
-                                component_info = vuln['bom-ref'].split('@')
+                                component_info = vuln["bom-ref"].split("@")
                                 vuln_info.set_value("product", component_info[0])
                                 vuln_info.set_value("release", component_info[1])
                         vuln_info.set_id(vuln["id"])
                         if "source" in vuln:
                             if "name" in vuln["source"]:
-                                vuln_info.set_value("source-name", vuln["source"]["name"])
+                                vuln_info.set_value(
+                                    "source-name", vuln["source"]["name"]
+                                )
                             if "url" in vuln["source"]:
                                 vuln_info.set_value("source-url", vuln["source"]["url"])
                         if "description" in vuln:
@@ -596,21 +620,27 @@ class CycloneDXParser:
                                 )
                         if "affects" in vuln:
                             if "ref" in vuln["affects"][0]:
-                                vuln_info.set_value("bom_link", vuln["affects"][0]["ref"])
+                                vuln_info.set_value(
+                                    "bom_link", vuln["affects"][0]["ref"]
+                                )
                             if "versions" in vuln["affects"][0]:
                                 if "version" in vuln["affects"][0]["versions"]:
-                                    vuln_info.set_release(vuln["affects"][0]["versions"]["version"])
+                                    vuln_info.set_release(
+                                        vuln["affects"][0]["versions"]["version"]
+                                    )
                         vulnerabilities.append(vuln_info.get_vulnerability())
                     if self.debug:
                         print(vulnerabilities)
                 if "services" in data:
                     if self.debug:
-                        print ("Processing Services")
+                        print("Processing Services")
                     service_info = SBOMService()
-                    service_id=1
+                    service_id = 1
                     for service in data["services"]:
                         service_info.initialise()
-                        service_info.set_id(service.get("bom-ref",f"CycloneDX-Service-{service_id}"))
+                        service_info.set_id(
+                            service.get("bom-ref", f"CycloneDX-Service-{service_id}")
+                        )
                         service_info.set_name(service["name"])
                         if "version" in service:
                             service_info.set_version(service["version"])
@@ -653,7 +683,10 @@ class CycloneDXParser:
                                 name = data_element.get("name", "")
                                 description = data_element.get("description", "")
                                 service_info.set_data(
-                                    flow, classification, name=name, description=description
+                                    flow,
+                                    classification,
+                                    name=name,
+                                    description=description,
                                 )
                         if "licenses" in service:
                             for license in service["licenses"]:
@@ -678,7 +711,7 @@ class CycloneDXParser:
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
             if self.debug:
-                print ("[ERROR] Unable to process file.")
+                print("[ERROR] Unable to process file.")
             raise SBOMParserException
         return (
             cyclonedx_document,
@@ -687,7 +720,7 @@ class CycloneDXParser:
             relationships,
             vulnerabilities,
             services,
-            self.licences
+            self.licences,
         )
 
     def _parse_component(self, component_element):
@@ -817,11 +850,9 @@ class CycloneDXParser:
                     # Implicit value
                     value = property.text
                 if params["name"] == "release_date":
-                    self.cyclonedx_package.set_value(
-                        "release_date", value
-                    )
+                    self.cyclonedx_package.set_value("release_date", value)
                 else:
-                   self.cyclonedx_package.set_property(params["name"], value)
+                    self.cyclonedx_package.set_property(params["name"], value)
         for references in component.findall(self.schema + "externalReferences"):
             for reference in references.findall(self.schema + "reference"):
                 params = reference.attrib
@@ -889,4 +920,12 @@ class CycloneDXParser:
         dependencies = self.parse_dependencies_xml()
         vulnerabilities = self.parse_vulnerabilities_xml()
         services = self.parse_services_xml()
-        return document, {}, self.packages, dependencies, vulnerabilities, services, self.licences
+        return (
+            document,
+            {},
+            self.packages,
+            dependencies,
+            vulnerabilities,
+            services,
+            self.licences,
+        )

@@ -9,9 +9,9 @@ import yaml
 
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.file import SBOMFile
+from lib4sbom.data.license import SBOMLicense
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
-from lib4sbom.data.license import SBOMLicense
 from lib4sbom.exception import SBOMParserException
 
 
@@ -21,7 +21,7 @@ class SPDXParser:
         self.vulnerabilities = []
         # Services not in SPDX
         self.services = []
-        self.user_licences=[]
+        self.user_licences = []
 
     def parse(self, sbom_file):
         """parses SPDX SBOM file"""
@@ -39,7 +39,15 @@ class SPDXParser:
         elif sbom_file.endswith(".spdx.xml"):
             return self.parse_spdx_xml(sbom_file)
         else:
-            return {}, {}, {}, [], self.vulnerabilities, self.services, self.user_licences
+            return (
+                {},
+                {},
+                {},
+                [],
+                self.vulnerabilities,
+                self.services,
+                self.user_licences,
+            )
 
     def parse_spdx_tag(self, sbom_file):
         """parses SPDX tag value file extracting all SBOM data"""

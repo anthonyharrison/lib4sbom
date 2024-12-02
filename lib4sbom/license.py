@@ -47,7 +47,11 @@ class LicenseScanner:
             # Ensure string is only of format M.N
             license_version_release = self.licenses.get("licenseListVersion")
             if "." in license_version_release:
-                return license_version_release.split(".")[0] + "." + license_version_release.split(".")[1]
+                return (
+                    license_version_release.split(".")[0]
+                    + "."
+                    + license_version_release.split(".")[1]
+                )
             return license_version_release
         return self.SPDX_LICENSE_VERSION
 
