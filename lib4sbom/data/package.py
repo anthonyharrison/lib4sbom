@@ -106,7 +106,8 @@ class SBOMPackage:
             self.package["homepage"] = page
 
     def set_sourceinfo(self, info):
-        self.package["sourceinfo"] = self._text(info)
+        if len(info) > 0:
+            self.package["sourceinfo"] = self._text(info)
 
     def set_filesanalysis(self, analysis):
         self.package["filesanalysis"] = analysis
@@ -142,7 +143,8 @@ class SBOMPackage:
         self.package["licenselist"] = list
 
     def set_licensecomments(self, comment):
-        self.package["licensecomments"] = self._text(comment)
+        if len(comment) > 0:
+            self.package["licensecomments"] = self._text(comment)
 
     def set_licenseinfoinfiles(self, license_info):
         # Validate license
@@ -265,16 +267,20 @@ class SBOMPackage:
         self.set_externalreference("PACKAGE_MANAGER", "purl", purl_value)
 
     def set_copyrighttext(self, text):
-        self.package["copyrighttext"] = self._text(text)
+        if len(text) > 0:
+            self.package["copyrighttext"] = self._text(text)
 
     def set_comment(self, comment):
-        self.package["comment"] = self._text(comment)
+        if len(comment) > 0:
+            self.package["comment"] = self._text(comment)
 
     def set_summary(self, summary):
-        self.package["summary"] = self._text(summary)
+        if len(summary) > 0:
+            self.package["summary"] = self._text(summary)
 
     def set_description(self, description):
-        self.package["description"] = self._text(description)
+        if len(description) > 0:
+            self.package["description"] = self._text(description)
 
     def set_evidence(self, evidence):
         if "evidence" in self.package:

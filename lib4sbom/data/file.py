@@ -70,16 +70,20 @@ class SBOMFile:
             self.file["licenseinfoinfile"] = [license_id]
 
     def set_licensecomment(self, comment):
-        self.file["licensecomment"] = self._text(comment)
+        if len(comment) > 0:
+            self.file["licensecomment"] = self._text(comment)
 
     def set_copyrighttext(self, text):
-        self.file["copyrighttext"] = self._text(text)
+        if len(text) > 0:
+            self.file["copyrighttext"] = self._text(text)
 
     def set_comment(self, comment):
-        self.file["comment"] = self._text(comment)
+        if len(comment) > 0:
+            self.file["comment"] = self._text(comment)
 
     def set_notice(self, notice):
-        self.file["notice"] = self._text(notice)
+        if len(notice) > 0:
+            self.file["notice"] = self._text(notice)
 
     def set_contributor(self, name):
         if len(name) > 0:

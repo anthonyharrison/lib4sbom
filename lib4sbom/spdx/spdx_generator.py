@@ -75,7 +75,8 @@ class SPDXGenerator:
 
     def generateTag(self, tag, value):
         if value is not None:
-            self.show(tag + ": " + value)
+            if len(value) > 0:
+                self.show(tag + ": " + value)
         elif self.debug:
             print(f"[ERROR] with value for {tag}")
 
@@ -204,7 +205,8 @@ class SPDXGenerator:
 
     def _text(file, text_item):
         if text_item not in ["NONE", "NOASSERTION"]:
-            return f"<text>{text_item}</text>"
+            if len(text_item) > 0:
+                return f"<text>{text_item}</text>"
         return text_item
 
     def _file_name(self, name):
