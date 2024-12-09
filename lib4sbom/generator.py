@@ -263,9 +263,14 @@ class SBOMGenerator:
                             current_version = self._semantic_version(
                                 c[1].split("_")[-1]
                             )
-                        if current_version > latest_version:
-                            latest_version = current_version
-                            index = i
+                        try:
+                            if current_version > latest_version:
+                                latest_version = current_version
+                                index = i
+                        except TypeError:
+                            if self.debug:
+                                print (f"Current {current_version} {type(current_version)} {name}")
+                                print (f"Latest {latest_version} {type(latest_version)}")
                     elif c[1] == id:
                         return c[0]
                     i += 1
