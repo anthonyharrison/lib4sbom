@@ -160,6 +160,8 @@ class LicenseScanner:
         # Multiple licenses can be specified and connected using boolean logic.
         # This will preserve any brackets and boolean operators included in the expression
         # Ensure case of operators is uppercase
+        if license_expression is None:
+            return "NOASSERTION"
         updated_expression = (
             license_expression.replace(" or ", " OR ")
             .replace(" Or ", " OR ")
