@@ -361,7 +361,7 @@ class SBOMGenerator:
                     my_id = package.get("id", None)
                     if not self._validate_id(my_id):
                         my_id = f"{id}-{product}"
-                self._save_element(product, str(id) + "-" + product, my_id)
+                self._save_element(product, my_id, my_id)
                 if parent == "-":
                     type = "application"
                 else:
