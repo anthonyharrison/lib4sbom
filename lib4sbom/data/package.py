@@ -13,7 +13,14 @@ class SBOMPackage:
         self.license = LicenseScanner()
 
     def _text(self, text_item):
-        return text_item.replace("<text>", "").replace("</text>", "")
+        # Reomve non-ascii characters
+        return (
+            "".join([i if ord(i) < 128 else "" for i in text_item])
+            .replace("<text>", "")
+            .replace("</text>", "")
+            .strip()
+        )
+        # return text_item.replace("<text>", "").replace("</text>", "")
 
     def _url_valid(self, url):
         url_pattern = (

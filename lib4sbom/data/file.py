@@ -12,7 +12,13 @@ class SBOMFile:
         self.license = LicenseScanner()
 
     def _text(self, text_item):
-        return text_item.replace("<text>", "").replace("</text>", "")
+        # Reomve non-ascii characters
+        return (
+            "".join([i if ord(i) < 128 else "" for i in text_item])
+            .replace("<text>", "")
+            .replace("</text>", "")
+            .strip()
+        )
 
     def initialise(self):
         self.file = {}
