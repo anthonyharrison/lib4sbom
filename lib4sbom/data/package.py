@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Anthony Harrison
+# Copyright (C) 2025 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
 import re
@@ -346,6 +346,9 @@ class SBOMPackage:
             "SHA256",
             "SHA384",
             "SHA512",
+            "SHA3-256",
+            "SHA3-384",
+            "SHA3-512",
             "BLAKE2b-256",
             "BLAKE2b-384",
             "BLAKE2b-512",
