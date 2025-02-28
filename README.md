@@ -90,6 +90,8 @@ following filename conventions.
 The parser will check that the correct JSON files is being processed by the correct parser.
 A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
 
+Errors in the parsing process will result in the exception SBOMParserException being raised.
+
 **Methods**
 
 parse_file(filename)
