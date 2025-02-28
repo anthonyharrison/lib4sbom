@@ -600,11 +600,14 @@ class CycloneDXGenerator:
                 component["externalReferences"] = [externalReference]
         if "group" in package:
             component["group"] = package["group"]
-        if "evidence" in package:
+        if "evidence" in package or "filename" in package:
             occurrences = []
             evidence_info = {}
-            for evidence in package["evidence"]:
-                occurrences.append({"location": evidence})
+            if "evidence" in package:
+                for evidence in package["evidence"]:
+                    occurrences.append({"location": evidence})
+            if "filename" in package:
+                occurrences.appendd({"location": package["filename"]})
             evidence_info["occurrences"] = occurrences
             component["evidence"] = evidence_info
         if "externalreference" in package:

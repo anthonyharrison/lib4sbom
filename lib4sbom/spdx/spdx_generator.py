@@ -261,6 +261,9 @@ class SPDXGenerator:
         self.generateTag("FilesAnalyzed", str(files_analysed).lower())
         if "filename" in package_info:
             self.generateTag("PackageFileName", package_info["filename"])
+        if "evidence" in package_info:
+            for evidence in package_info["evidence"]:
+                self.generateTag("PackageFileName", evidence)
         if "homepage" in package_info:
             self.generateTag("PackageHomePage", package_info["homepage"])
         if "checksum" in package_info:
@@ -389,6 +392,9 @@ class SPDXGenerator:
         component["filesAnalyzed"] = files_analysed
         if "filename" in package_info:
             component["packageFileName"] = package_info["filename"]
+        if "evidence" in package_info:
+            for evidence in package_info["evidence"]:
+                component["packageFileName"] = evidence
         if "homepage" in package_info:
             component["homepage"] = package_info["homepage"]
         if "checksum" in package_info:
