@@ -1,7 +1,7 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
-""" Set up Output Formatting """
+"""Set up Output Formatting"""
 
 import json
 

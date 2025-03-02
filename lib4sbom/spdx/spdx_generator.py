@@ -352,7 +352,11 @@ class SPDXGenerator:
                 ]:
                     self.generateTag(
                         "ExternalRef",
-                        reference[0].replace("_","-") + " " + reference[1] + " " + reference[2],
+                        reference[0].replace("_", "-")
+                        + " "
+                        + reference[1]
+                        + " "
+                        + reference[2],
                     )
 
     def generateJSONPackageDetails(
@@ -482,7 +486,7 @@ class SPDXGenerator:
                     "OTHER",
                 ]:
                     reference_data = dict()
-                    reference_data["referenceCategory"] = reference[0].replace("_","-")
+                    reference_data["referenceCategory"] = reference[0].replace("_", "-")
                     reference_data["referenceType"] = reference[1]
                     reference_data["referenceLocator"] = reference[2]
                     if "externalRefs" in component:

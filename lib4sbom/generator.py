@@ -269,8 +269,10 @@ class SBOMGenerator:
                                 index = i
                         except TypeError:
                             if self.debug:
-                                print (f"Current {current_version} {type(current_version)} {name}")
-                                print (f"Latest {latest_version} {type(latest_version)}")
+                                print(
+                                    f"Current {current_version} {type(current_version)} {name}"
+                                )
+                                print(f"Latest {latest_version} {type(latest_version)}")
                     elif c[1] == id:
                         return c[0]
                     i += 1
