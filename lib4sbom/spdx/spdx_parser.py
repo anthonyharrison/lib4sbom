@@ -265,6 +265,9 @@ class SPDXParser:
                 spdx_package.set_attribution(attribute_value)
             elif line_elements[0] == "BuiltDate":
                 date = line_elements[1].strip().rstrip("\n")
+                spdx_package.set_value("build_date", date)
+            elif line_elements[0] == "ReleaseDate":
+                date = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_value("release_date", date)
             elif line_elements[0] == "ExternalRef":
                 # Format is TAG CATEGORY TYPE LOCATOR
@@ -488,14 +491,14 @@ class SPDXParser:
                             spdx_package.set_comment(d["comment"])
                         if "summary" in d:
                             spdx_package.set_summary(d["summary"])
-                        if "downloadlocation" in d:
-                            spdx_package.set_downloadlocation(d["downloadlocation"])
                         if "attribution" in d:
                             # Potentially multiple entries
                             for attribution in d["attribution"]:
                                 spdx_package.set_attribution(attribution["value"])
-                        if "builtdate" in d:
-                            spdx_package.set_value("release_date", d["builtdate"])
+                        if "builtDate" in d:
+                            spdx_package.set_value("build_date", d["builtDate"])
+                        if "releaseDate" in d:
+                            spdx_package.set_value("release_date", d["releaseDate"])
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
                                 spdx_package.set_externalreference(

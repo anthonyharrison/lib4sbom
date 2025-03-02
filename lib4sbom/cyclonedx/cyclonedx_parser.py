@@ -408,6 +408,10 @@ class CycloneDXParser:
                         self.cyclonedx_package.set_value(
                             "release_date", property["value"]
                         )
+                    elif property["name"] == "build_date":
+                        self.cyclonedx_package.set_value(
+                            "build_date", property["value"]
+                        )
                     else:
                         self.cyclonedx_package.set_property(
                             property["name"], property["value"]
