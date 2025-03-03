@@ -1,14 +1,31 @@
 # LIB4SBOM license synonyms
+[0BSD]
+Zero-Clause BSD
+Zero-Clause BSD (0BSD)
+#[AAL]
+#Attribution Assurance License
+[AFL-1.1]
+# Default to earliest version
+AFL
+Academic Free License
+Academic Free License (AFL)
+[Aladdin]
+AFPL
+#Aladdin Free Public License
+Aladdin Free Public License (AFPL)
 [AGPL-3.0-only]
 AGPL3
 AGPL-3
 AGPLv3
 AGPL-3.0
+GNU Affero General Public License v3
 [AGPL-3.0-or-later]
 AGPL3+
 AGPL-3+
 AGPLv3+
 AGPL-3.0+
+GNU Affero General Public License v3 or later
+GNU Affero General Public License v3 or later (AGPLv3+)
 [Apache-2.0]
 Apache Software License
 Apache License, Version 2.0
@@ -20,6 +37,10 @@ Apache-2
 ASL 2
 ASL 2.0
 Apache
+Apache-2.0 license
+[APSL-1.0]
+# Default to earliest version
+Apple Public Source License
 [Artistic-1.0-Perl]
 Artistic
 Artistic License
@@ -29,6 +50,9 @@ Artistic License 2
 [Bitstream-Vera]
 Bitstream Vera
 BitstreamVera
+[BlueOak-1.0.0]
+Blue Oak Model License
+Blue Oak Model License (BlueOak-1.0.0)
 [BSD-2-Clause]
 BSD2
 BSD-2
@@ -39,16 +63,68 @@ BSD3
 BSD-3
 3-Clause BSD
 BSD-3-cluase
+BSD 3-Clause License
 [BSD-4-Clause]
 BSD4
 BSD-4
 [BSL-1.0]
 Boost
+Boost Software License 1.0 (BSL-1.0)
 [CC0-1.0]
 CC0
+CC0 1.0
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+[CDDL-1.0]
+Common Development and Distribution License 1.0 (CDDL-1.0)
+[CECILL-2.1]
+CeCILL 2.1
+CEA CNRS Inria Logiciel Libre License, version 2.1
+CEA CNRS Inria Logiciel Libre License, version 2.1 (CeCILL-2.1)
+[CECILL-B]
+CeCILL-B Free Software License Agreement (CECILL-B)
+[CECILL-C]
+CeCILL-C Free Software License Agreement (CECILL-C)
+[CNRI-Python]
+Python License (CNRI Python License)
 [CPL-1.0]
 CPL
+Common Public License
+[ECL-1.0]
+ECL 1.0
+Educational Community License, Version 1.0
+Educational Community License, Version 1.0 (ECL-1.0)
+[ECL-2.0]
+ECL 2.0
+Educational Community License, Version 2.0
+Educational Community License, Version 2.0 (ECL-2.0)
+[EFL-1.0]
+# Default to earliest version
+EFL
+Eiffel Forum License
+Eiffel Forum License (EFL)
+[EPL-1.0]
+EPL 1.0
+Eclipse Public License 1.0 (EPL-1.0)
+[EPL-2.0]
+EPL 2.0
+Eclipse Public License 2.0 (EPL-2.0)
+[EUPL-1.0]
+EUPL 1.0
+European Union Public Licence 1.0
+European Union Public Licence 1.0 (EUPL 1.0)
+[EUPL-1.1]
+EUPL 1.1
+European Union Public Licence 1.1
+European Union Public Licence 1.1 (EUPL 1.1)
+[EUPL-1.2]
+EUPL 1.2
+European Union Public Licence 1.2
+European Union Public Licence 1.2 (EUPL 1.2)
 [GFDL-1.1-only]
+# Default to earliest version
+FDL
+GNU Free Documentation License
+GNU Free Documentation License (FDL)
 GFDLv1.1
 [GFDL-1.1-or-later]
 GFDLv1.1+
@@ -77,6 +153,9 @@ GPL2
 GPL-2
 GPLv2
 GPL-2.0
+GNU General Public License v2
+GNU General Public License v2 (GPLv2)
+GNU General Public License (GPL)
 [GPL-2.0-or-later]
 GPL2+
 GPL-2+
@@ -84,27 +163,48 @@ GPLv2+
 GPL v2 or later
 GNU General Public License GPL, version 2 or later
 GPL-2.0+
+GNU General Public License v2 or later
+GNU General Public License v2 or later (GPLv2+)
 [GPL-3.0-only]
 GPL3
 GPL-3
 GPLv3
 GPL-3.0
+GNU General Public License v3
+GNU General Public License v3 (GPLv3)
 [GPL-3.0-or-later]
 GPL3+
 GPL-3+
 GPLv3+
 GPL-3.0+
+GNU General Public License v3 or later
+GNU General Public License v3 or later (GPLv3+)
+[HPND]
+Historical Permission Notice and Disclaimer (HPND)
+[IPL-1.0]
+IPL
+IPL 1.0
+IBM Public License
+[ISC]
+ISCL
+ISC License (ISCL)
 [LGPL-2.0-only]
+GNU Library or Lesser General Public License
+GNU Library or Lesser General Public License (LGPL)
 LGPL2
 LGPL-2
 LGPL-2.0
 LGPLv2
+GNU Lesser General Public License v2
+GNU Lesser General Public License v2 (LGPLv2)
 [LGPL-2.0-or-later]
 LGPL
 LGPL2+
 LGPL-2+
 LGPLv2+
 LGPL-2.0+
+GNU Lesser General Public License v2 or later
+GNU Lesser General Public License v2 or later (LGPLv2+)
 [LGPL-2.1-only]
 LGPL2.1
 LGPL-2.1
@@ -118,44 +218,108 @@ LGPL3
 LGPL-3
 LGPLv3
 LGPL-3.0
+GNU Lesser General Public License v3
+GNU Lesser General Public License v3 (LGPLv3)
 [LGPL-3.0-or-later]
 LGPL3+
 LGPL-3+
 LGPLv3+
 LGPL-3.0+
+GNU Lesser General Public License v3 or later
+GNU Lesser General Public License v3 or later (LGPLv3+)
 [LPPL-1.3c]
 LPPL
 [MIT]
 Expat
+Expat License
+[MIT-0]
+MIT0
+MIT No Attribution License
+MIT No Attribution License (MIT-0)
+[MIT-CMU]
+CMU License (MIT-CMU)
+[MirOS]
+MirOS License
+MirOS License (MirOS)
+[MPL-1.0]
+MPL
+MPL 1.0
+Mozilla Public License 1.0 (MPL)
 [MPL-1.1]
 MPLv1.1
+MPL 1.1
+Mozilla Public License 1.1 (MPL 1.1)
 [MPL-2.0]
 MPLv2.0
 MPL-2
+MPL 2.0
+Mozilla Public License 2.0 (MPL 2.0)
+[MulanPSL-1.0]
+Mulan Permissive Software License v1
+Mulan Permissive Software License v1 (MulanPSL-1.0)
+[MulanPSL-2.0]
+Mulan Permissive Software License v2
+Mulan Permissive Software License v2 (MulanPSL-2.0)
+[NASA-1.3]
+NASA Open Source Agreement v1.3
+NASA Open Source Agreement v1.3 (NASA-1.3)
+[NPL-1.0]
+NPL
+Netscape Public License
+Netscape Public License (NPL)
+[Nokia]
+NOKOS
+Nokia Open Source License (NOKOS)
 [OFL-1.1]
 OFL
 SIL-OFL-1.1
+SIL Open Font License 1.1 (OFL-1.1)
 [OLDAP-2.8]
 OpenLDAP-2.8
 [OSL-2.1]
 OSL 2.1
+Open Software License 2.1 (OSL-2.1)
 [OSL-3.0]
 OSL 3.0
+Open Software License 3.0 (OSL-3.0)
 [PSF-2.0]
 PSF-2
 PSFL
+Python Software Foundation License
 [Python-2.0]
 Python
+Python license
+[QPL-1.0]
+QPL
+Qt Public License
+Qt Public License (QPL)
 [Ruby]
 RubyLicense
-Ruby License
 [SGI-B-2.0]
 SGI-2
+[SPL-1.0]
+SPL
+Sun Public License
+[Unlicense]
+The Unlicense (Unlicense)
+[UPL-1.0]
+UPL
+Universal Permissive License
+Universal Permissive License (UPL)
+[VSL-1.0]
+Vovida Software License
+Vovida Software License 1.0
+[W3C]
+W3C License
 [X11]
 MIT/X
 MIT/X11
+[zlib-acknowledgement]
+zlib/libpng License
 [ZPL-1.1]
 Zope-1.1
+# Default to earliest version
+Zope Public License
 [ZPL-2.0]
 Zope-2.0
 [ZPL-2.1]
