@@ -658,10 +658,10 @@ class CycloneDXGenerator:
                 else:
                     component["properties"] = [property_entry]
         # SPDX items with no corresponding entry are created as properties
-        if "licensecomment" in package:
+        if "licensecomments" in package:
             property_entry = dict()
             property_entry["name"] = "License Comments"
-            property_entry["value"] = package["licensecomment"]
+            property_entry["value"] = package["licensecomments"]
             if "properties" in component:
                 component["properties"].append(property_entry)
             else:
