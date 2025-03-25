@@ -131,11 +131,12 @@ class SBOMPackage:
 
     def set_property(self, name, value):
         # Allow multiple entries
-        property_entry = [name.strip(), value]
-        if "property" in self.package:
-            self.package["property"].append(property_entry)
-        else:
-            self.package["property"] = [property_entry]
+        if value is not None:
+            property_entry = [name.strip(), value]
+            if "property" in self.package:
+                self.package["property"].append(property_entry)
+            else:
+                self.package["property"] = [property_entry]
 
     def set_licenseconcluded(self, license):
         self.package["licenseconcluded"] = license
