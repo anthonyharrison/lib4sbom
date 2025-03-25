@@ -12,6 +12,7 @@ class SBOMData(NamedTuple):
     vulnerabilities: Dict
     services: Dict
     licenses: List
+    annotations: List
     type: str
     version: str
 
@@ -47,6 +48,9 @@ class SBOM:
 
     def add_licenses(self, licenses: List):
         self.sbom["licenses"] = licenses
+
+    def add_annotations(self, annotations: List):
+        self.sbom["annotations"] = annotations
 
     def add_data(self, sbom_data: SBOMData) -> None:
         for key, value in sbom_data.items():
@@ -102,6 +106,9 @@ class SBOM:
 
     def get_licenses(self) -> List:
         return self.sbom.get("licenses", [])
+
+    def get_annoations(self) -> List:
+        return self.sbom.get("annotations", [])
 
     def get_version(self) -> str:
         return self.sbom.get("version", "")

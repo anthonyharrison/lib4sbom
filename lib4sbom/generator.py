@@ -386,6 +386,7 @@ class SBOMGenerator:
             self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
         if "services" in sbom_data:
             self.bom.generate_service_data(sbom_data["services"])
-
+        if "annotations" in sbom_data:
+            self.bom.generate_annotation_data(sbom_data["annotations"], self.element_set)
 
 # End of file

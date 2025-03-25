@@ -42,6 +42,7 @@ class CycloneDXGenerator:
         self.relationship = []
         self.vulnerability = []
         self.service = []
+        self.annotation = []
         self.sbom_complete = False
         self.include_purl = False
         # Can specify version of CycloneDX through environment variable
@@ -78,6 +79,8 @@ class CycloneDXGenerator:
                     self.doc["vulnerabilities"] = self.vulnerability
                 if len(self.service) > 0:
                     self.doc["services"] = self.service
+                if len(self.annotation) > 0:
+                    self.doc["annotations"] = self.annotation
             self.sbom_complete = True
         return self.doc
 
@@ -909,3 +912,27 @@ class CycloneDXGenerator:
             service_definitions.append(service)
             service_number += 1
         self.service = service_definitions
+
+    def generate_annotation_data(self, annotations, idents):
+        annotation_definitions = []
+        for annotation in annotations:
+            annotation_record = {}
+            # Get Annotator
+            if "annotator" in annotation:
+                annotator_record = {}
+                if annotation["annotator"]["annotator_type"] == "organization":
+                    annotator_record["organization"] = {"name": annotation["annotator"]["name"], "contact": [{"email": annotation["annotator"]["email"]}]}
+                else:
+                    annotator_record["individual"] =  {"name": annotation["annotator"]["name"], "contact": [{"email": annotation["annotator"]["email"]}]}
+                annotation_record["annotator"] = annotator_record
+            # Get Subject
+            if "subject" in annotation:
+                subjects = []
+                for subject in annotation["subject"]:
+                    subjects.append(idents[subject][0][0])
+                annotation_record["subjects"] = subjects
+            if "text" in annotation:
+                annotation_record["text"] = annotation["text"]
+            annotation_record["timestamp"] = self.generateTime()
+            annotation_definitions.append(annotation_record)
+        self.annotation = annotation_definitions
