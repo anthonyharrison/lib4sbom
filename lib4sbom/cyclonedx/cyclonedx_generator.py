@@ -657,6 +657,12 @@ class CycloneDXGenerator:
                     component["properties"].append(property_entry)
                 else:
                     component["properties"] = [property_entry]
+        if "tag" in package:
+            for tag in package["tag"]:
+                if "tags" in component:
+                    component["tags"].append(tag)
+                else:
+                    component["tags"] = [tag]
         # SPDX items with no corresponding entry are created as properties
         if "licensecomments" in package:
             property_entry = dict()

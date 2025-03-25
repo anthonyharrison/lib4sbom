@@ -1,0 +1,84 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "components": [
+    {
+      "type": "application",
+      "name": "Example Application",
+      "version": "1.0.0",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d88bc4e70bfb34d18b5542136639acbb26a8ae2429aa1e47489332fb389cc964"
+        },
+        {
+          "alg": "SHA-512",
+          "content": "74a51ff45e4c11df9ba1f0094282c80489649cb157a75fa337992d2d4592a5a1b8cb4525de8db0ae25233553924d76c36e093ea7fa9df4e5b8b07fd2e074efd6"
+        }
+      ],
+      "cpe": "cpe:/a:acme:example_application:1.0.0",
+      "purl": "pkg:maven/acme/examplea-application@1.0.0",
+      "omniborId": [
+        "gitoid:blob:sha1:261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+        "gitoid:blob:sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+      ],
+      "swhid": [
+        "swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2",
+        "swh:1:dir:d198bc9d7a6bcf6db04f476d29314f157507d505"
+      ],
+      "swid": {
+        "tagId": "83f4f966-9a9a-4892-a254-473838c57ac4",
+        "name": "Example Application",
+        "version": "1.0.0",
+        "text": {
+          "contentType": "text/xml",
+          "encoding": "base64",
+          "content": "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8+CjxTb2Z0d2FyZUlkZW50aXR5IHhtbDpsYW5nPSJFTiIgbmFtZT0iRXhhbXBsZSBBcHBsaWNhdGlvbiIgdmVyc2lvbj0iMS4wLjAiIAogICAgdmVyc2lvblNjaGVtZT0ibXVsdGlwYXJ0bnVtZXJpYyIgCiAgICB0YWdJZD0iODNmNGY5NjYtOWE5YS00ODkyLWEyNTQtNDczODM4YzU3YWM0IiAKICAgIHhtbG5zPSJodHRwOi8vc3RhbmRhcmRzLmlzby5vcmcvaXNvLzE5NzcwLy0yLzIwMTUvc2NoZW1hLnhzZCI+CgogICAgPEVudGl0eSBuYW1lPSJBY21lIiByZWdpZD0iZXhhbXBsZS5jb20iIHJvbGU9InNvZnR3YXJlQ3JlYXRvciIgLz4gCiAgICA8RW50aXR5IG5hbWU9IkFjbWUiIHJlZ2lkPSJleGFtcGxlLmNvbSIgcm9sZT0idGFnQ3JlYXRvciIgLz4gCjwvU29mdHdhcmVJZGVudGl0eT4="
+        }
+      },
+      "evidence": {
+        "identity": [
+          {
+            "field": "purl",
+            "confidence": 1,
+            "concludedValue": "pkg:maven/acme/examplea-application@1.0.0",
+            "methods": [
+              {
+                "technique": "filename",
+                "confidence": 0.1,
+                "value": "example-application-1.0.0.jar"
+              },
+              {
+                "technique": "ast-fingerprint",
+                "confidence": 0.9,
+                "value": "61e4bc08251761c3a73b606b9110a65899cb7d44f3b14c81ebc1e67c98e1d9ab"
+              },
+              {
+                "technique": "hash-comparison",
+                "confidence": 0.7,
+                "value": "d88bc4e70bfb34d18b5542136639acbb26a8ae2429aa1e47489332fb389cc964"
+              }
+            ]
+          }
+        ],
+        "occurrences": [
+          {
+            "location": "/path/to/component"
+          },
+          {
+            "location": "/another/path/to/component"
+          }
+        ]
+      },
+      "tags": [
+        "data-processing",
+        "credit-card-processing",
+        "iso-20022",
+        "java"
+      ]
+    }
+  ]
+}

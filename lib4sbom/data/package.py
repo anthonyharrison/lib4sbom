@@ -138,6 +138,15 @@ class SBOMPackage:
             else:
                 self.package["property"] = [property_entry]
 
+    def set_tag(self, name):
+        # Allow multiple entries
+        if name is not None:
+            tag_entry = name.strip()
+            if "tag" in self.package:
+                self.package["tag"].append(tag_entry)
+            else:
+                self.package["tag"] = [tag_entry]
+
     def set_licenseconcluded(self, license):
         self.package["licenseconcluded"] = license
 
