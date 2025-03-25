@@ -398,9 +398,9 @@ class SPDXParser:
                     spdx_file.set_id(id)
                     elements[id] = filename
                     try:
-                        if "checksum" in d:
+                        if "checksums" in d:
                             # Potentially multiple entries
-                            for checksum in d["checksum"]:
+                            for checksum in d["checksums"]:
                                 spdx_file.set_checksum(
                                     checksum["algorithm"], checksum["checksumValue"]
                                 )
@@ -461,15 +461,15 @@ class SPDXParser:
                             )
                         if "filesAnalyzed" in d:
                             spdx_package.set_filesanalysis(d["filesAnalyzed"])
-                        if "filename" in d:
-                            spdx_package.set_filename(d["filename"])
+                        if "packageFileName" in d:
+                            spdx_package.set_filename(d["packageFileName"])
                         if "homepage" in d:
                             spdx_package.set_homepage(d["homepage"])
                         if "primaryPackagePurpose" in d:
                             spdx_package.set_type(d["primaryPackagePurpose"])
-                        if "checksum" in d:
+                        if "checksums" in d:
                             # Potentially multiple entries
-                            for checksum in d["checksum"]:
+                            for checksum in d["checksums"]:
                                 spdx_package.set_checksum(
                                     checksum["algorithm"], checksum["checksumValue"]
                                 )
