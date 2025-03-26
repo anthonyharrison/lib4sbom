@@ -49,6 +49,7 @@ class SPDXGenerator:
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
         # Can specify version of SPDX through environment variable
         self.spdx_version = os.getenv("LIB4SBOM_SPDX_VERSION")
+        self.organisation = os.getenv("SBOM_ORGANIZATION")
         # Check valid version
         self.spec_version(self.spdx_version)
         if self.spdx_version is None:
@@ -98,7 +99,16 @@ class SPDXGenerator:
             return str(uuid.uuid4())
         return id
 
-    def generateTagDocumentHeader(self, project_name, uuid=None):
+    def _creatorcomment(self, lifecycle = None):
+        lifecycle_to_sbomtype = {"design": "Design", "pre-build": "Source",
+        "build": "Build", "post-build": "Analyzed", "operations": "Deployed", "discovery": "Runtime"}
+        default_text = "This document has been automatically generated."
+        if lifecycle is not None:
+            if lifecycle_to_sbomtype.get(lifecycle) is not None:
+                return f"SBOM Type: {lifecycle_to_sbomtype[lifecycle]} - {default_text}"
+        return default_text
+
+    def generateTagDocumentHeader(self, project_name, uuid=None, lifecycle=None):
         # Geerate SPDX Document Header
         self.generateTag("SPDXVersion", self.spdx_version)
         self.generateTag("DataLicense", self.DATA_LICENSE)
@@ -116,22 +126,27 @@ class SPDXGenerator:
         self.generateTag(
             "Creator: Tool", self.application + "-" + self.application_version
         )
+        if self.organisation is not None:
+            self.generateTag(
+                "Creator: Organization", self.organisation
+            )
         self.generateTag("Created", self.generateTime())
         self.generateTag(
             "CreatorComment",
-            self._text("This document has been automatically generated."),
+            self._text(self._creatorcomment(lifecycle)),
         )
         return self.SPDX_PROJECT_ID
 
-    def generateJSONDocumentHeader(self, project_name, uuid=None):
+    def generateJSONDocumentHeader(self, project_name, uuid=None, lifecycle=None):
         # Generate SPDX Document Header
         self.doc["SPDXID"] = self.SPDX_PROJECT_ID
         self.doc["spdxVersion"] = self.spdx_version
         creation_info = dict()
-        creation_info["comment"] = "This document has been automatically generated."
-        creation_info["creators"] = [
-            "Tool: " + self.application + "-" + self.application_version
-        ]
+        creation_info["comment"] = self._creatorcomment(lifecycle)
+        creators = ["Tool: " + self.application + "-" + self.application_version]
+        if self.organisation is not None:
+            creators.append("Organization: " + self.organisation)
+        creation_info["creators"] = creators
         creation_info["created"] = self.generateTime()
         creation_info["licenseListVersion"] = self.license.get_license_version()
         self.doc["creationInfo"] = creation_info
@@ -146,17 +161,17 @@ class SPDXGenerator:
         )
         return self.SPDX_PROJECT_ID
 
-    def generateDocumentHeader(self, project_name, uuid=None):
+    def generateDocumentHeader(self, project_name, uuid=None, lifecycle=None):
         # Assume a new document being created
         if self.format == "tag":
             self.doc = []
-            return self.generateTagDocumentHeader(project_name, uuid)
+            return self.generateTagDocumentHeader(project_name, uuid, lifecycle)
         else:
             self.doc = {}
             self.component = []
             self.file_component = []
             self.relationships = []
-            return self.generateJSONDocumentHeader(project_name, uuid)
+            return self.generateJSONDocumentHeader(project_name, uuid, lifecycle)
 
     def _validate_spdxid(self, id, preamble):
         spdx_id = ""
