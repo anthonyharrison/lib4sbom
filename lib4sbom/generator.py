@@ -105,12 +105,13 @@ class SBOMGenerator:
             doc.copy_document(sbom_data["document"])
             name = doc.get_name()
             lifecycle = doc.get_value("lifecycle")
+            organisation = doc.get_value("metadata_supplier")
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
-            project_id = self.bom.generateDocumentHeader(name, uuid, lifecycle)
+            project_id = self.bom.generateDocumentHeader(name, uuid, lifecycle, organisation)
             self._save_element(name, project_id)
         else:
-            project_id = self.bom.generateDocumentHeader(project_name, uuid, lifecycle)
+            project_id = self.bom.generateDocumentHeader(project_name, uuid, lifecycle, organisation)
             self._save_element(project_name, project_id)
         if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
             # Load user defined licences
