@@ -488,9 +488,11 @@ class SPDXGenerator:
                 else:
                     component["attribution"] = [attribution_data]
         if "release_date" in package_info:
-            component["releaseDate"] = package_info["release_date"]
+            if len(package_info["release_date"]) > 0:
+                component["releaseDate"] = package_info["release_date"]
         if "build_date" in package_info:
-            component["builtDate"] = package_info["build_date"]
+            if len(package_info["build_date"]) > 0:
+                component["builtDate"] = package_info["build_date"]
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
