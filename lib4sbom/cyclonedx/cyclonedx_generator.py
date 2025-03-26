@@ -47,7 +47,6 @@ class CycloneDXGenerator:
         self.include_purl = False
         # Can specify version of CycloneDX through environment variable
         self.cyclonedx_version = os.getenv("LIB4SBOM_CYCLONEDX_VERSION")
-        self.organisation = os.getenv("SBOM_ORGANIZATION")
         # Check valid version
         self.spec_version(self.cyclonedx_version)
         if self.cyclonedx_version is None:

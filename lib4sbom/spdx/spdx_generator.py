@@ -49,7 +49,7 @@ class SPDXGenerator:
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
         # Can specify version of SPDX through environment variable
         self.spdx_version = os.getenv("LIB4SBOM_SPDX_VERSION")
-        self.organisation = os.getenv("SBOM_ORGANIZATION")
+        self.organisation = None
         # Check valid version
         self.spec_version(self.spdx_version)
         if self.spdx_version is None:
@@ -164,6 +164,8 @@ class SPDXGenerator:
     def generateDocumentHeader(self, project_name, uuid=None, lifecycle=None, organisation = None):
         if organisation is not None:
             self.organisation = organisation
+            if len (self.organisation) == 0:
+                self.organisation = None
         # Assume a new document being created
         if self.format == "tag":
             self.doc = []

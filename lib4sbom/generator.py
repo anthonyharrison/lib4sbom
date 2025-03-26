@@ -52,6 +52,7 @@ class SBOMGenerator:
         self.element_set = {}
         self.sbom = None
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
+        self.organisation = os.getenv("SBOM_ORGANIZATION")
 
     def get_format(self) -> str:
         return self.format
@@ -100,12 +101,14 @@ class SBOMGenerator:
         else:
             uuid = None
         name = None
+        organisation = self.organisation
         if "document" in sbom_data:
             doc = SBOMDocument()
             doc.copy_document(sbom_data["document"])
             name = doc.get_name()
             lifecycle = doc.get_value("lifecycle")
-            organisation = doc.get_value("metadata_supplier")
+            if doc.get_value("metadata_supplier") is not None:
+                organisation = doc.get_value("metadata_supplier")
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(name, uuid, lifecycle, organisation)
@@ -308,7 +311,7 @@ class SBOMGenerator:
             property = None
         component_data = {
             "type": "application",
-            "supplier": None,
+            "supplier": self.organisation,
             "version": None,
             "bom-ref": None,
             "timestamp": None,
@@ -320,12 +323,14 @@ class SBOMGenerator:
             doc.copy_document(sbom_data["document"])
             name = doc.get_name()
             component_data["type"] = doc.get_value("metadata_type", "application")
-            component_data["supplier"] = doc.get_value("metadata_supplier")
+            component_data["supplier"] = doc.get_value("metadata_supplier", self.organisation)
             component_data["version"] = doc.get_value("metadata_version")
             component_data["bom-ref"] = doc.get_value("bom-ref")
             component_data["lifecycle"] = doc.get_value("lifecycle")
             component_data["timestamp"] = doc.get_created()
             component_data["creator"] = doc.get_creator()
+            if len(component_data["supplier"]) == 0:
+                component_data["supplier"] = None
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(
