@@ -329,7 +329,7 @@ class SBOMGenerator:
             component_data["lifecycle"] = doc.get_value("lifecycle")
             component_data["timestamp"] = doc.get_created()
             component_data["creator"] = doc.get_creator()
-            if len(component_data["supplier"]) == 0:
+            if component_data["supplier"] is not None and len(component_data["supplier"]) == 0:
                 component_data["supplier"] = None
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
