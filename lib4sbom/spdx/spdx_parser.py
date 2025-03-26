@@ -49,6 +49,17 @@ class SPDXParser:
                 self.user_licences,
             )
 
+    def get_lifecycle(self, comment):
+        # Use to extract lifecycle from comment. Assumes follows OpenChain telco format
+        # SBOM Type: Design|Source|Build|Analyzed|Deployed|Runtime <extra>
+        sbomtype_to_lifecycle = {"Design": "design", "Source": "pre-build",
+                                 "Build": "build", "Analyzed": "post-build", "Deployed": "operations",
+                                 "Runtime": "discovery"}
+        if comment.startswith("SBOM Type: "):
+            sbomtype = comment.split(" ")[2]
+            return sbomtype_to_lifecycle[sbomtype]
+        return None
+
     def parse_spdx_tag(self, sbom_file):
         """parses SPDX tag value file extracting all SBOM data"""
         DEFAULT_VERSION = ""
@@ -116,6 +127,11 @@ class SPDXParser:
                     .rstrip("\n")
                 )
                 spdx_document.set_creator(creator_type, creator)
+            elif line_elements[0] == "CreatorComment":
+                comment = line[len("CreatorComment:") :].strip().rstrip("\n")
+                lifecycle = self.get_lifecycle(comment)
+                if lifecycle is not None:
+                    spdx_document.set_value("lifcycle", lifecycle)
             if line_elements[0] == "FileName":
                 # Is this a new file?
                 if file is not None and file not in files:
@@ -376,6 +392,10 @@ class SPDXParser:
             for creator in data["creationInfo"]["creators"]:
                 creator_entry = creator.split(":")
                 spdx_document.set_creator(creator_entry[0], creator_entry[1])
+            if "comment" in data["creationInfo"]:
+                lifecycle = self.get_lifecycle(data["creationInfo"]["comment"])
+                if lifecycle is not None:
+                    spdx_document.set_value("lifecycle", lifecycle)
             elements[data["SPDXID"]] = data["name"]
             if "hasExtractedLicensingInfos" in data:
                 for e in data["hasExtractedLicensingInfos"]:

@@ -161,7 +161,9 @@ class SPDXGenerator:
         )
         return self.SPDX_PROJECT_ID
 
-    def generateDocumentHeader(self, project_name, uuid=None, lifecycle=None):
+    def generateDocumentHeader(self, project_name, uuid=None, lifecycle=None, organisation = None):
+        if organisation is not None:
+            self.organisation = organisation
         # Assume a new document being created
         if self.format == "tag":
             self.doc = []
