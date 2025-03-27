@@ -111,10 +111,14 @@ class SBOMGenerator:
                 organisation = doc.get_value("metadata_supplier")
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
-            project_id = self.bom.generateDocumentHeader(name, uuid, lifecycle, organisation)
+            project_id = self.bom.generateDocumentHeader(
+                name, uuid, lifecycle, organisation
+            )
             self._save_element(name, project_id)
         else:
-            project_id = self.bom.generateDocumentHeader(project_name, uuid, lifecycle, organisation)
+            project_id = self.bom.generateDocumentHeader(
+                project_name, uuid, lifecycle, organisation
+            )
             self._save_element(project_name, project_id)
         if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
             # Load user defined licences
@@ -323,13 +327,18 @@ class SBOMGenerator:
             doc.copy_document(sbom_data["document"])
             name = doc.get_name()
             component_data["type"] = doc.get_value("metadata_type", "application")
-            component_data["supplier"] = doc.get_value("metadata_supplier", self.organisation)
+            component_data["supplier"] = doc.get_value(
+                "metadata_supplier", self.organisation
+            )
             component_data["version"] = doc.get_value("metadata_version")
             component_data["bom-ref"] = doc.get_value("bom-ref")
             component_data["lifecycle"] = doc.get_value("lifecycle")
             component_data["timestamp"] = doc.get_created()
             component_data["creator"] = doc.get_creator()
-            if component_data["supplier"] is not None and len(component_data["supplier"]) == 0:
+            if (
+                component_data["supplier"] is not None
+                and len(component_data["supplier"]) == 0
+            ):
                 component_data["supplier"] = None
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
@@ -394,6 +403,9 @@ class SBOMGenerator:
         if "services" in sbom_data:
             self.bom.generate_service_data(sbom_data["services"])
         if "annotations" in sbom_data:
-            self.bom.generate_annotation_data(sbom_data["annotations"], self.element_set)
+            self.bom.generate_annotation_data(
+                sbom_data["annotations"], self.element_set
+            )
+
 
 # End of file

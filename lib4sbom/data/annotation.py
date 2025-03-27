@@ -12,10 +12,18 @@ class SBOMAnnotation:
 
     def set_annatator(self, annotation_type, name, email):
         if annotation_type in ["organization", "individual"]:
-            self.annatotor = {"annotator_type": annotation_type, "name": name, "email": email}
+            self.annatotor = {
+                "annotator_type": annotation_type,
+                "name": name,
+                "email": email,
+            }
 
     def add(self, subject, text):
-        annotation_entry = {"annotator": self.annatotor, "subject": [subject], "text": text}
+        annotation_entry = {
+            "annotator": self.annatotor,
+            "subject": [subject],
+            "text": text,
+        }
         if len(self.annotation) > 0:
             self.annotation.append(annotation_entry)
         else:

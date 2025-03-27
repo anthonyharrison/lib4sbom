@@ -419,7 +419,7 @@ class CycloneDXParser:
             if "tags" in d:
                 # Potentially multiple entries
                 for tag in d["tags"]:
-                   self.cyclonedx_package.set_tag(tag)
+                    self.cyclonedx_package.set_tag(tag)
             if "externalReferences" in d:
                 # Potentially multiple entries
                 for reference in d["externalReferences"]:

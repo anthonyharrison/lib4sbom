@@ -52,9 +52,14 @@ class SPDXParser:
     def get_lifecycle(self, comment):
         # Use to extract lifecycle from comment. Assumes follows OpenChain telco format
         # SBOM Type: Design|Source|Build|Analyzed|Deployed|Runtime <extra>
-        sbomtype_to_lifecycle = {"Design": "design", "Source": "pre-build",
-                                 "Build": "build", "Analyzed": "post-build", "Deployed": "operations",
-                                 "Runtime": "discovery"}
+        sbomtype_to_lifecycle = {
+            "Design": "design",
+            "Source": "pre-build",
+            "Build": "build",
+            "Analyzed": "post-build",
+            "Deployed": "operations",
+            "Runtime": "discovery",
+        }
         if comment.startswith("SBOM Type: "):
             sbomtype = comment.split(" ")[2]
             return sbomtype_to_lifecycle[sbomtype]

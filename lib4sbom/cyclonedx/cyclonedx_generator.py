@@ -921,9 +921,15 @@ class CycloneDXGenerator:
             if "annotator" in annotation:
                 annotator_record = {}
                 if annotation["annotator"]["annotator_type"] == "organization":
-                    annotator_record["organization"] = {"name": annotation["annotator"]["name"], "contact": [{"email": annotation["annotator"]["email"]}]}
+                    annotator_record["organization"] = {
+                        "name": annotation["annotator"]["name"],
+                        "contact": [{"email": annotation["annotator"]["email"]}],
+                    }
                 else:
-                    annotator_record["individual"] =  {"name": annotation["annotator"]["name"], "contact": [{"email": annotation["annotator"]["email"]}]}
+                    annotator_record["individual"] = {
+                        "name": annotation["annotator"]["name"],
+                        "contact": [{"email": annotation["annotator"]["email"]}],
+                    }
                 annotation_record["annotator"] = annotator_record
             # Get Subject
             if "subject" in annotation:

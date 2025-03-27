@@ -99,9 +99,15 @@ class SPDXGenerator:
             return str(uuid.uuid4())
         return id
 
-    def _creatorcomment(self, lifecycle = None):
-        lifecycle_to_sbomtype = {"design": "Design", "pre-build": "Source",
-        "build": "Build", "post-build": "Analyzed", "operations": "Deployed", "discovery": "Runtime"}
+    def _creatorcomment(self, lifecycle=None):
+        lifecycle_to_sbomtype = {
+            "design": "Design",
+            "pre-build": "Source",
+            "build": "Build",
+            "post-build": "Analyzed",
+            "operations": "Deployed",
+            "discovery": "Runtime",
+        }
         default_text = "This document has been automatically generated."
         if lifecycle is not None:
             if lifecycle_to_sbomtype.get(lifecycle) is not None:
@@ -127,9 +133,7 @@ class SPDXGenerator:
             "Creator: Tool", self.application + "-" + self.application_version
         )
         if self.organisation is not None:
-            self.generateTag(
-                "Creator: Organization", self.organisation
-            )
+            self.generateTag("Creator: Organization", self.organisation)
         self.generateTag("Created", self.generateTime())
         self.generateTag(
             "CreatorComment",
@@ -161,10 +165,12 @@ class SPDXGenerator:
         )
         return self.SPDX_PROJECT_ID
 
-    def generateDocumentHeader(self, project_name, uuid=None, lifecycle=None, organisation = None):
+    def generateDocumentHeader(
+        self, project_name, uuid=None, lifecycle=None, organisation=None
+    ):
         if organisation is not None:
             self.organisation = organisation
-            if len (self.organisation) == 0:
+            if len(self.organisation) == 0:
                 self.organisation = None
         # Assume a new document being created
         if self.format == "tag":
