@@ -126,7 +126,10 @@ class SPDXParser:
                     .strip()
                     .rstrip("\n")
                 )
-                spdx_document.set_creator(creator_type, creator)
+                if creator_type == "Organization":
+                    spdx_document.set_value("metadata_supplier", creator)
+                else:
+                    spdx_document.set_creator(creator_type, creator)
             elif line_elements[0] == "CreatorComment":
                 comment = line[len("CreatorComment:") :].strip().rstrip("\n")
                 lifecycle = self.get_lifecycle(comment)
@@ -391,7 +394,10 @@ class SPDXParser:
             # Potentially multiple entries
             for creator in data["creationInfo"]["creators"]:
                 creator_entry = creator.split(":")
-                spdx_document.set_creator(creator_entry[0], creator_entry[1])
+                if creator_entry[0] == "Organization":
+                    spdx_document.set_value("metadata_supplier", creator_entry[1])
+                else:
+                    spdx_document.set_creator(creator_entry[0], creator_entry[1])
             if "comment" in data["creationInfo"]:
                 lifecycle = self.get_lifecycle(data["creationInfo"]["comment"])
                 if lifecycle is not None:
