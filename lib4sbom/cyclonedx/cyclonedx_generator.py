@@ -510,17 +510,6 @@ class CycloneDXGenerator:
                     contact["email"] = supplier_email
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
-                # Not for machine learning model
-                if component["type"] != "machine-learning-model":
-                    if "version" in package:
-                        if component["type"] == "operating-system":
-                            cpe_type = "/o"
-                        else:
-                            cpe_type = "/a"
-                        component["cpe"] = (
-                            f'cpe:{cpe_type}:{supplier_name.replace(" ", "_")}:{name}:{version}'
-                        )
-                # Alternative is it within external reference
         if "originator" in package:
             component["author"] = package["originator"]
         if "description" in package:
@@ -607,7 +596,7 @@ class CycloneDXGenerator:
                 for evidence in package["evidence"]:
                     occurrences.append({"location": evidence})
             if "filename" in package:
-                occurrences.appendd({"location": package["filename"]})
+                occurrences.append({"location": package["filename"]})
             evidence_info["occurrences"] = occurrences
             component["evidence"] = evidence_info
         if "externalreference" in package:

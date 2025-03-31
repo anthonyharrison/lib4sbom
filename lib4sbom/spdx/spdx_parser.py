@@ -461,8 +461,8 @@ class SPDXParser:
                             )
                         if "filesAnalyzed" in d:
                             spdx_package.set_filesanalysis(d["filesAnalyzed"])
-                        if "filename" in d:
-                            spdx_package.set_filename(d["filename"])
+                        if "packageFileName" in d:
+                            spdx_package.set_filename(d["packageFileName"])
                         if "homepage" in d:
                             spdx_package.set_homepage(d["homepage"])
                         if "primaryPackagePurpose" in d:
