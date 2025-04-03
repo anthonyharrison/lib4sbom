@@ -132,3 +132,5 @@ dmypy.json
 
 # Test data
 samples/
+
+.idea/
