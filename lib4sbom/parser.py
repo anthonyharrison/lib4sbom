@@ -47,18 +47,19 @@ class SBOMParser:
         file_str : string
             SBOM content
         """
-        # Check file exists
-        invalid_file = True
-        if len(filename) > 0:
-            # Check path
-            filePath = Path(filename)
-            # Check path exists, a valid file and not empty file
-            if filePath.exists() and filePath.is_file() and filePath.stat().st_size > 0:
-                # Assume that processing can proceed
-                invalid_file = False
+        if not file_str:
+            # Check file exists
+            invalid_file = True
+            if len(filename) > 0:
+                # Check path
+                filePath = Path(filename)
+                # Check path exists, a valid file and not empty file
+                if filePath.exists() and filePath.is_file() and filePath.stat().st_size > 0:
+                    # Assume that processing can proceed
+                    invalid_file = False
 
-        if invalid_file:
-            raise FileNotFoundError
+            if invalid_file:
+                raise FileNotFoundError
 
         # Set up parser
         if self.sbom_type == "cyclonedx":
