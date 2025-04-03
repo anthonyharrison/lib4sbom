@@ -37,13 +37,15 @@ class SBOMParser:
         self.licenses = None
         self.sbom = SBOM(self.sbom_type)
 
-    def parse_file(self, filename: str) -> None:
+    def parse_file(self, filename: str, file_str: str = None) -> None:
         """Parses a SBOM file
 
         Parameters
         ----------
         filename : string
             The filename of the SBOM
+        file_str : string
+            SBOM content
         """
         # Check file exists
         invalid_file = True
@@ -78,7 +80,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename)
+                ) = self.parser.parse(filename, file_str)
                 # but if no packages or files found, assume it must be CycloneDX
                 if (
                     len(self.packages) == 0
@@ -95,7 +97,7 @@ class SBOMParser:
                         self.vulnerabilities,
                         self.services,
                         self.licenses,
-                    ) = self.parser.parse(filename)
+                    ) = self.parser.parse(filename, file_str)
             else:
                 (
                     self.document,
@@ -105,7 +107,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename)
+                ) = self.parser.parse(filename, file_str)
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
             self.sbom.add_relationships(self.relationships)

@@ -27,12 +27,12 @@ class CycloneDXParser:
         self.model_card = SBOMModelCard()
         self.cyclonedx_version = None
 
-    def parse(self, sbom_file):
+    def parse(self, sbom_file, file_str=None):
         """parses CycloneDX BOM file extracting package name, version and license"""
         if sbom_file.endswith((".bom.json", ".cdx.json", ".json")):
-            return self.parse_cyclonedx_json(sbom_file)
+            return self.parse_cyclonedx_json(sbom_file, file_str)
         elif sbom_file.endswith((".bom.xml", ".cdx.xml", ".xml")):
-            return self.parse_cyclonedx_xml(sbom_file)
+            return self.parse_cyclonedx_xml(sbom_file, file_str)
         else:
             return {}, {}, {}, [], [], [], []
 
@@ -447,7 +447,7 @@ class CycloneDXParser:
                 for component in d["components"]:
                     self._cyclondex_component(component)
 
-    def parse_cyclonedx_json(self, sbom_file):
+    def parse_cyclonedx_json(self, sbom_file, file_str):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
         files = {}
         relationships = []
@@ -458,7 +458,10 @@ class CycloneDXParser:
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         try:
-            data = json.load(open(sbom_file, "r", encoding="utf-8"))
+            if file_str:
+                data = json.loads(file_str)
+            else:
+                data = json.load(open(sbom_file, "r", encoding="utf-8"))
             # Check valid CycloneDX JSON file (and not SPDX)
             cyclonedx_json_file = data.get("bomFormat", False)
             if cyclonedx_json_file:
@@ -918,9 +921,12 @@ class CycloneDXParser:
         services = []
         return services
 
-    def parse_cyclonedx_xml(self, sbom_file):
-        self.tree = ET.parse(sbom_file)
-        self.root = self.tree.getroot()
+    def parse_cyclonedx_xml(self, sbom_file, file_str):
+        if file_str:
+            self.root = ET.fromstring(file_str)
+        else:
+            tree = ET.parse(sbom_file)
+            self.root = tree.getroot()
         # Extract schema
         self.schema = self.root.tag[: self.root.tag.find("}") + 1]
         document = self.parse_document_xml()

@@ -23,21 +23,21 @@ class SPDXParser:
         self.services = []
         self.user_licences = []
 
-    def parse(self, sbom_file):
+    def parse(self, sbom_file, file_str=None):
         """parses SPDX SBOM file"""
         if sbom_file.endswith(".spdx"):
-            return self.parse_spdx_tag(sbom_file)
+            return self.parse_spdx_tag(sbom_file, file_str)
         elif sbom_file.endswith((".spdx.json", ".json")):
             # Convention for SPDX is to use .spdx.json extension but
             # check any json file just in case. Attempts to parse a CycloneDX JSON
             # file will result in no data being returned.
-            return self.parse_spdx_json(sbom_file)
+            return self.parse_spdx_json(sbom_file, file_str)
         elif sbom_file.endswith((".spdx.yaml", "spdx.yml")):
-            return self.parse_spdx_yaml(sbom_file)
+            return self.parse_spdx_yaml(sbom_file, file_str)
         elif sbom_file.endswith(".spdx.rdf"):
-            return self.parse_spdx_rdf(sbom_file)
+            return self.parse_spdx_rdf(sbom_file, file_str)
         elif sbom_file.endswith(".spdx.xml"):
-            return self.parse_spdx_xml(sbom_file)
+            return self.parse_spdx_xml(sbom_file, file_str)
         else:
             return (
                 {},
@@ -65,11 +65,14 @@ class SPDXParser:
             return sbomtype_to_lifecycle[sbomtype]
         return None
 
-    def parse_spdx_tag(self, sbom_file):
+    def parse_spdx_tag(self, sbom_file, file_str=None):
         """parses SPDX tag value file extracting all SBOM data"""
         DEFAULT_VERSION = ""
-        with open(sbom_file, "r", encoding="utf-8") as f:
-            lines = f.readlines()
+        if file_str:
+            lines = file_str.splitlines()
+        else:
+            with open(sbom_file, "r", encoding="utf-8") as f:
+                lines = f.readlines()
         spdx_document = SBOMDocument()
         packages = {}
         spdx_package = SBOMPackage()
@@ -352,10 +355,13 @@ class SPDXParser:
             self.user_licences,
         )
 
-    def parse_spdx_json(self, sbom_file):
+    def parse_spdx_json(self, sbom_file, file_str=None):
         """parses SPDX JSON SBOM file extracting SBOM data"""
         try:
-            data = json.load(open(sbom_file, "r", encoding="utf-8"))
+            if file_str:
+                data = json.loads(file_str)
+            else:
+                data = json.load(open(sbom_file, "r", encoding="utf-8"))
             return self._parse_spdx_data(data)
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
@@ -564,9 +570,13 @@ class SPDXParser:
             self.user_licences,
         )
 
-    def parse_spdx_yaml(self, sbom_file):
+    def parse_spdx_yaml(self, sbom_file, file_str=None):
         """parses SPDX YAML SBOM file extracting SBOM data"""
-        data = yaml.safe_load(open(sbom_file, "r", encoding="utf-8"))
+        if file_str:
+            source = file_str
+        else:
+            source = open(sbom_file, "r", encoding="utf-8")
+        data = yaml.safe_load(source)
         return self._parse_spdx_data(data)
 
     def _transform_relationship(self, relationship_list, element_mapping):
@@ -587,10 +597,13 @@ class SPDXParser:
                 relationships.append(spdx_relationship.get_relationship())
         return relationships
 
-    def parse_spdx_rdf(self, sbom_file):
+    def parse_spdx_rdf(self, sbom_file, file_str=None):
         # parses SPDX RDF BOM file extracting package name and version ONLY
-        with open(sbom_file, "r", encoding="utf-8") as f:
-            lines = f.readlines()
+        if file_str:
+            lines = file_str.splitlines()
+        else:
+            with open(sbom_file, "r", encoding="utf-8") as f:
+                lines = f.readlines()
         packages = {}
         package = ""
         for line in lines:
@@ -620,13 +633,16 @@ class SPDXParser:
             self.user_licences,
         )
 
-    def parse_spdx_xml(self, sbom_file):
+    def parse_spdx_xml(self, sbom_file, file_str=None):
         # parses SPDX XML BOM file extracting package name and version ONLY
         # XML is experimental in SPDX 2.x
         packages = {}
-        tree = ET.parse(sbom_file)
-        # Find root element
-        root = tree.getroot()
+        if file_str:
+            root = ET.fromstring(file_str)
+        else:
+            tree = ET.parse(sbom_file)
+            # Find root element
+            root = tree.getroot()
         # Extract schema
         schema = root.tag[: root.tag.find("}") + 1]
         # Extract package information
