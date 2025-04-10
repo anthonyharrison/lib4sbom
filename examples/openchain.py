@@ -19,7 +19,8 @@ my_package.set_supplier("person", "Kirill Simonov (xi@resolvent.net)")
 my_package.set_downloadlocation("https://pypi.org/project/PyYAML/")
 my_package.set_homepage("https://pyyaml.org/")
 my_package.set_summary("YAML parser and emitter for Python")
-my_package.set_licensedeclared("MIT")
+my_package.set_licensedeclared("MiT")
+my_package.set_licenseconcluded("MIt license")
 my_package.set_checksum("SHA256", "d858aa552c999bc8a8d57426ed01e40bef403cd8ccdd0fc5f6f04a00414cac2a")
 my_package.set_purl("pkg:pypi/pyyaml@6.0.1")
 sbom_packages[
@@ -37,6 +38,6 @@ my_doc.set_metadata_supplier("Acme Inc.")
 my_sbom.add_document(my_doc.get_document())
 my_sbom.add_packages(sbom_packages)
 #
-my_generator = SBOMGenerator(False, sbom_type="spdx", format="tag")
+my_generator = SBOMGenerator(True, sbom_type="spdx", format="tag")
 # Will be displayed on console
 my_generator.generate("OpenChain", my_sbom.get_sbom())
