@@ -220,7 +220,7 @@ class SPDXGenerator:
         elif self.validate_license:
             if license != "UNKNOWN":
                 derived_license = self.license.find_license(license)
-                if derived_license != "UNKNOWN":
+                if derived_license not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                     return derived_license
                 # Not an SPDX License id
             return "NOASSERTION"
