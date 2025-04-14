@@ -48,7 +48,7 @@ class LicenseScanner:
                     data_list[line.strip().upper()] = license
 
     def get_license_list(self):
-        return self.licenses.get("licenses",[])
+        return self.licenses.get("licenses", [])
 
     def get_license_version(self):
         if self.licenses.get("licenseListVersion") is not None:
