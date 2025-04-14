@@ -646,7 +646,7 @@ class CycloneDXGenerator:
         if "build_date" in package:
             property_entry = dict()
             property_entry["name"] = "build_date"
-            property_entry["value"] = package["rbuild_date"]
+            property_entry["value"] = package["build_date"]
             if "properties" in component:
                 component["properties"].append(property_entry)
             else:
