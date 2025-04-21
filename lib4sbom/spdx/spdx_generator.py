@@ -498,7 +498,7 @@ class SPDXGenerator:
                 else:
                     component["attribution"] = [attribution_data]
         if "release_date" in package_info:
-            if len(package_info["release_date"]) > 0:
+            if package_info["release_date"] is not None and len(package_info["release_date"]) > 0:
                 component["releaseDate"] = package_info["release_date"]
         if "build_date" in package_info:
             if len(package_info["build_date"]) > 0:
