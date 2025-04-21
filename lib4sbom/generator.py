@@ -101,6 +101,7 @@ class SBOMGenerator:
         else:
             uuid = None
         name = None
+        lifecycle = None
         organisation = self.organisation
         if "document" in sbom_data:
             doc = SBOMDocument()
