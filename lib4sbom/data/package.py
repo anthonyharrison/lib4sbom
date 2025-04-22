@@ -256,6 +256,7 @@ class SBOMPackage:
 
     def set_cpe(self, vector, cpetype="cpe23Type"):
         if cpetype in ["cpe22Type", "cpe23Type"]:
+            # Temporarily remove _escape usage as it's incomplete (e.g., it incorrectly escapes '*').
             new_vector = vector.replace(" ", "_").lower()
             self.set_externalreference("SECURITY", cpetype, new_vector)
 
