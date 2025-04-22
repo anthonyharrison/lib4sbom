@@ -256,7 +256,7 @@ class SBOMPackage:
 
     def set_cpe(self, vector, cpetype="cpe23Type"):
         if cpetype in ["cpe22Type", "cpe23Type"]:
-            new_vector = vector.replace(" ", "_")
+            new_vector = vector.replace(" ", "_").lower()
             self.set_externalreference("SECURITY", cpetype, new_vector)
 
     def set_purl(self, purl_value):
