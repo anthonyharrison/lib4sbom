@@ -37,26 +37,29 @@ class SBOMParser:
         self.licenses = None
         self.sbom = SBOM(self.sbom_type)
 
-    def parse_file(self, filename: str) -> None:
+    def parse_file(self, filename: str, file_str: str = None) -> None:
         """Parses a SBOM file
 
         Parameters
         ----------
         filename : string
             The filename of the SBOM
+        file_str : string
+            SBOM content
         """
-        # Check file exists
-        invalid_file = True
-        if len(filename) > 0:
-            # Check path
-            filePath = Path(filename)
-            # Check path exists, a valid file and not empty file
-            if filePath.exists() and filePath.is_file() and filePath.stat().st_size > 0:
-                # Assume that processing can proceed
-                invalid_file = False
+        if not file_str:
+            # Check file exists
+            invalid_file = True
+            if len(filename) > 0:
+                # Check path
+                filePath = Path(filename)
+                # Check path exists, a valid file and not empty file
+                if filePath.exists() and filePath.is_file() and filePath.stat().st_size > 0:
+                    # Assume that processing can proceed
+                    invalid_file = False
 
-        if invalid_file:
-            raise FileNotFoundError
+            if invalid_file:
+                raise FileNotFoundError
 
         # Set up parser
         if self.sbom_type == "cyclonedx":
@@ -78,7 +81,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename)
+                ) = self.parser.parse(filename, file_str)
                 # but if no packages or files found, assume it must be CycloneDX
                 if (
                     len(self.packages) == 0
@@ -95,7 +98,7 @@ class SBOMParser:
                         self.vulnerabilities,
                         self.services,
                         self.licenses,
-                    ) = self.parser.parse(filename)
+                    ) = self.parser.parse(filename, file_str)
             else:
                 (
                     self.document,
@@ -105,7 +108,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename)
+                ) = self.parser.parse(filename, file_str)
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
             self.sbom.add_relationships(self.relationships)
