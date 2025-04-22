@@ -256,18 +256,8 @@ class SBOMPackage:
 
     def set_cpe(self, vector, cpetype="cpe23Type"):
         if cpetype in ["cpe22Type", "cpe23Type"]:
-            # Validate vector
-            elements = vector.replace("\\:", "$").split(":")
-            if cpetype == "cpe23Type":
-                supplier = self._escape(elements[3].replace(" ", "_").lower())
-                package = self._escape(elements[4])
-                version = self._escape(elements[5])
-                new_vector = f"cpe:2.3:a:{supplier}:{package}:{version}:*:*:*:*:*:*:*"
-            else:
-                supplier = self._escape(elements[2].replace(" ", "_").lower())
-                package = self._escape(elements[3])
-                version = self._escape(elements[4])
-                new_vector = f"cpe:{elements[1]}:{supplier}:{package}:{version}"
+            # Temporarily remove _escape usage as it's incomplete (e.g., it incorrectly escapes '*').
+            new_vector = vector.replace(" ", "_").lower()
             self.set_externalreference("SECURITY", cpetype, new_vector)
 
     def set_purl(self, purl_value):
