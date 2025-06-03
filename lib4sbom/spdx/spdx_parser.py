@@ -356,6 +356,9 @@ class SPDXParser:
         """parses SPDX JSON SBOM file extracting SBOM data"""
         try:
             data = json.load(open(sbom_file, "r", encoding="utf-8"))
+            # Might be a protobom file
+            if data.get("sbom") is not None:
+                return self._parse_spdx_data(data["sbom"])
             return self._parse_spdx_data(data)
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
