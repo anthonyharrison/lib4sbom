@@ -155,14 +155,16 @@ class CycloneDXParser:
                     )
             if "graphics" in d["modelCard"]["quantitativeAnalysis"]:
                 graphicset = ModelGraphicset()
-                graphicset.set_description(
-                    d["modelCard"]["quantitativeAnalysis"]["graphics"]["description"]
-                )
-                for graphic in d["modelCard"]["quantitativeAnalysis"]["graphics"][
-                    "collection"
-                ]:
-                    image = graphic["image"]
-                    graphicset.add_image(graphic.get("name"), image.get("content"))
+                if "description" in d["modelCard"]["quantitativeAnalysis"]["graphics"]:
+                    graphicset.set_description(
+                        d["modelCard"]["quantitativeAnalysis"]["graphics"]["description"]
+                    )
+                if "collection" in d["modelCard"]["quantitativeAnalysis"]["graphics"]:
+                    for graphic in d["modelCard"]["quantitativeAnalysis"]["graphics"][
+                        "collection"
+                    ]:
+                        image = graphic["image"]
+                        graphicset.add_image(graphic.get("name"), image.get("content"))
                 self.model_card.set_graphics(graphicset.get_graphicset())
         if "considerations" in d["modelCard"]:
             if "users" in d["modelCard"]["considerations"]:
