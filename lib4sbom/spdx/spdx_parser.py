@@ -23,21 +23,21 @@ class SPDXParser:
         self.services = []
         self.user_licences = []
 
-    def parse(self, sbom_file: str, from_string: bool):
+    def parse(self, filename: str, file_str: str = None):
         """parses SPDX SBOM file"""
-        if sbom_file.endswith(".spdx"):
-            return self.parse_spdx_tag(sbom_file, from_string)
-        elif sbom_file.endswith((".spdx.json", ".json")):
+        if filename.endswith(".spdx"):
+            return self.parse_spdx_tag(file_str or filename, bool(file_str))
+        elif filename.endswith((".spdx.json", ".json")):
             # Convention for SPDX is to use .spdx.json extension but
             # check any json file just in case. Attempts to parse a CycloneDX JSON
             # file will result in no data being returned.
-            return self.parse_spdx_json(sbom_file, from_string)
-        elif sbom_file.endswith((".spdx.yaml", "spdx.yml")):
-            return self.parse_spdx_yaml(sbom_file, from_string)
-        elif sbom_file.endswith(".spdx.rdf"):
-            return self.parse_spdx_rdf(sbom_file, from_string)
-        elif sbom_file.endswith(".spdx.xml"):
-            return self.parse_spdx_xml(sbom_file, from_string)
+            return self.parse_spdx_json(file_str or filename, bool(file_str))
+        elif filename.endswith((".spdx.yaml", "spdx.yml")):
+            return self.parse_spdx_yaml(file_str or filename, bool(file_str))
+        elif filename.endswith(".spdx.rdf"):
+            return self.parse_spdx_rdf(file_str or filename, bool(file_str))
+        elif filename.endswith(".spdx.xml"):
+            return self.parse_spdx_xml(file_str or filename, bool(file_str))
         else:
             return (
                 {},
