@@ -27,12 +27,12 @@ class CycloneDXParser:
         self.model_card = SBOMModelCard()
         self.cyclonedx_version = None
 
-    def parse(self, sbom_file, file_str=None):
+    def parse(self, sbom_file: str, from_string: bool):
         """parses CycloneDX BOM file extracting package name, version and license"""
         if sbom_file.endswith((".bom.json", ".cdx.json", ".json")):
-            return self.parse_cyclonedx_json(sbom_file, file_str)
+            return self.parse_cyclonedx_json(sbom_file, from_string)
         elif sbom_file.endswith((".bom.xml", ".cdx.xml", ".xml")):
-            return self.parse_cyclonedx_xml(sbom_file, file_str)
+            return self.parse_cyclonedx_xml(sbom_file, from_string)
         else:
             return {}, {}, {}, [], [], [], []
 
@@ -447,7 +447,7 @@ class CycloneDXParser:
                 for component in d["components"]:
                     self._cyclondex_component(component)
 
-    def parse_cyclonedx_json(self, sbom_file, file_str):
+    def parse_cyclonedx_json(self, sbom_file: str, from_string: bool):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
         files = {}
         relationships = []
@@ -458,8 +458,8 @@ class CycloneDXParser:
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         try:
-            if file_str:
-                data = json.loads(file_str)
+            if from_string:
+                data = json.loads(sbom_file)
             else:
                 data = json.load(open(sbom_file, "r", encoding="utf-8"))
             # Check valid CycloneDX JSON file (and not SPDX)
@@ -921,9 +921,9 @@ class CycloneDXParser:
         services = []
         return services
 
-    def parse_cyclonedx_xml(self, sbom_file, file_str):
-        if file_str:
-            self.root = ET.fromstring(file_str)
+    def parse_cyclonedx_xml(self, sbom_file: str, from_string: bool):
+        if from_string:
+            self.root = ET.fromstring(sbom_file)
         else:
             tree = ET.parse(sbom_file)
             self.root = tree.getroot()

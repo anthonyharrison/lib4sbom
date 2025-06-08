@@ -81,7 +81,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename, file_str)
+                ) = self.parser.parse(file_str or filename, bool(file_str))
                 # but if no packages or files found, assume it must be CycloneDX
                 if (
                     len(self.packages) == 0
@@ -98,7 +98,7 @@ class SBOMParser:
                         self.vulnerabilities,
                         self.services,
                         self.licenses,
-                    ) = self.parser.parse(filename, file_str)
+                    ) = self.parser.parse(file_str or filename, bool(file_str))
             else:
                 (
                     self.document,
@@ -108,7 +108,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename, file_str)
+                ) = self.parser.parse(file_str or filename, bool(file_str))
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
             self.sbom.add_relationships(self.relationships)
