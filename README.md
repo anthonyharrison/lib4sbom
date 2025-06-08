@@ -94,8 +94,8 @@ Errors in the parsing process will result in the exception SBOMParserException b
 
 **Methods**
 
-parse_file(filename)
-Parses the SBOM file. If the file does not exist, a FileNotFoundError exception is raised.
+parse_file(filename, file_str=None)
+Parses the SBOM content from file (if no file_str is provided) or string. Filename is needed in both cases (it is used to determine the content format and correct parser to use). If no file_str is provided and the file does not exist, a FileNotFoundError exception is raised.
 
 If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
 
