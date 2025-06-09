@@ -47,29 +47,29 @@ class SBOMParser:
                 """
         self._parse_sbom(filename)
 
-    def parse_string(self, filename: str, file_str: str) -> None:
+    def parse_string(self, filename: str, sbom_string: str) -> None:
         """Parses a SBOM string
 
                 Parameters
                 ----------
                 filename : string
                     The filename of the SBOM
-                file_str : string
+                sbom_string : string
                     SBOM content
                 """
-        self._parse_sbom(filename, file_str)
+        self._parse_sbom(filename, sbom_string)
 
-    def _parse_sbom(self, filename: str, file_str: str = None) -> None:
+    def _parse_sbom(self, filename: str, sbom_string: str = None) -> None:
         """Parses a SBOM file or string
 
         Parameters
         ----------
         filename : string
             The filename of the SBOM
-        file_str : string
+        sbom_string : string
             SBOM content
         """
-        if not file_str:
+        if not sbom_string:
             # Check file exists
             invalid_file = True
             if len(filename) > 0:
@@ -103,7 +103,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename, file_str)
+                ) = self.parser.parse(filename, sbom_string)
                 # but if no packages or files found, assume it must be CycloneDX
                 if (
                     len(self.packages) == 0
@@ -120,7 +120,7 @@ class SBOMParser:
                         self.vulnerabilities,
                         self.services,
                         self.licenses,
-                    ) = self.parser.parse(filename, file_str)
+                    ) = self.parser.parse(filename, sbom_string)
             else:
                 (
                     self.document,
@@ -130,7 +130,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename, file_str)
+                ) = self.parser.parse(filename, sbom_string)
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
             self.sbom.add_relationships(self.relationships)

@@ -27,12 +27,12 @@ class CycloneDXParser:
         self.model_card = SBOMModelCard()
         self.cyclonedx_version = None
 
-    def parse(self, filename: str, file_str: str = None):
+    def parse(self, filename: str, sbom_string: str = None):
         """parses CycloneDX BOM file extracting package name, version and license"""
         if filename.endswith((".bom.json", ".cdx.json", ".json")):
-            return self.parse_cyclonedx_json(file_str or filename, bool(file_str))
+            return self.parse_cyclonedx_json(sbom_string or filename, bool(sbom_string))
         elif filename.endswith((".bom.xml", ".cdx.xml", ".xml")):
-            return self.parse_cyclonedx_xml(file_str or filename, bool(file_str))
+            return self.parse_cyclonedx_xml(sbom_string or filename, bool(sbom_string))
         else:
             return {}, {}, {}, [], [], [], []
 

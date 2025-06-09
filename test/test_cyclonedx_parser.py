@@ -32,8 +32,8 @@ class TestCcycloneDX_parser:
         ) = result
 
         with open(path, "r", encoding="utf-8") as f:
-            file_str = f.read()
-        result = test_parser.parse(path, file_str)
+            sbom_string = f.read()
+        result = test_parser.parse(path, sbom_string)
         (
             cyclonedx_document,
             files,
@@ -49,8 +49,8 @@ class TestCcycloneDX_parser:
         path = self.get_test_filepath("testapp2.json")
         result1 = test_parser.parse(path)
         with open(path, "r", encoding="utf-8") as f:
-            file_str = f.read()
-        result2 = test_parser.parse(path, file_str)
+            sbom_string = f.read()
+        result2 = test_parser.parse(path, sbom_string)
         for result in [result1, result2]:
             (
                 cyclonedx_document,
