@@ -37,8 +37,30 @@ class SBOMParser:
         self.licenses = None
         self.sbom = SBOM(self.sbom_type)
 
-    def parse_file(self, filename: str, file_str: str = None) -> None:
+    def parse_file(self, filename: str) -> None:
         """Parses a SBOM file
+
+                Parameters
+                ----------
+                filename : string
+                    The filename of the SBOM
+                """
+        self._parse_sbom(filename)
+
+    def parse_string(self, filename: str, file_str: str) -> None:
+        """Parses a SBOM string
+
+                Parameters
+                ----------
+                filename : string
+                    The filename of the SBOM
+                file_str : string
+                    SBOM content
+                """
+        self._parse_sbom(filename, file_str)
+
+    def _parse_sbom(self, filename: str, file_str: str = None) -> None:
+        """Parses a SBOM file or string
 
         Parameters
         ----------
