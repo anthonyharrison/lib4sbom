@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from typing import Dict, List, NamedTuple
+from enum import Enum
 
 
 class SBOMData(NamedTuple):
@@ -121,3 +122,14 @@ class SBOM:
 
     def get_bom_version(self):
         return self.sbom.get("bom_version", None)
+
+
+class ParserType(Enum):
+    JSON = 0
+    CYCLONEDX_JSON = 1
+    CYCLONEDX_XML = 2
+    SPDX_JSON = 3
+    SPDX_XML = 4
+    SPDX_YML = 5
+    SPDX_RDF = 6
+    SPDX_TAG = 7
