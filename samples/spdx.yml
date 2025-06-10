@@ -1,0 +1,48 @@
+SPDXID: asyncapi-runtime-expression-SBOM
+spdxVersion: SPDX-2.2
+name: asyncapi-runtime-expression-SBOM
+licenseListVersion: 3.16
+dataLicense: CC0-1.0
+comment: |
+  This document was created by manual inspection of node_modules after asyncapi-runtime-expression installation on production dependencies.
+creationInfo:
+  comment: This is Software Bill of Materials (SBOM) generated for asyncapi-runtime-expression-SBOM.
+  created: 2022-10-28T20:48:00Z
+  creators:
+    - "Person: Vladimír Gorej (vladimir.gorej@gmail.com)"
+    - "Tool: Manual inspection of node_modules"
+  licenseListVersion: 3.9
+documentDescribes:
+  - SPDXRef-asyncapi-runtime-expression
+documentNamespace: 9c185864-d85b-4b7e-a782-9128aa7585f6
+
+packages:
+  - SPDXID: SPDXRef-asyncapi-runtime-expression
+    name: asyncapi-runtime-expression
+    copyrightText: Copyright 2022, Vladimír Gorej
+    description: AsyncAPI Runtime expressions validator
+    licenseComments: See NOTICE file for more information
+    downloadLocation: https://registry.npmjs.org/asyncapi-runtime-expression/-/asyncapi-runtime-expression-1.0.0.tgz
+    filesAnalyzed: false
+    homepage: https://github.com/char0n/asyncapi-runtime-expression
+    licenseDeclared: Apache-2.0
+    licenseConcluded: Apache-2.0
+    originator: "Person: Vladimír Gorej (vladimir.gorej@gmail.com)"
+    versionInfo: 1.9.0
+
+  - SPDXID: SPDXRef-apg-js
+    name: apg-js
+    copyrightText: Copyright (c) 2021 Lowell D. Thomas
+    description: Create objects from reusable, composable behaviors.
+    downloadLocation: https://registry.npmjs.org/apg-js/-/apg-js-4.1.2.tgz
+    filesAnalyzed: false
+    homepage: https://github.com/ldthomas/apg-js
+    licenseDeclared: BSD-2-Clause
+    licenseConcluded: BSD-2-Clause
+    originator: "Person: Lowell D. Thomas"
+    versionInfo: 4.1.2
+
+relationships:
+  - spdxElementId: SPDXRef-asyncapi-runtime-expression
+    relatedSpdxElement: SPDXRef-apg-js
+    relationshipType: DEPENDS_ON
