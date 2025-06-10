@@ -99,8 +99,8 @@ Parses the SBOM file. If the file does not exist, a FileNotFoundError exception 
 
 If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
 
-parse_string(filename, sbom_string)
-Parses the SBOM content from string in sbom_string. Filename is used to determine the content format and the parser to use.
+parse_string(sbom_string)
+Parses the SBOM content from sbom_string.
 
 If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
 

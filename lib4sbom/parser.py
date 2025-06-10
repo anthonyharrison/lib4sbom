@@ -7,7 +7,7 @@ from typing import Dict, List
 
 from lib4sbom.cyclonedx.cyclonedx_parser import CycloneDXParser
 from lib4sbom.exception import SBOMParserException
-from lib4sbom.sbom import SBOM, SBOMData
+from lib4sbom.sbom import SBOM, SBOMData, ParserType
 from lib4sbom.spdx.spdx_parser import SPDXParser
 
 
@@ -40,49 +40,73 @@ class SBOMParser:
     def parse_file(self, filename: str) -> None:
         """Parses a SBOM file
 
-                Parameters
-                ----------
-                filename : string
-                    The filename of the SBOM
-                """
-        self._parse_sbom(filename)
-
-    def parse_string(self, filename: str, sbom_string: str) -> None:
-        """Parses a SBOM string
-
-                Parameters
-                ----------
-                filename : string
-                    The filename of the SBOM
-                sbom_string : string
-                    SBOM content
-                """
-        self._parse_sbom(filename, sbom_string)
-
-    def _parse_sbom(self, filename: str, sbom_string: str = None) -> None:
-        """Parses a SBOM file or string
-
         Parameters
         ----------
         filename : string
             The filename of the SBOM
+        """
+        # Check file exists
+        invalid_file = True
+        if len(filename) > 0:
+            # Check path
+            filePath = Path(filename)
+            # Check path exists, a valid file and not empty file
+            if filePath.exists() and filePath.is_file() and filePath.stat().st_size > 0:
+                # Assume that processing can proceed
+                invalid_file = False
+
+        if invalid_file:
+            raise FileNotFoundError
+
+        # Determine parser type
+        if filename.endswith((".bom.json", ".cdx.json")):
+            parser_type = ParserType.CYCLONEDX_JSON
+        elif filename.endswith((".bom.xml", ".cdx.xml", ".xml")):
+            parser_type = ParserType.CYCLONEDX_XML
+
+        elif filename.endswith(".spdx"):
+            parser_type = ParserType.SPDX_TAG
+        elif filename.endswith(".spdx.json"):
+            parser_type = ParserType.SPDX_JSON
+        elif filename.endswith((".spdx.yaml", "spdx.yml")):
+            parser_type = ParserType.SPDX_YML
+        elif filename.endswith(".spdx.rdf"):
+            parser_type = ParserType.SPDX_RDF
+        elif filename.endswith(".spdx.xml"):
+            parser_type = ParserType.SPDX_XML
+        elif filename.endswith(".json"):
+            # Convention for SPDX is to use .spdx.json extension but
+            # check any json file just in case. Attempts to parse a CycloneDX JSON
+            # file will result in no data being returned.
+            parser_type = ParserType.JSON
+        else:
+            raise SBOMParserException
+
+        with open(filename, "r", encoding="utf-8") as f:
+            sbom_string = f.read()
+        self._parse_sbom(sbom_string, parser_type)
+
+    def parse_string(self, sbom_string: str) -> None:
+        """Parses a SBOM string
+
+        Parameters
+        ----------
         sbom_string : string
             SBOM content
         """
-        if not sbom_string:
-            # Check file exists
-            invalid_file = True
-            if len(filename) > 0:
-                # Check path
-                filePath = Path(filename)
-                # Check path exists, a valid file and not empty file
-                if filePath.exists() and filePath.is_file() and filePath.stat().st_size > 0:
-                    # Assume that processing can proceed
-                    invalid_file = False
+        canonical_string = sbom_string.strip()
+        self._parse_sbom(canonical_string, None)
 
-            if invalid_file:
-                raise FileNotFoundError
+    def _parse_sbom(self, sbom_string: str, parser_type: ParserType = None) -> None:
+        """Parses a SBOM file or string
 
+        Parameters
+        ----------
+        sbom_string : string
+            SBOM content
+        parser_type : ParserType
+            Parser type
+        """
         # Set up parser
         if self.sbom_type == "cyclonedx":
             self.parser = CycloneDXParser()
@@ -103,7 +127,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename, sbom_string)
+                ) = self.parser.parse(sbom_string, parser_type)
                 # but if no packages or files found, assume it must be CycloneDX
                 if (
                     len(self.packages) == 0
@@ -120,7 +144,7 @@ class SBOMParser:
                         self.vulnerabilities,
                         self.services,
                         self.licenses,
-                    ) = self.parser.parse(filename, sbom_string)
+                    ) = self.parser.parse(sbom_string, parser_type)
             else:
                 (
                     self.document,
@@ -130,7 +154,7 @@ class SBOMParser:
                     self.vulnerabilities,
                     self.services,
                     self.licenses,
-                ) = self.parser.parse(filename, sbom_string)
+                ) = self.parser.parse(sbom_string, parser_type)
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
             self.sbom.add_relationships(self.relationships)
