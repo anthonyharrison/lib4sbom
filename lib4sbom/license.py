@@ -234,3 +234,13 @@ class LicenseScanner:
             if license_category.get(c.upper()) is not None:
                 return c.upper()
         return "UNKNOWN"
+
+    def valid_spdx_license(self, license_id):
+        for lic in self.get_license_list():
+            # Comparisons ignore case of provided license text
+            if lic["licenseId"].lower() == license_id.lower():
+                return True
+        return False
+
+    def expression_license_list(self, expression):
+        return self._expression_split(expression)

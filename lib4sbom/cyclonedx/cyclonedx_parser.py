@@ -314,27 +314,32 @@ class CycloneDXParser:
             if license_data is not None and len(license_data) > 0:
                 # Multiple ways of defining licenses
                 for license_info in license_data:
+                    name = None
                     license = license_info.get("expression")
                     if license is None:
                         license = license_info.get("id")
                         if license is None:
                             license = license_info.get("name")
+                            name = license
                     acknowledgement = license_info.get("acknowledgement")
+                    licensetext = license_info.get("text")
                     if license is not None:
                         # CycloneDX 1.6 distinguishes between concluded and declared
                         if self._cyclonedx_16():
                             if acknowledgement is not None:
                                 if acknowledgement == "concluded":
-                                    self.cyclonedx_package.set_licenseconcluded(license)
+                                    self.cyclonedx_package.set_licenseconcluded(license, name)
                                 else:
-                                    self.cyclonedx_package.set_licensedeclared(license)
+                                    self.cyclonedx_package.set_licensedeclared(license, name)
                             else:
-                                self.cyclonedx_package.set_licenseconcluded(license)
-                                self.cyclonedx_package.set_licensedeclared(license)
+                                self.cyclonedx_package.set_licenseconcluded(license, name)
+                                self.cyclonedx_package.set_licensedeclared(license, name)
                         else:
                             # Assume License concluded is same as license declared
-                            self.cyclonedx_package.set_licenseconcluded(license)
-                            self.cyclonedx_package.set_licensedeclared(license)
+                            self.cyclonedx_package.set_licenseconcluded(license, name)
+                            self.cyclonedx_package.set_licensedeclared(license, name)
+                        if licensetext is not None:
+                            self.cyclonedx_package.set_value("licensetext", licensetext.get("content"))
                 if license_data is not None and len(license_data) > 1:
                     self.cyclonedx_package.set_licenselist(license_data)
             # acknowledgement = None
