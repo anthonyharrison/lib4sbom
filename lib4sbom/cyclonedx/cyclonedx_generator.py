@@ -255,7 +255,7 @@ class CycloneDXGenerator:
             dependency["dependsOn"] = [package_id]
             self.relationship.append(dependency)
 
-    def generateComponent(self, id, type, package, user_licenses = None):
+    def generateComponent(self, id, type, package, user_licenses=None):
         if self.format == "xml":
             self.generateXMLComponent(id, type, package)
         else:
@@ -553,7 +553,10 @@ class CycloneDXGenerator:
                 license_definition = package["licensedeclared"]
                 acknowledgement = "declared"
             license_id = self.license.find_license(license_definition)
-            if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"] and (self.license.valid_spdx_license(license_id) or self.license.license_expression(license_id)):
+            if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"] and (
+                self.license.valid_spdx_license(license_id)
+                or self.license.license_expression(license_id)
+            ):
                 # A valid SPDX license
                 license = dict()
                 # SPDX license expression handled separately to single license
@@ -578,13 +581,13 @@ class CycloneDXGenerator:
                 license_text = None
                 if user_licenses is not None:
                     for u in user_licenses:
-                        if u.get('id') == license_definition:
+                        if u.get("id") == license_definition:
                             license_text = u.get("text")
                             break
                 if "licensename" in package:
                     license["name"] = package["licensename"]
                     text = {}
-                    text["content"] = package.get("licensetext",license_definition)
+                    text["content"] = package.get("licensetext", license_definition)
                     license["text"] = text
                 else:
                     license["name"] = license_definition

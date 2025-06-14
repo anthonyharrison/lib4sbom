@@ -157,7 +157,9 @@ class CycloneDXParser:
                 graphicset = ModelGraphicset()
                 if "description" in d["modelCard"]["quantitativeAnalysis"]["graphics"]:
                     graphicset.set_description(
-                        d["modelCard"]["quantitativeAnalysis"]["graphics"]["description"]
+                        d["modelCard"]["quantitativeAnalysis"]["graphics"][
+                            "description"
+                        ]
                     )
                 if "collection" in d["modelCard"]["quantitativeAnalysis"]["graphics"]:
                     for graphic in d["modelCard"]["quantitativeAnalysis"]["graphics"][
@@ -328,18 +330,28 @@ class CycloneDXParser:
                         if self._cyclonedx_16():
                             if acknowledgement is not None:
                                 if acknowledgement == "concluded":
-                                    self.cyclonedx_package.set_licenseconcluded(license, name)
+                                    self.cyclonedx_package.set_licenseconcluded(
+                                        license, name
+                                    )
                                 else:
-                                    self.cyclonedx_package.set_licensedeclared(license, name)
+                                    self.cyclonedx_package.set_licensedeclared(
+                                        license, name
+                                    )
                             else:
-                                self.cyclonedx_package.set_licenseconcluded(license, name)
-                                self.cyclonedx_package.set_licensedeclared(license, name)
+                                self.cyclonedx_package.set_licenseconcluded(
+                                    license, name
+                                )
+                                self.cyclonedx_package.set_licensedeclared(
+                                    license, name
+                                )
                         else:
                             # Assume License concluded is same as license declared
                             self.cyclonedx_package.set_licenseconcluded(license, name)
                             self.cyclonedx_package.set_licensedeclared(license, name)
                         if licensetext is not None:
-                            self.cyclonedx_package.set_value("licensetext", licensetext.get("content"))
+                            self.cyclonedx_package.set_value(
+                                "licensetext", licensetext.get("content")
+                            )
                 if license_data is not None and len(license_data) > 1:
                     self.cyclonedx_package.set_licenselist(license_data)
             # acknowledgement = None

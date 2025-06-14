@@ -367,7 +367,9 @@ class SBOMGenerator:
                     if my_id == "NOT_DEFINED":
                         my_id = str(id) + "-" + file["name"]
                     self._save_element(file["name"], my_id)
-                    self.bom.generateComponent(my_id, "file", file, sbom_data.get("licenses"))
+                    self.bom.generateComponent(
+                        my_id, "file", file, sbom_data.get("licenses")
+                    )
                     id = id + 1
         # Process list of packages
         if "packages" in sbom_data:
@@ -386,7 +388,10 @@ class SBOMGenerator:
                 else:
                     type = "library"
                 self.bom.generateComponent(
-                    self._get_element(product, my_id), type, package, sbom_data.get("licenses")
+                    self._get_element(product, my_id),
+                    type,
+                    package,
+                    sbom_data.get("licenses"),
                 )
                 id = id + 1
         if "relationships" in sbom_data:
