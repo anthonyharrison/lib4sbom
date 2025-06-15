@@ -81,13 +81,13 @@ class LicenseScanner:
         elif license.startswith("LicenseRef"):
             # Don't process SPDX user defined licenses
             return license
-        # Deprecated license ids are still valid
-        if self.deprecated(license):
-            return license
         # Look for synonyms
         license_id = self.check_synonym(license)
         if license_id is not None:
             return license_id
+        # Deprecated license ids are still valid
+        if self.deprecated(license):
+            return license
         for lic in self.get_license_list():
             # Comparisons ignore case of provided license text
             if lic["licenseId"].lower() == license.lower():
@@ -149,6 +149,8 @@ class LicenseScanner:
         working = expression.replace("(", "").replace(")", "").split(" ")
         word = ""
         for item in working:
+            if len(item) == 0:
+                continue
             if item.upper() in boolean_operator:
                 # Store word in list
                 if word not in result:
@@ -175,10 +177,14 @@ class LicenseScanner:
             .replace(" Or ", " OR ")
             .replace(" and ", " AND ")
             .replace(" And ", " AND ")
+            .replace("  ", " ")
+            .replace("( ","(")
+            .replace(" )",")")
             .replace("MIT/Apache-2.0", "MIT OR Apache-2.0")
             .replace("Apache-2.0/MIT", "Apache-2.0 OR MIT")
             .replace("Unlicense/MIT", "Unlicense OR MIT")
             .replace("MIT/Unlicense", "MIT OR Unlicense")
+            .strip()
         )
         # Remove brackets and split into elements (separated by boolean operators)
         license_information = self._expression_split(updated_expression)
@@ -197,7 +203,7 @@ class LicenseScanner:
         return (
             "NOASSERTION"
             if len(updated_expression) == 0 or self.DEFAULT_LICENSE in license_data
-            else updated_expression
+            else updated_expression.replace("  ", " ").replace("( ","(").replace(" )",")")
         )
 
     def license_expression(self, expression):
