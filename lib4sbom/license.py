@@ -178,8 +178,8 @@ class LicenseScanner:
             .replace(" and ", " AND ")
             .replace(" And ", " AND ")
             .replace("  ", " ")
-            .replace("( ","(")
-            .replace(" )",")")
+            .replace("( ", "(")
+            .replace(" )", ")")
             .replace("MIT/Apache-2.0", "MIT OR Apache-2.0")
             .replace("Apache-2.0/MIT", "Apache-2.0 OR MIT")
             .replace("Unlicense/MIT", "Unlicense OR MIT")
@@ -203,7 +203,9 @@ class LicenseScanner:
         return (
             "NOASSERTION"
             if len(updated_expression) == 0 or self.DEFAULT_LICENSE in license_data
-            else updated_expression.replace("  ", " ").replace("( ","(").replace(" )",")")
+            else updated_expression.replace("  ", " ")
+            .replace("( ", "(")
+            .replace(" )", ")")
         )
 
     def license_expression(self, expression):
