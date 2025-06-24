@@ -218,7 +218,7 @@ SBOM type spdx
 
 _class_ **SBOMValidator**(_sbom_type='auto', version=None, debug=False_)
 
-This creates a simple SBOM Validator object. 
+This creates a simple SBOM Validator object.
 
 The optional parameter, _sbom_type_, can be specified
 which represents the type of SBOM (either spdx, cyclonedx or auto). The default is auto in
@@ -254,7 +254,7 @@ A SPDX JSON file submitted to the CycloneDX parser will result in no data being 
 
 If an error occurs during the validation of the file, a SBOMValidatorException exception is raised.
 
-The return value is a dictionary representing the type of SBOM and the version. e.g. {"SPDX" : 2.3}. 
+The return value is a dictionary representing the type of SBOM and the version. e.g. {"SPDX" : 2.3}.
 If the SBOM fails to validate the return value is the type of SBOM and a boolean value e.g. e.g. {"SPDX" : False}.
 If the SBOM cannot be validated the return value is the type of SBOM and "Unknown" i.e. {"SPDX" : "Unknown"}.
 
