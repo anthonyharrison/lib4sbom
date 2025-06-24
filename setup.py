@@ -46,6 +46,8 @@ setup_kwargs = dict(
         "lib4sbom": [
             "license_data/*.*",
             "license_data/text/*.*",
+            "schemas/cyclonedx/*.*",
+            "schemas/spdx/*.*",
         ],
     },
 )
