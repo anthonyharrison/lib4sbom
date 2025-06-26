@@ -35,7 +35,10 @@ class CycloneDXParser:
                 sbom_dict = json.loads(sbom_string)
                 if sbom_dict['bomFormat'] == 'CycloneDX':
                     return self.parse_cyclonedx_json(sbom_dict)
-            except (json.JSONDecodeError, KeyError):
+            except json.JSONDecodeError:
+                # Unable to process file. Probably not a JSON file
+                raise SBOMParserException
+            except KeyError:
                 pass
 
         # Check for CycloneDX XML

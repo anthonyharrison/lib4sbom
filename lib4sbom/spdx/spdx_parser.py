@@ -31,9 +31,15 @@ class SPDXParser:
         if parser_type == ParserType.SPDX_JSON or parser_type == ParserType.JSON or sbom_string.startswith('{'):
             try:
                 sbom_dict = json.loads(sbom_string)
+                # Might be a protobom file
+                if sbom_dict.get('sbom') is not None:
+                    sbom_dict = sbom_dict['sbom']
                 if sbom_dict['spdxVersion']:
                     return self._parse_spdx_data(sbom_dict)
-            except (json.JSONDecodeError, KeyError):
+            except json.JSONDecodeError:
+                # Unable to process file. Probably not a JSON file
+                raise SBOMParserException
+            except KeyError:
                 pass
 
         # Check for SPDX RDF
