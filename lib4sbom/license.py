@@ -8,23 +8,31 @@ import os
 
 class LicenseScanner:
     DEFAULT_LICENSE = "UNKNOWN"
-    SPDX_LICENSE_VERSION = "3.25"
+    SPDX_LICENSE_VERSION = "3.26"
 
     def __init__(self):
         # Load licenses
         license_dir, filename = os.path.split(__file__)
+        self.licenses = {}
         license_path = os.path.join(license_dir, "license_data", "spdx_licenses.json")
-        licfile = open(license_path, "r", encoding="utf-8")
-        self.licenses = json.load(licfile)
+        if self._check_file(license_path):
+            licfile = open(license_path, "r", encoding="utf-8")
+            self.licenses = json.load(licfile)
         # Set up list of license synonyms
         synonym_file = os.path.join(license_dir, "license_data", "license_synonyms.txt")
         self.license_synonym = {}
-        self.synonym_setup(synonym_file, self.license_synonym)
+        if self._check_file(synonym_file):
+            self.synonym_setup(synonym_file, self.license_synonym)
         # Set up type of licenses
         type_file = os.path.join(license_dir, "license_data", "license_type.txt")
         self.license_type = {}
-        self.synonym_setup(type_file, self.license_type)
+        if self._check_file(type_file):
+            self.synonym_setup(type_file, self.license_type)
         self.license_text_path = os.path.join(license_dir, "license_data", "text")
+
+    def _check_file(self, filename):
+        # Check path exists and is a valid file
+        return os.path.exists(filename)
 
     def synonym_setup(self, filename, data_list):
         with open(filename, "r", encoding="utf-8") as f:
@@ -40,7 +48,7 @@ class LicenseScanner:
                     data_list[line.strip().upper()] = license
 
     def get_license_list(self):
-        return self.licenses["licenses"]
+        return self.licenses.get("licenses", [])
 
     def get_license_version(self):
         if self.licenses.get("licenseListVersion") is not None:
@@ -73,14 +81,14 @@ class LicenseScanner:
         elif license.startswith("LicenseRef"):
             # Don't process SPDX user defined licenses
             return license
-        # Deprecated license ids are still valid
-        if self.deprecated(license):
-            return license
         # Look for synonyms
         license_id = self.check_synonym(license)
         if license_id is not None:
             return license_id
-        for lic in self.licenses["licenses"]:
+        # Deprecated license ids are still valid
+        if self.deprecated(license):
+            return license
+        for lic in self.get_license_list():
             # Comparisons ignore case of provided license text
             if lic["licenseId"].lower() == license.lower():
                 return lic["licenseId"]
@@ -92,7 +100,7 @@ class LicenseScanner:
         license_text = ""
         filename = f"{self.license_text_path}/{license_id.lower()}.html"
         # check filename exists
-        if os.path.exists(filename):
+        if self._check_file(filename):
             license_text_file = open(filename, "r", encoding="utf-8")
             license_text = license_text_file.read()
             license_text_file.close()
@@ -101,7 +109,7 @@ class LicenseScanner:
     def get_license_name(self, license_id):
         # Assume that license_id is a valid SPDX id
         if license_id != self.DEFAULT_LICENSE:
-            for lic in self.licenses["licenses"]:
+            for lic in self.get_license_list():
                 if lic["licenseId"] == license_id:
                     return lic["name"]
         return ""  # License not found
@@ -109,7 +117,7 @@ class LicenseScanner:
     def get_license_url(self, license_id):
         # Assume that license_id is a valid SPDX id
         if license_id != self.DEFAULT_LICENSE:
-            for lic in self.licenses["licenses"]:
+            for lic in self.get_license_list():
                 # License URL is in the seeAlso field.
                 # If multiple entries, just return first one
                 if lic["licenseId"] == license_id:
@@ -119,7 +127,7 @@ class LicenseScanner:
     def osi_approved(self, license_id):
         # Assume that license_id is a valid SPDX id
         if license_id != self.DEFAULT_LICENSE:
-            for lic in self.licenses["licenses"]:
+            for lic in self.get_license_list():
                 if lic["licenseId"] == license_id:
                     return lic["isOsiApproved"]
         return False  # License not found
@@ -127,7 +135,7 @@ class LicenseScanner:
     def deprecated(self, license_id):
         # Assume that license_id is a valid SPDX id
         if license_id != self.DEFAULT_LICENSE:
-            for lic in self.licenses["licenses"]:
+            for lic in self.get_license_list():
                 if lic["licenseId"] == license_id and lic["isDeprecatedLicenseId"]:
                     return True
         return False  # License not found
@@ -141,6 +149,8 @@ class LicenseScanner:
         working = expression.replace("(", "").replace(")", "").split(" ")
         word = ""
         for item in working:
+            if len(item) == 0:
+                continue
             if item.upper() in boolean_operator:
                 # Store word in list
                 if word not in result:
@@ -167,10 +177,14 @@ class LicenseScanner:
             .replace(" Or ", " OR ")
             .replace(" and ", " AND ")
             .replace(" And ", " AND ")
+            .replace("  ", " ")
+            .replace("( ", "(")
+            .replace(" )", ")")
             .replace("MIT/Apache-2.0", "MIT OR Apache-2.0")
             .replace("Apache-2.0/MIT", "Apache-2.0 OR MIT")
             .replace("Unlicense/MIT", "Unlicense OR MIT")
             .replace("MIT/Unlicense", "MIT OR Unlicense")
+            .strip()
         )
         # Remove brackets and split into elements (separated by boolean operators)
         license_information = self._expression_split(updated_expression)
@@ -189,7 +203,9 @@ class LicenseScanner:
         return (
             "NOASSERTION"
             if len(updated_expression) == 0 or self.DEFAULT_LICENSE in license_data
-            else updated_expression
+            else updated_expression.replace("  ", " ")
+            .replace("( ", "(")
+            .replace(" )", ")")
         )
 
     def license_expression(self, expression):
@@ -226,3 +242,13 @@ class LicenseScanner:
             if license_category.get(c.upper()) is not None:
                 return c.upper()
         return "UNKNOWN"
+
+    def valid_spdx_license(self, license_id):
+        for lic in self.get_license_list():
+            # Comparisons ignore case of provided license text
+            if lic["licenseId"].lower() == license_id.lower():
+                return True
+        return False
+
+    def expression_license_list(self, expression):
+        return self._expression_split(expression)

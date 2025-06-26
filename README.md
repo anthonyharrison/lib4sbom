@@ -10,6 +10,8 @@ The following facilities are provided:
 - Generate SPDX SBOM in TagValue, JSON and YAML formats
 - Generate CycloneDX SBOM in JSON format
 - Parse SPDX SBOM in TagValue, JSON, YAML, XML and RDF formats
+- Validate CycloneDX SBOM in JSON and XML format
+- Validate SPDX SBOM in TagValue, JSON, YAML, XML and RDF formats
 - Parse CycloneDX SBOM in JSON and XMLformat
 - Create and manipulate a SBOM file object
 - Create and manipulate a SBOM package object
@@ -42,7 +44,7 @@ returns the file, package and relationship information from within the SBOM.
 
 The focus of the implementation is on providing a common set of SBOM data regardless of the SBOM format.
 
-SBOMs are supported in the following formats
+SBOMs are supported in the following formats and versions
 
 | SBOM Type | Version | Format   |
 | --------- |---------|----------|
@@ -218,6 +220,54 @@ SBOM type spdx
 {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'filelock', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-3-filelock'}
 >>> 
 ```
+
+_class_ **SBOMValidator**(_sbom_type='auto', version=None, debug=False_)
+
+This creates a simple SBOM Validator object.
+
+The optional parameter, _sbom_type_, can be specified
+which represents the type of SBOM (either spdx, cyclonedx or auto). The default is auto in
+which case the parser will automatically work out the SBOM type using the
+following filename conventions.
+
+| SBOM      | Format   | Filename extension |
+| --------- |----------|--------------------|
+| SPDX      | TagValue | .spdx              |
+| SPDX      | JSON     | .spdx.json         |
+| SPDX      | YAML     | .spdx.yaml         |
+| SPDX      | YAML     | .spdx.yml          |
+| SPDX      | RDF      | .spdx.rdf          |
+| SPDX      | XML      | .spdx.xml          |
+| CycloneDX | JSON     | .json              |
+| CycloneDX | JSON     | .cdx.json          |
+| CycloneDX | JSON     | .bom.json          |
+| CycloneDX | XML      | .xml               |
+| CycloneDX | XML      | .cdx.xml           |
+| CycloneDX | XML      | .bom..xml          |
+
+The optional parameter, _version_, can be used to specify a single version of the SBOM to be validated against e.g. "1.6".
+
+The optional parameter, _debug_, can be used to generate debug output.
+
+**Methods**
+
+validate_file(filename)
+Validates the SBOM file. If the file does not exist, a FileNotFoundError exception is raised.
+
+The validator will check that the correct JSON files is being processed by the correct parser.
+A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
+
+If an error occurs during the validation of the file, a SBOMValidatorException exception is raised.
+
+The return value is a dictionary representing the type of SBOM and the version. e.g. {"SPDX" : 2.3}.
+If the SBOM fails to validate the return value is the type of SBOM and a boolean value e.g. e.g. {"SPDX" : False}.
+If the SBOM cannot be validated the return value is the type of SBOM and "Unknown" i.e. {"SPDX" : "Unknown"}.
+
+Validation rules:
+- The validation for SPDX JSON and YAML files is against the SPDX JSON schema.
+- The validation for SPDX TagValue, RDF and XML files is simply vaerification that a valid version of the SDPX specification is detected.
+- The validation for CycloneDX JSON files is against the CycloneDX JSON schema.
+- The validation for CycloneDX XML files is against the CycloneDX XML schema.
 
 ### SBOMGenerator
 

@@ -44,6 +44,7 @@ try:
         print("-" * 70)
         thepackage = SBOMPackage()
         for package in packages:
+            thepackage.initialise()
             thepackage.copy_package(package)
             print(
                 f"{package['name']:30} {package.get('version','MISSING'):15} {package['type']:20}"

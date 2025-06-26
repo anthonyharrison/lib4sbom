@@ -220,7 +220,7 @@ class SPDXGenerator:
         elif self.validate_license:
             if license != "UNKNOWN":
                 derived_license = self.license.find_license(license)
-                if derived_license != "UNKNOWN":
+                if derived_license not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                     return derived_license
                 # Not an SPDX License id
             return "NOASSERTION"
@@ -307,7 +307,7 @@ class SPDXGenerator:
                     {
                         "id": self.license_ref(),
                         "name": package_info["licensename"],
-                        "text": package_info["licensedeclared"],
+                        "text": package_info.get("licensetext", ""),
                     }
                 )
                 self.license_id = self.license_id + 1
@@ -317,10 +317,22 @@ class SPDXGenerator:
                     self.license_ident(package_info["licensedeclared"]),
                 )
         if "licenseconcluded" in package_info:
-            self.generateTag(
-                "PackageLicenseConcluded",
-                self.license_ident(package_info["licenseconcluded"]),
-            )
+            if "licensename" in package_info:
+                # User defined license
+                self.generateTag("PackageLicenseConcluded", self.license_ref())
+                self.license_info.append(
+                    {
+                        "id": self.license_ref(),
+                        "name": package_info["licensename"],
+                        "text": package_info.get("licensetext", ""),
+                    }
+                )
+                self.license_id = self.license_id + 1
+            else:
+                self.generateTag(
+                    "PackageLicenseConcluded",
+                    self.license_ident(package_info["licenseconcluded"]),
+                )
         if "licenselist" in package_info:
             # Handle multiple licenses from a CycloneDX SBOM
             license_expression = ""
@@ -441,9 +453,21 @@ class SPDXGenerator:
         if "sourceinfo" in package_info:
             component["sourceInfo"] = package_info["sourceinfo"]
         if "licenseconcluded" in package_info:
-            component["licenseConcluded"] = self.license_ident(
-                package_info["licenseconcluded"]
-            )
+            if "licensename" in package_info:
+                # User defined license
+                component["licenseConcluded"] = self.license_ref()
+                self.license_info.append(
+                    {
+                        "id": self.license_ref(),
+                        "name": package_info["licensename"],
+                        "text": package_info.get("licensetext", ""),
+                    }
+                )
+                self.license_id = self.license_id + 1
+            else:
+                component["licenseConcluded"] = self.license_ident(
+                    package_info["licenseconcluded"]
+                )
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
@@ -452,7 +476,7 @@ class SPDXGenerator:
                     {
                         "id": self.license_ref(),
                         "name": package_info["licensename"],
-                        "text": package_info["licensedeclared"],
+                        "text": package_info.get("licensetext", ""),
                     }
                 )
                 self.license_id = self.license_id + 1
@@ -498,7 +522,10 @@ class SPDXGenerator:
                 else:
                     component["attribution"] = [attribution_data]
         if "release_date" in package_info:
-            if len(package_info["release_date"]) > 0:
+            if (
+                package_info["release_date"] is not None
+                and len(package_info["release_date"]) > 0
+            ):
                 component["releaseDate"] = package_info["release_date"]
         if "build_date" in package_info:
             if len(package_info["build_date"]) > 0:
@@ -658,14 +685,14 @@ class SPDXGenerator:
                 self.generateTagLicenseDetails(
                     license_info.get("id", ""),
                     license_info.get("name", ""),
-                    license_info["text"],
+                    license_info.get("text", ""),
                     license_info.get("comment", ""),
                 )
             else:
                 self.generateJSONLicenseDetails(
                     license_info.get("id", ""),
                     license_info.get("name", ""),
-                    license_info["text"],
+                    license_info.get("text", ""),
                     license_info.get("comment", ""),
                 )
 

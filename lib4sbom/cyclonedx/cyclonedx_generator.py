@@ -255,11 +255,11 @@ class CycloneDXGenerator:
             dependency["dependsOn"] = [package_id]
             self.relationship.append(dependency)
 
-    def generateComponent(self, id, type, package):
+    def generateComponent(self, id, type, package, user_licenses=None):
         if self.format == "xml":
             self.generateXMLComponent(id, type, package)
         else:
-            self.generateJSONComponent(id, type, package)
+            self.generateJSONComponent(id, type, package, user_licenses)
 
     def _process_supplier_info(self, supplier_info):
         # Get email addresses
@@ -480,7 +480,7 @@ class CycloneDXGenerator:
                 ml_model["properties"] = ml_properties
         return ml_model
 
-    def generateJSONComponent(self, id, type, package):
+    def generateJSONComponent(self, id, type, package, user_licenses):
         component = dict()
         if "type" in package:
             component["type"] = package["type"].lower()
@@ -553,12 +553,17 @@ class CycloneDXGenerator:
                 license_definition = package["licensedeclared"]
                 acknowledgement = "declared"
             license_id = self.license.find_license(license_definition)
-            if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
+            if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"] and (
+                self.license.valid_spdx_license(license_id)
+                or self.license.license_expression(license_id)
+            ):
                 # A valid SPDX license
                 license = dict()
                 # SPDX license expression handled separately to single license
                 if self.license.license_expression(license_id):
                     license["expression"] = license_id
+                    if self._cyclonedx_16():
+                        license["acknowledgement"] = acknowledgement
                     component["licenses"] = [license]
                 else:
                     license["id"] = license_id
@@ -573,13 +578,25 @@ class CycloneDXGenerator:
             elif license_definition not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # Not a valid SPDX license
                 license = dict()
+                license_text = None
+                if user_licenses is not None:
+                    for u in user_licenses:
+                        if u.get("id") == license_definition:
+                            license_text = u.get("text")
+                            break
                 if "licensename" in package:
                     license["name"] = package["licensename"]
                     text = {}
-                    text["content"] = license_definition
+                    text["content"] = package.get("licensetext", license_definition)
                     license["text"] = text
                 else:
                     license["name"] = license_definition
+                if license_text is not None:
+                    text = {}
+                    text["content"] = license_text
+                    license["text"] = text
+                if self._cyclonedx_16():
+                    license["acknowledgement"] = acknowledgement
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
@@ -639,14 +656,15 @@ class CycloneDXGenerator:
                     else:
                         component["externalReferences"] = [externalReference]
         if "release_date" in package:
-            property_entry = dict()
-            property_entry["name"] = "release_date"
-            property_entry["value"] = package["release_date"]
-            component["properties"] = [property_entry]
+            if package["release_date"] is not None:
+                property_entry = dict()
+                property_entry["name"] = "release_date"
+                property_entry["value"] = package["release_date"]
+                component["properties"] = [property_entry]
         if "build_date" in package:
             property_entry = dict()
             property_entry["name"] = "build_date"
-            property_entry["value"] = package["rbuild_date"]
+            property_entry["value"] = package["build_date"]
             if "properties" in component:
                 component["properties"].append(property_entry)
             else:

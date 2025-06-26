@@ -101,6 +101,7 @@ class SBOMGenerator:
         else:
             uuid = None
         name = None
+        lifecycle = None
         organisation = self.organisation
         if "document" in sbom_data:
             doc = SBOMDocument()
@@ -352,9 +353,9 @@ class SBOMGenerator:
             )
             self._save_element(project_name, project_id)
         parent = project_name
-        if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
-            # Load user defined licences
-            print("User defined licences available")
+        # if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
+        #     # Load user defined licences
+        #     print("User defined licences available")
         # Process list of files
         if "files" in sbom_data:
             # Process list of files
@@ -366,7 +367,9 @@ class SBOMGenerator:
                     if my_id == "NOT_DEFINED":
                         my_id = str(id) + "-" + file["name"]
                     self._save_element(file["name"], my_id)
-                    self.bom.generateComponent(my_id, "file", file)
+                    self.bom.generateComponent(
+                        my_id, "file", file, sbom_data.get("licenses")
+                    )
                     id = id + 1
         # Process list of packages
         if "packages" in sbom_data:
@@ -385,7 +388,10 @@ class SBOMGenerator:
                 else:
                     type = "library"
                 self.bom.generateComponent(
-                    self._get_element(product, my_id), type, package
+                    self._get_element(product, my_id),
+                    type,
+                    package,
+                    sbom_data.get("licenses"),
                 )
                 id = id + 1
         if "relationships" in sbom_data:
