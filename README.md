@@ -101,6 +101,11 @@ Parses the SBOM file. If the file does not exist, a FileNotFoundError exception 
 
 If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
 
+parse_string(sbom_string)
+Parses the SBOM content from sbom_string.
+
+If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
+
 get_files()
 Returns a list of file elements from within a parsed SBOM
 

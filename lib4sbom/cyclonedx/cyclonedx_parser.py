@@ -4,7 +4,6 @@
 import json
 import os
 import uuid
-
 import defusedxml.ElementTree as ET
 
 from lib4sbom.data.document import SBOMDocument
@@ -14,6 +13,7 @@ from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.service import SBOMService
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.exception import SBOMParserException
+from lib4sbom.sbom import ParserType
 
 
 class CycloneDXParser:
@@ -27,14 +27,30 @@ class CycloneDXParser:
         self.model_card = SBOMModelCard()
         self.cyclonedx_version = None
 
-    def parse(self, sbom_file):
-        """parses CycloneDX BOM file extracting package name, version and license"""
-        if sbom_file.endswith((".bom.json", ".cdx.json", ".json")):
-            return self.parse_cyclonedx_json(sbom_file)
-        elif sbom_file.endswith((".bom.xml", ".cdx.xml", ".xml")):
-            return self.parse_cyclonedx_xml(sbom_file)
-        else:
-            return {}, {}, {}, [], [], [], []
+    def parse(self, sbom_string: str, parser_type: ParserType = None):
+        """parses CycloneDX BOM string extracting package name, version and license"""
+        # Check for CycloneDX JSON
+        if parser_type == ParserType.CYCLONEDX_JSON or parser_type == ParserType.JSON or sbom_string.startswith('{'):
+            try:
+                sbom_dict = json.loads(sbom_string)
+                if sbom_dict['bomFormat'] == 'CycloneDX':
+                    return self.parse_cyclonedx_json(sbom_dict)
+            except json.JSONDecodeError:
+                # Unable to process file. Probably not a JSON file
+                raise SBOMParserException
+            except KeyError:
+                pass
+
+        # Check for CycloneDX XML
+        if parser_type == ParserType.CYCLONEDX_XML or sbom_string.startswith('<'):
+            try:
+                root = ET.fromstring(sbom_string)
+                if 'cyclonedx' in root.tag:
+                    return self.parse_cyclonedx_xml(root)
+            except ET.ParseError:
+                pass
+
+        return {}, {}, {}, [], [], [], []
 
     def _governance_element(self, element):
         elements = []
@@ -466,7 +482,7 @@ class CycloneDXParser:
                 for component in d["components"]:
                     self._cyclondex_component(component)
 
-    def parse_cyclonedx_json(self, sbom_file):
+    def parse_cyclonedx_json(self, data: dict):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
         files = {}
         relationships = []
@@ -477,7 +493,6 @@ class CycloneDXParser:
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         try:
-            data = json.load(open(sbom_file, "r", encoding="utf-8"))
             # Check valid CycloneDX JSON file (and not SPDX)
             cyclonedx_json_file = data.get("bomFormat", False)
             if cyclonedx_json_file:
@@ -937,9 +952,8 @@ class CycloneDXParser:
         services = []
         return services
 
-    def parse_cyclonedx_xml(self, sbom_file):
-        self.tree = ET.parse(sbom_file)
-        self.root = self.tree.getroot()
+    def parse_cyclonedx_xml(self, xml_root):
+        self.root = xml_root
         # Extract schema
         self.schema = self.root.tag[: self.root.tag.find("}") + 1]
         document = self.parse_document_xml()
