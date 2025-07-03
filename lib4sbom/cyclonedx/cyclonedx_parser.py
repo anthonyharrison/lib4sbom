@@ -281,6 +281,7 @@ class CycloneDXParser:
             "file",
             "machine-learning-model",
             "data",
+            "cryptographic-asset"
         ]:
             package = d["name"]
             self.cyclonedx_package.set_name(package)
