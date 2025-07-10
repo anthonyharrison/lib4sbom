@@ -4,6 +4,7 @@
 import json
 import os
 import uuid
+
 import defusedxml.ElementTree as ET
 
 from lib4sbom.data.document import SBOMDocument
@@ -30,10 +31,14 @@ class CycloneDXParser:
     def parse(self, sbom_string: str, parser_type: ParserType = None):
         """parses CycloneDX BOM string extracting package name, version and license"""
         # Check for CycloneDX JSON
-        if parser_type == ParserType.CYCLONEDX_JSON or parser_type == ParserType.JSON or sbom_string.startswith('{'):
+        if (
+            parser_type == ParserType.CYCLONEDX_JSON
+            or parser_type == ParserType.JSON
+            or sbom_string.startswith("{")
+        ):
             try:
                 sbom_dict = json.loads(sbom_string)
-                if sbom_dict['bomFormat'] == 'CycloneDX':
+                if sbom_dict["bomFormat"] == "CycloneDX":
                     return self.parse_cyclonedx_json(sbom_dict)
             except json.JSONDecodeError:
                 # Unable to process file. Probably not a JSON file
@@ -42,10 +47,10 @@ class CycloneDXParser:
                 pass
 
         # Check for CycloneDX XML
-        if parser_type == ParserType.CYCLONEDX_XML or sbom_string.startswith('<'):
+        if parser_type == ParserType.CYCLONEDX_XML or sbom_string.startswith("<"):
             try:
                 root = ET.fromstring(sbom_string)
-                if 'cyclonedx' in root.tag:
+                if "cyclonedx" in root.tag:
                     return self.parse_cyclonedx_xml(root)
             except ET.ParseError:
                 pass
@@ -281,7 +286,7 @@ class CycloneDXParser:
             "file",
             "machine-learning-model",
             "data",
-            "cryptographic-asset"
+            "cryptographic-asset",
         ]:
             package = d["name"]
             self.cyclonedx_package.set_name(package)

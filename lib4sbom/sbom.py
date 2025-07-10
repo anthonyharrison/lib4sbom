@@ -1,8 +1,8 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict, List, NamedTuple
 from enum import Enum
+from typing import Dict, List, NamedTuple
 
 
 class SBOMData(NamedTuple):

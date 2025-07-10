@@ -1,8 +1,9 @@
 # Copyright (C) 2024 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
-import re
 import json
+import re
+
 import defusedxml.ElementTree as ET
 import yaml
 
@@ -28,13 +29,17 @@ class SPDXParser:
 
         # SPDX
         # Check for SPDX JSON
-        if parser_type == ParserType.SPDX_JSON or parser_type == ParserType.JSON or sbom_string.startswith('{'):
+        if (
+            parser_type == ParserType.SPDX_JSON
+            or parser_type == ParserType.JSON
+            or sbom_string.startswith("{")
+        ):
             try:
                 sbom_dict = json.loads(sbom_string)
                 # Might be a protobom file
-                if sbom_dict.get('sbom') is not None:
-                    sbom_dict = sbom_dict['sbom']
-                if sbom_dict['spdxVersion']:
+                if sbom_dict.get("sbom") is not None:
+                    sbom_dict = sbom_dict["sbom"]
+                if sbom_dict["spdxVersion"]:
                     return self._parse_spdx_data(sbom_dict)
             except json.JSONDecodeError:
                 # Unable to process file. Probably not a JSON file
@@ -43,13 +48,14 @@ class SPDXParser:
                 pass
 
         # Check for SPDX RDF
-        if parser_type == ParserType.SPDX_RDF or \
-                (sbom_string.startswith('<') and '<spdx:packages>' in sbom_string):
+        if parser_type == ParserType.SPDX_RDF or (
+            sbom_string.startswith("<") and "<spdx:packages>" in sbom_string
+        ):
             lines = sbom_string.splitlines()
             return self.parse_spdx_rdf(lines)
 
         # Check for SPDX XML
-        if parser_type == ParserType.SPDX_XML or sbom_string.startswith('<'):
+        if parser_type == ParserType.SPDX_XML or sbom_string.startswith("<"):
             try:
                 root = ET.fromstring(sbom_string)
                 schema = root.tag[: root.tag.find("}") + 1]
@@ -63,13 +69,13 @@ class SPDXParser:
         if parser_type == ParserType.SPDX_YML or parser_type is None:
             try:
                 yml_data = yaml.safe_load(sbom_string)
-                if 'SPDXID' in yml_data:
+                if "SPDXID" in yml_data:
                     return self._parse_spdx_data(yml_data)
             except yaml.YAMLError:
                 pass
 
         # Check for SPDX tag-value
-        if parser_type == ParserType.SPDX_TAG or 'PackageName:' in sbom_string:
+        if parser_type == ParserType.SPDX_TAG or "PackageName:" in sbom_string:
             lines = sbom_string.splitlines()
             return self.parse_spdx_tag(lines)
 

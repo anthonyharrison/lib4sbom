@@ -7,7 +7,7 @@ from typing import Dict, List
 
 from lib4sbom.cyclonedx.cyclonedx_parser import CycloneDXParser
 from lib4sbom.exception import SBOMParserException
-from lib4sbom.sbom import SBOM, SBOMData, ParserType
+from lib4sbom.sbom import SBOM, ParserType, SBOMData
 from lib4sbom.spdx.spdx_parser import SPDXParser
 
 
