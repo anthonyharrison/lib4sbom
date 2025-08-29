@@ -13,7 +13,7 @@ from referencing.jsonschema import DRAFT7
 
 class CycloneDXValidator:
 
-    CYCLONEDX_VERSIONS = ["1.3", "1.4", "1.5", "1.6"]
+    CYCLONEDX_VERSIONS = ["1.6", "1.5", "1.4", "1.3"]
     SUPPORT_SCHEMA = ["spdx.schema.json", "jsf-0.82.schema.json"]
 
     def __init__(self, cyclonedx_version=None, debug=False):
