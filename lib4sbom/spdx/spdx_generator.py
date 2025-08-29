@@ -704,7 +704,7 @@ class SPDXGenerator:
             self.relationship.append([from_id, to_id, relationship_type])
 
     def showRelationship(self):
-        self.relationship.sort()
+        # self.relationship.sort()
         if self.format == "tag":
             self.generateComment("\n")
         for r in self.relationship:
