@@ -4,17 +4,17 @@
 import contextlib
 import json
 from pathlib import Path
+from urllib.parse import urlparse
 
-import jsonschema
+import fastjsonschema
 import xmlschema
-from referencing import Registry, Resource
-from referencing.jsonschema import DRAFT7
 
 
 class CycloneDXValidator:
 
     CYCLONEDX_VERSIONS = ["1.6", "1.5", "1.4", "1.3"]
     SUPPORT_SCHEMA = ["spdx.schema.json", "jsf-0.82.schema.json"]
+    BASE_URI = "http://cyclonedx.org/schema/"
 
     def __init__(self, cyclonedx_version=None, debug=False):
         self.debug = debug
@@ -36,41 +36,57 @@ class CycloneDXValidator:
         else:
             return {"CycloneDX": "Unknown"}
 
-    def _load_supporting_schema(self, uri):
-        filename = f"{self.schemas_path}/{uri}"
-        schema = json.load(open(filename))
-        resource = Resource(contents=schema, specification=DRAFT7)
-        return (uri, resource)
+    def _load_schema_with_local_refs(self, schema_file, local_dir):
+        # Load a CycloneDX schema JSON file and rewrite to point to local schema files.
+        schema_file = Path(schema_file)
+        local_dir = Path(local_dir)
+        with open(schema_file, "r") as f:
+            schema = json.load(f)
+
+        def rewrite_refs(obj):
+            if isinstance(obj, dict):
+                if "$id" in obj or "$ref" in obj:
+                    key = "$id" if "$id" in obj else "$ref"
+                    uri = obj[key]
+                    # Check if the URI is a local, relative path (not an external URL)
+                    # It handles cases like `file.json` or `../path/file.json`
+                    if not urlparse(uri).scheme:
+                        ref_name = Path(uri).name
+                        local_ref = local_dir / ref_name
+                        if local_ref.exists():
+                            obj[key] = f"file://{str(local_ref.resolve())}"
+                            if self.debug:
+                                print(
+                                    f"[JSON] {key} - {local_ref} resolved to {obj[key]}"
+                                )
+                for v in obj.values():
+                    rewrite_refs(v)
+            elif isinstance(obj, list):
+                for i in obj:
+                    rewrite_refs(i)
+
+        rewrite_refs(schema)
+        return schema
 
     def validate_cyclonedx_json(self, sbom_file):
         sbom_data = json.load(open(sbom_file))
         for cyclonedx_version in self.cyclonedx_version:
             schema_file = f"{self.schemas_path}/bom-{cyclonedx_version}.schema.json"
-            base_schema = json.load(open(schema_file))
-            # Load supporting schemas
-            resources = []
-            for schema_uri in self.SUPPORT_SCHEMA:
-                resources.append(self._load_supporting_schema(schema_uri))
-            registry = Registry().with_resources(resources)
             if self.debug:
                 print(
                     f"[JSON] Checking to validate against CycloneDX {cyclonedx_version}."
                 )
+            # Validate SBOM
             try:
-                validator = jsonschema.Draft7Validator(base_schema, registry=registry)
-                validator.validate(sbom_data)
-                # if no validation errors
+                schema = self._load_schema_with_local_refs(
+                    schema_file, self.schemas_path
+                )
+                validate = fastjsonschema.compile(schema)
+                validate(sbom_data)
                 return {"CycloneDX": cyclonedx_version}
-            except jsonschema.exceptions.SchemaError:
+            except Exception as e:
                 if self.debug:
-                    print(
-                        f"[Schema Error] Failed to validate against CycloneDX {cyclonedx_version} JSON schema"
-                    )
-            except jsonschema.exceptions.ValidationError:
-                if self.debug:
-                    print(
-                        f"[ValidationError] Failed to validate against CycloneDX {cyclonedx_version} JSON schema"
-                    )
+                    f"[ValidationError] Failed to validate against CycloneDX {cyclonedx_version} JSON schema.\n{e}"
         return {"CycloneDX": False}
 
     def validate_cyclonedx_xml(self, sbom_file):
