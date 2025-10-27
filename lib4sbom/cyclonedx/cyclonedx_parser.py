@@ -324,6 +324,11 @@ class CycloneDXParser:
             if "author" in d:
                 # Assume that this refers to an individual
                 self.cyclonedx_package.set_originator("Person", d["author"])
+            if "authors" in d:
+                # Assume that this refers to an individual
+                for author in d["authors"]:
+                    if "name" in author:
+                        self.cyclonedx_package.set_originator("Person", author["name"])
             if "description" in d:
                 self.cyclonedx_package.set_description(d["description"])
             if "hashes" in d:
@@ -592,6 +597,10 @@ class CycloneDXParser:
                     if "properties" in data["metadata"]:
                         cyclonedx_document.set_value(
                             "property", data["metadata"]["properties"]
+                        )
+                    if "distributionConstraints" in data["metadata"]:
+                        cyclonedx_document.set_value(
+                            "distribition", data["metadata"]["distributionConstraints"]["tlp"]
                         )
                     if self.debug:
                         print(cyclonedx_document)
