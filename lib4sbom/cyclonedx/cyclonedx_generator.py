@@ -16,7 +16,7 @@ class CycloneDXGenerator:
     Generate CycloneDX SBOM.
     """
 
-    CYCLONEDX_VERSION = "1.6"
+    CYCLONEDX_VERSION = "1.7"
     DATA_LICENCE = "CC0-1.0"
     PROJECT_ID = "CDXRef-DOCUMENT"
     PACKAGE_PREAMBLE = "CDXRef-Package-"
@@ -89,18 +89,22 @@ class CycloneDXGenerator:
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def spec_version(self, version):
-        if version in ["1.3", "1.4", "1.5", "1.6"]:
+        if version in ["1.3", "1.4", "1.5", "1.6", "1.7"]:
             self.cyclonedx_version = version
         else:
             self.cyclonedx_version = None
 
     def _cyclonedx_15(self):
         # utility for features introduced in version 1.5
-        return self.cyclonedx_version in ["1.5", "1.6"]
+        return self.cyclonedx_version in ["1.5", "1.6", "1.7"]
 
     def _cyclonedx_16(self):
         # utility for features introduced in version 1.6
-        return self.cyclonedx_version in ["1.6"]
+        return self.cyclonedx_version in ["1.6", "1.7"]
+
+    def _cyclonedx_17(self):
+        # utility for features introduced in version 1.7
+        return self.cyclonedx_version in ["1.7"]
 
     def generateDocumentHeader(
         self, project_name, component_type, uuid=None, bom_version="1", property=None
@@ -206,6 +210,9 @@ class CycloneDXGenerator:
                 metadata_property.append(property_entry)
             metadata["properties"] = metadata_property
         metadata["component"] = component
+        distributionConstraints = dict()
+        distributionConstraints["tlp"] = component_type["distribution"]
+        metadata["distributionConstraints"] = distributionConstraints
         self.doc["metadata"] = metadata
         return component["bom-ref"]
 
@@ -525,7 +532,13 @@ class CycloneDXGenerator:
                         )
                 # Alternative is it within external reference
         if "originator" in package:
-            component["author"] = package["originator"]
+            if self._cyclonedx_17():
+                # author is deprecated
+                author = {}
+                author["name"] = package["originator"]
+                component["authors"] = [author]
+            else:
+                component["author"] = package["originator"]
         if "description" in package:
             component["description"] = package["description"]
         elif "summary" in package:

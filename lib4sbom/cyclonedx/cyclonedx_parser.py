@@ -73,11 +73,15 @@ class CycloneDXParser:
 
     def _cyclonedx_15(self):
         # utility for features introduced in version 1.5
-        return self.cyclonedx_version in ["1.5", "1.6"]
+        return self.cyclonedx_version in ["1.5", "1.6", "1.7"]
 
     def _cyclonedx_16(self):
         # utility for features introduced in version 1.6
-        return self.cyclonedx_version in ["1.6"]
+        return self.cyclonedx_version in ["1.6", "1.7"]
+
+    def _cyclonedx_17(self):
+        # utility for features introduced in version 1.7
+        return self.cyclonedx_version in ["1.7"]
 
     def _cyclonedx_mlmodel(self, d):
         # Machine learning model data

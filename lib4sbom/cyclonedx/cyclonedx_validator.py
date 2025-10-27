@@ -12,7 +12,7 @@ import xmlschema
 
 class CycloneDXValidator:
 
-    CYCLONEDX_VERSIONS = ["1.6", "1.5", "1.4", "1.3"]
+    CYCLONEDX_VERSIONS = ["1.7", "1.6", "1.5", "1.4", "1.3"]
     SUPPORT_SCHEMA = ["spdx.schema.json", "jsf-0.82.schema.json"]
     BASE_URI = "http://cyclonedx.org/schema/"
 
