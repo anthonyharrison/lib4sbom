@@ -39,6 +39,10 @@ class SPDXParser:
                 # Might be a protobom file
                 if sbom_dict.get("sbom") is not None:
                     sbom_dict = sbom_dict["sbom"]
+                # Might be an Into attestation
+                if sbom_dict.get('predicateType'):
+                    if "spdx.dev/Document" in sbom_dict.get('predicateType'):
+                        sbom_dict = sbom_dict.get("predicate")
                 if sbom_dict["spdxVersion"]:
                     return self._parse_spdx_data(sbom_dict)
             except json.JSONDecodeError:
