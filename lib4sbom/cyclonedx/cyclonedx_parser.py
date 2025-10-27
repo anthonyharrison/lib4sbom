@@ -600,7 +600,8 @@ class CycloneDXParser:
                         )
                     if "distributionConstraints" in data["metadata"]:
                         cyclonedx_document.set_value(
-                            "distribition", data["metadata"]["distributionConstraints"]["tlp"]
+                            "distribition",
+                            data["metadata"]["distributionConstraints"]["tlp"],
                         )
                     if self.debug:
                         print(cyclonedx_document)

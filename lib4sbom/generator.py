@@ -322,7 +322,7 @@ class SBOMGenerator:
             "timestamp": None,
             "creator": None,
             "lifecycle": None,
-            "distribution": None
+            "distribution": None,
         }
         if "document" in sbom_data:
             doc = SBOMDocument()
@@ -337,8 +337,7 @@ class SBOMGenerator:
             component_data["lifecycle"] = doc.get_value("lifecycle")
             component_data["timestamp"] = doc.get_created()
             component_data["creator"] = doc.get_creator()
-            component_data["distribution"] = doc.get_value(
-                "distribition", "CLEAR")
+            component_data["distribution"] = doc.get_value("distribition", "CLEAR")
             if (
                 component_data["supplier"] is not None
                 and len(component_data["supplier"]) == 0
