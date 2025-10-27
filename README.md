@@ -69,6 +69,8 @@ SBOMs are supported in the following formats and versions
 
 **Note** that support for SPDX RDF and XML formats is limited to a few package attributes.
 
+**Note** support for parsing SBOMs embedded as [In-Toto](https://in-toto.io/) statements is supported for SPDX documents.
+
 _class_ **SBOMParser**(_sbom_type='auto_')
 
 This creates a simple SBOM Parser object. A single optional parameter, _sbom_type_, can be specified
