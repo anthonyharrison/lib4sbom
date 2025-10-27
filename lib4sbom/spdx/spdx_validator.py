@@ -10,7 +10,7 @@ import yaml
 
 class SPDXValidator:
 
-    SPDX_VERSIONS = ["2.2", "2.3"]
+    SPDX_VERSIONS = ["2.3", "2.2"]
 
     def __init__(self, spdx_version=None, debug=False):
         self.debug = debug
@@ -78,6 +78,13 @@ class SPDXValidator:
 
     def validate_spdx_json(self, sbom_file):
         sbom_data = json.load(open(sbom_file))
+        # Might be in a protobuf
+        if sbom_data.get("sbom") is not None:
+            sbom_dict = sbom_data["sbom"]
+        # Might be an Into attestation
+        if sbom_data.get("predicateType"):
+            if "spdx.dev/Document" in sbom_data.get("predicateType"):
+                sbom_data = sbom_data.get("predicate")
         return self._validate_jsonyaml_data(sbom_data)
 
     def validate_spdx_yaml(self, sbom_file):
