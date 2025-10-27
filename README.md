@@ -64,6 +64,8 @@ SBOMs are supported in the following formats and versions
 | CycloneDX | 1.5     | XML      |
 | CycloneDX | 1.6     | JSON     |
 | CycloneDX | 1.6     | XML      |
+| CycloneDX | 1.7     | JSON     |
+| CycloneDX | 1.7     | XML      |
 
 **Note** that support for SPDX RDF and XML formats is limited to a few package attributes.
 
@@ -243,7 +245,7 @@ following filename conventions.
 | CycloneDX | JSON     | .bom.json          |
 | CycloneDX | XML      | .xml               |
 | CycloneDX | XML      | .cdx.xml           |
-| CycloneDX | XML      | .bom..xml          |
+| CycloneDX | XML      | .bom.xml           |
 
 The optional parameter, _version_, can be used to specify a single version of the SBOM to be validated against e.g. "1.6".
 
@@ -288,8 +290,9 @@ SBOMs can be generated in the following formats
 | CycloneDX | 1.4     | JSON      |
 | CycloneDX | 1.5     | JSON      |
 | CycloneDX | 1.6     | JSON      |
+| CycloneDX | 1.7     | JSON      |
 
-The default version for CycloneDX is version 1.6. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4" if required.
+The default version for CycloneDX is version 1.7. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4", "1.5" or "1.6" as required.
 
 The default version for SPDX is version 2.3. However, the version can be overridden by setting the environment variable LIB4SBOM_SPDX_VERSION to "SPDX-2.2" if required.
 
@@ -914,6 +917,8 @@ user of the tool is reminded that they should assert the quality of any data whi
 5. When parsing an SBOM with multiple instances of a component with the same name and version, only one instance of the comnponent is retained. If mulitple instances are
 required to be preserved, consider ensuring that the component name is unique.
 
+6. When validating an SBOM in SPDX format, as there are no offocial schemas published, the validation is limited to checking for the presence for some mandatory fields.
+
 ## Future Development
 
 1. Support later versions of SPDX (3.0).
@@ -938,6 +943,8 @@ Licensed under the Apache 2.0 Licence.
 
 The tool uses a local copy of the [SPDX Licenses List](https://github.com/spdx/license-list-data) which is released under
 [Creative Commons Attribution 3.0 (CC-BY-3.0)](http://creativecommons.org/licenses/by/3.0/).
+
+This tools uses a local copy of the CycloneDX schemas which are released under [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 This tool uses information sourced from the [Blue Oak Council's License List](https://blueoakcouncil.org/list) which is released under
 [Creative Commons Attribution 1.0 (CC-BY-1.0)](https://creativecommons.org/licenses/by/1.0/).
