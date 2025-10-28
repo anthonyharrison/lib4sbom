@@ -1,0 +1,22 @@
+#!/usr/bin/make -f
+
+export PYBUILD_NAME=lib4sbom
+export PYBUILD_DESTDIR=$(CURDIR)/debian/python3-lib4sbom
+export PYBUILD_INSTALL_ARGS=--install-lib=/usr/lib/python3/dist-packages
+
+%:
+	dh $@ --buildsystem=pybuild
+
+override_dh_auto_test:
+	python3 -m pytest test/test_sbom.py test/test_relationship.py test/test_document.py
+
+override_dh_auto_clean:
+	dh_auto_clean
+	find . -name "__pycache__" -type d -exec rm -r {} +
+
+override_dh_auto_install:
+	dh_auto_install --buildsystem=pybuild
+	find debian/python3-lib4sbom -type d -name "__pycache__" -exec rm -r {} +
+	find debian/python3-lib4sbom -type d -name "test" -exec rm -r {} +
+	find debian/python3-lib4sbom -type d -name "examples" -exec rm -r {} +
+	find . -type f -name 'json.html' -o -name 'php-3.0.html' -o -name 'php-3.01.html' -exec rm -v {} +

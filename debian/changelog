@@ -1,0 +1,11 @@
+lib4sbom (0.8.8-1) sid; urgency=medium
+
+  * Initial release (Closes: #1119140)
+  * Imported upstream version 0.8.8
+  * Built for internal use and preparation for Debian contribution
+  * No changes to upstream code
+  * Removed test and examples directories as well as problematic license files
+    json.html and php-3.* after installation to comply with Debian policy and
+    avoid lintian warnings.
+
+ -- Eugene Kaddo <arduinum628@gmail.com>  Mon, 27 Oct 2025 13:40:41 +0300

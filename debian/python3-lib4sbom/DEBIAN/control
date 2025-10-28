@@ -1,0 +1,15 @@
+Package: python3-lib4sbom
+Source: lib4sbom
+Version: 0.8.8-1
+Architecture: amd64
+Maintainer: Eugene Kaddo <arduinum628@gmail.com>
+Installed-Size: 10370
+Depends: python3
+Section: python
+Priority: optional
+Homepage: https://github.com/anthonyharrison/lib4sbom
+Description: C library for Software Bill of Materials processing
+ This library provides tools for creating, reading, and validating
+ Software Bill of Materials (SBOM) documents in multiple formats.
+ It is designed for integration into build pipelines and package
+ analysis tools, supporting SPDX and CycloneDX standards.
