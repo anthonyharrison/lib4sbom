@@ -81,12 +81,15 @@ class CycloneDXValidator:
                 schema = self._load_schema_with_local_refs(
                     schema_file, self.schemas_path
                 )
-                validate = fastjsonschema.compile(schema)
-                validate(sbom_data)
+                validate = fastjsonschema.compile(schema, detailed_exceptions=True)
+                validate_result = validate(sbom_data)
+                # if a validation error occurs, won't get here
+                if self.debug:
+                     print (f"Result from validate: {validate_result}")
                 return {"CycloneDX": cyclonedx_version}
             except Exception as e:
                 if self.debug:
-                    f"[ValidationError] Failed to validate against CycloneDX {cyclonedx_version} JSON schema.\n{e}"
+                    print (f"[ValidationError] Failed to validate against CycloneDX {cyclonedx_version} JSON schema.\n{e}")
         return {"CycloneDX": False}
 
     def validate_cyclonedx_xml(self, sbom_file):
