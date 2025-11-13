@@ -85,11 +85,13 @@ class CycloneDXValidator:
                 validate_result = validate(sbom_data)
                 # if a validation error occurs, won't get here
                 if self.debug:
-                     print (f"Result from validate: {validate_result}")
+                    print(f"Result from validate: {validate_result}")
                 return {"CycloneDX": cyclonedx_version}
             except Exception as e:
                 if self.debug:
-                    print (f"[ValidationError] Failed to validate against CycloneDX {cyclonedx_version} JSON schema.\n{e}")
+                    print(
+                        f"[ValidationError] Failed to validate against CycloneDX {cyclonedx_version} JSON schema.\n{e}"
+                    )
         return {"CycloneDX": False}
 
     def validate_cyclonedx_xml(self, sbom_file):
