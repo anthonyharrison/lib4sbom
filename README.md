@@ -30,7 +30,7 @@ Alternatively, just clone the repo and install dependencies using the following 
 
 `pip install -U -r requirements.txt`
 
-The tool requires Python 3 (3.7+). It is recommended to use a virtual python environment especially
+The tool requires a recent version of Python 3 (3.9+). It is recommended to use a virtual python environment especially
 if you are using different versions of python. `virtualenv` is a tool for setting up virtual python environments which
 allows you to have all the dependencies for the tool set up in a single environment, or have different environments set
 up for testing using different versions of Python.
