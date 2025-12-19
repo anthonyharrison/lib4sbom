@@ -213,11 +213,11 @@ class LicenseScanner:
         return len(self._expression_split(expression)) > 1
 
     def get_license_type(self, license):
-        # Default is PERMISSIVE
+        # Default is UNKNOWN
         license_id = self.check_synonym(license)
         if license_id is None:
             license_id = license
-        return self.license_type.get(license_id.upper(), "permissive").upper()
+        return self.license_type.get(license_id.upper(), "unknown").upper()
 
     def get_license_category(self, license_list):
         # For each license
@@ -236,6 +236,7 @@ class LicenseScanner:
             "copyleft",
             "weakcopyleft",
             "permissive",
+            "unknown"
         )
         # Return most onerous category of license found
         for c in category:
