@@ -147,8 +147,20 @@ class CycloneDXGenerator:
         else:
             metadata["timestamp"] = component_type["timestamp"]
         if component_type.get("lifecycle") is not None:
+            sbom_lifecycle = component_type.get("lifecycle").lower()
+            # Convert from CISA sbomtypes if required
+            lifecycle_to_sbomtype = {
+            "design": "design",
+            "source": "pre-build",
+            "build": "build",
+            "analyzed": "post-build",
+            "deployed": "operations",
+            "runtime": "discovery"
+            }
+            if lifecycle_to_sbomtype.get(sbom_lifecycle) is not None:
+                sbom_lifecycle = lifecycle_to_sbomtype.get(sbom_lifecycle)
             # Validate lifecycle phase
-            if component_type["lifecycle"].lower() in [
+            if sbom_lifecycle in [
                 "design",
                 "pre-build",
                 "build",
@@ -158,7 +170,7 @@ class CycloneDXGenerator:
                 "decommission",
             ]:
                 lifecycle = {}
-                lifecycle["phase"] = component_type["lifecycle"].lower()
+                lifecycle["phase"] = sbom_lifecycle
                 metadata["lifecycles"] = [lifecycle]
         tool = {}
         author = {}
