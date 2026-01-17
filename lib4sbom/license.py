@@ -236,7 +236,7 @@ class LicenseScanner:
             "copyleft",
             "weakcopyleft",
             "permissive",
-            "unknown"
+            "unknown",
         )
         # Return most onerous category of license found
         for c in category:

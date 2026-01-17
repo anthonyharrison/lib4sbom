@@ -150,12 +150,12 @@ class CycloneDXGenerator:
             sbom_lifecycle = component_type.get("lifecycle").lower()
             # Convert from CISA sbomtypes if required
             lifecycle_to_sbomtype = {
-            "design": "design",
-            "source": "pre-build",
-            "build": "build",
-            "analyzed": "post-build",
-            "deployed": "operations",
-            "runtime": "discovery"
+                "design": "design",
+                "source": "pre-build",
+                "build": "build",
+                "analyzed": "post-build",
+                "deployed": "operations",
+                "runtime": "discovery",
             }
             if lifecycle_to_sbomtype.get(sbom_lifecycle) is not None:
                 sbom_lifecycle = lifecycle_to_sbomtype.get(sbom_lifecycle)

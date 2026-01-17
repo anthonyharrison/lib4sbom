@@ -113,7 +113,14 @@ class SPDXGenerator:
             # Might not be using CISA SBOM types
             if lifecycle_to_sbomtype.get(lifecycle.lower()) is not None:
                 return f"SBOM Type: {lifecycle_to_sbomtype[lifecycle]} - {default_text}"
-            if lifecycle.lower() in ["design", "source", "build", "analyzed", "deployed", "runtime"]:
+            if lifecycle.lower() in [
+                "design",
+                "source",
+                "build",
+                "analyzed",
+                "deployed",
+                "runtime",
+            ]:
                 return f"SBOM Type: {lifecycle.capitalize()} - {default_text}"
         return default_text
 
