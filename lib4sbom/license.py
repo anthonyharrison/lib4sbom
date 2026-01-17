@@ -1,4 +1,4 @@
-# Copyright (C) 2024 Anthony Harrison
+# Copyright (C) 2026 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -8,7 +8,7 @@ import os
 
 class LicenseScanner:
     DEFAULT_LICENSE = "UNKNOWN"
-    SPDX_LICENSE_VERSION = "3.26"
+    SPDX_LICENSE_VERSION = "3.27"
 
     def __init__(self):
         # Load licenses
