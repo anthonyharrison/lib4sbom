@@ -710,6 +710,7 @@ class CycloneDXParser:
                             service_info.set_description(service["description"])
                         if "provider" in service:
                             name = service["provider"].get("name", "")
+                            url = ""
                             if "url" in service["provider"]:
                                 for u in service["provider"]["url"]:
                                     url = u

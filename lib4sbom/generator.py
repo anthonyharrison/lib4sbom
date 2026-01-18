@@ -396,6 +396,25 @@ class SBOMGenerator:
                     sbom_data.get("licenses"),
                 )
                 id = id + 1
+        if "vulnerabilities" in sbom_data:
+            self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
+        if "services" in sbom_data:
+            id = 1
+            sbom_services = [x for x in sbom_data["services"].values()]
+            for service in sbom_services:
+                service_data = self.bom.process_service(service)
+                service_name = service_data["name"]
+                my_id = service_data.get("bom-ref", None)
+                if my_id is None:
+                    my_id = service_data.get("id", None)
+                    if not self._validate_id(my_id):
+                        my_id = f"{id}-{service_name}"
+                self._save_element(service_name, my_id, my_id)
+                id = id + 1
+        if "annotations" in sbom_data:
+            self.bom.generate_annotation_data(
+                sbom_data["annotations"], self.element_set
+            )
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
                 self.bom.generateRelationship(
@@ -406,14 +425,5 @@ class SBOMGenerator:
                         relationship["target"], relationship["target_id"]
                     ),
                 )
-        if "vulnerabilities" in sbom_data:
-            self.bom.generate_vulnerability_data(sbom_data["vulnerabilities"])
-        if "services" in sbom_data:
-            self.bom.generate_service_data(sbom_data["services"])
-        if "annotations" in sbom_data:
-            self.bom.generate_annotation_data(
-                sbom_data["annotations"], self.element_set
-            )
-
 
 # End of file
