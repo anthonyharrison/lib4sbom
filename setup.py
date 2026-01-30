@@ -41,7 +41,9 @@ setup_kwargs = dict(
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
     python_requires=">=3.9",
-    packages=find_packages(),
+    packages=find_packages(
+        exclude=["test"],
+    ),
     package_data={
         "lib4sbom": [
             "license_data/*.*",
