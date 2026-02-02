@@ -4,16 +4,17 @@
 import contextlib
 import json
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urldefrag
 
 import fastjsonschema
 import xmlschema
+import urllib.request
 
 
 class CycloneDXValidator:
 
     CYCLONEDX_VERSIONS = ["1.7", "1.6", "1.5", "1.4", "1.3"]
-    SUPPORT_SCHEMA = ["spdx.schema.json", "jsf-0.82.schema.json"]
+    SUPPORT_SCHEMA = ["spdx.schema.json", "jsf-0.82.schema.json", "cryptography-defs.schema.json"]
     BASE_URI = "http://cyclonedx.org/schema/"
 
     def __init__(self, cyclonedx_version=None, debug=False):
@@ -47,15 +48,15 @@ class CycloneDXValidator:
             if isinstance(obj, dict):
                 if "$id" in obj or "$ref" in obj:
                     key = "$id" if "$id" in obj else "$ref"
-                    uri = obj[key]
+                    uri, _ = urldefrag(obj[key])
                     # Check if the URI is a local, relative path (not an external URL)
                     # It handles cases like `file.json` or `../path/file.json`
-                    if not urlparse(uri).scheme:
+                    if uri in self.SUPPORT_SCHEMA and not urlparse(uri).scheme:
                         ref_name = Path(uri).name
                         local_ref = local_dir / ref_name
                         if local_ref.exists():
                             obj[key] = f"file://{str(local_ref.resolve())}"
-                            if self.debug:
+                            if self.debug and "json" in {local_ref}:
                                 print(
                                     f"[JSON] {key} - {local_ref} resolved to {obj[key]}"
                                 )
@@ -69,6 +70,12 @@ class CycloneDXValidator:
         return schema
 
     def validate_cyclonedx_json(self, sbom_file):
+
+        def debug_handler(uri):
+            print(f"[DEBUG]: Attempting to fetch: {uri}")
+            with urllib.request.urlopen(uri) as response:
+                return response.read()
+
         sbom_data = json.load(open(sbom_file))
         for cyclonedx_version in self.cyclonedx_version:
             schema_file = f"{self.schemas_path}/bom-{cyclonedx_version}.schema.json"
@@ -81,7 +88,7 @@ class CycloneDXValidator:
                 schema = self._load_schema_with_local_refs(
                     schema_file, self.schemas_path
                 )
-                validate = fastjsonschema.compile(schema, detailed_exceptions=True)
+                validate = fastjsonschema.compile(schema, detailed_exceptions=True, handlers={'http': debug_handler, 'https': debug_handler})
                 validate_result = validate(sbom_data)
                 # if a validation error occurs, won't get here
                 if self.debug:
