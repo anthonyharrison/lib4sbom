@@ -268,7 +268,7 @@ class SPDXGenerator:
         if "type" in package_info:
             # Handle SPDX mismatch of - and _ in OPERATING-SYSTEM
             self.generateTag(
-                "PrimaryPackagePurpose", package_info["type"].upper().replace("-", "_")
+                "PrimaryPackagePurpose", package_info["type"].upper().replace("_", "-")
             )
         else:
             self.generateTag("PrimaryPackagePurpose", "LIBRARY")
