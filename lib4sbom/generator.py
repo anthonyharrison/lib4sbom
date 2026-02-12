@@ -324,6 +324,11 @@ class SBOMGenerator:
             component_data["lifecycle"] = doc.get_value("lifecycle")
             component_data["timestamp"] = doc.get_created()
             component_data["creator"] = doc.get_creator()
+
+        if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
+            # Load user defined licences
+            print("User defined licences available")
+            self.bom.addLicenseDetails(sbom_data["licenses"])
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(
@@ -336,9 +341,6 @@ class SBOMGenerator:
             )
             self._save_element(project_name, project_id)
         parent = project_name
-        if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
-            # Load user defined licences
-            print("User defined licences available")
         # Process list of files
         if "files" in sbom_data:
             # Process list of files

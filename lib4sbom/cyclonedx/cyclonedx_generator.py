@@ -50,6 +50,8 @@ class CycloneDXGenerator:
         self.spec_version(self.cyclonedx_version)
         if self.cyclonedx_version is None:
             self.cyclonedx_version = self.CYCLONEDX_VERSION
+        #it will be used only in case converting from SPDX to CDX
+        self.license_info = dict()
 
     def store(self, message):
         self.doc.append(message)
@@ -477,6 +479,13 @@ class CycloneDXGenerator:
                 ml_model["properties"] = ml_properties
         return ml_model
 
+    def addLicenseDetails(self, user_licenses):
+        for user_license in user_licenses:
+            license_item = dict()
+            license_item["name"] = user_license.get("name", "")
+            license_item["text"] = user_license.get("text", "")
+            self.license_info[user_license["id"]] = license_item
+
     def generateJSONComponent(self, id, type, package):
         component = dict()
         if "type" in package:
@@ -539,7 +548,19 @@ class CycloneDXGenerator:
                 license_definition = package["licensedeclared"]
                 acknowledgement = "declared"
             license_id = self.license.find_license(license_definition)
-            if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
+
+            if license_id.startswith(self.LICENSE_PREAMBLE):
+                if license_id in self.license_info:
+                    license_item = self.license_info[license_id]
+                    component["licenses"] = [license_item]
+                else:
+                    #user license info is missing, just put license_id into 'name' property
+                    print(f'license {license_id} not found in extracted licenses')
+                    license_item = dict()
+                    license_item["name"] = license_id.replace(self.LICENSE_PREAMBLE, "")
+                    component["licenses"] = [license_item]
+
+            elif license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # A valid SPDX license
                 license = dict()
                 # SPDX license expression handled separately to single license
