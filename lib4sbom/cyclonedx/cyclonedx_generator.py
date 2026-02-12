@@ -555,6 +555,7 @@ class CycloneDXGenerator:
                     component["licenses"] = [license_item]
                 else:
                     #user license info is missing, just put license_id into 'name' property
+                    print(f'license {license_id} not found in extracted licenses')
                     license_item = dict()
                     license_item["name"] = license_id.replace(self.LICENSE_PREAMBLE, "")
                     component["licenses"] = [license_item]
