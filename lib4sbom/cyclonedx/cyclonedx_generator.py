@@ -205,8 +205,6 @@ class CycloneDXGenerator:
                 metadata_property.append(property_entry)
             metadata["properties"] = metadata_property
         metadata["component"] = component
-        if self.license_info:
-            metadata["licenses"] = list(self.license_info.values())
         self.doc["metadata"] = metadata
         return component["bom-ref"]
 
