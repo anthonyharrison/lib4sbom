@@ -736,6 +736,9 @@ class CycloneDXGenerator:
             component["modelCard"] = self._generate_mlmodel(
                 package, component["bom-ref"]
             )
+        if self._cyclonedx_16() and component["type"] == "cryptographic-asset":
+            # Only for version 1.6 or later
+            component["cryptoProperties"] = self._generate_crypto(package["crypto"])
         self.component.append(component)
 
     def generateXMLComponent(self, id, type, package):
@@ -986,3 +989,76 @@ class CycloneDXGenerator:
             annotation_record["timestamp"] = self.generateTime()
             annotation_definitions.append(annotation_record)
         self.annotation = annotation_definitions
+
+    def _generate_crypto(self, package):
+        crypto_properties = {}
+        algorithm_properties = {}
+        certificate_properties = {}
+        material_properties = {}
+        protocol_properties = {}
+        asset_type = None
+        # check for a valid type
+        if "type" in package:
+            if package["type"] in ["algorithm", "certificate", "protocol", "related-crypto-material"]:
+                asset_type = package["type"]
+                crypto_properties["assetType"] = asset_type
+        if asset_type == "algorithm":
+            # Algorithm
+            if "primitive" in package:
+                algorithm_properties["primitive"] = package["primitive"]
+            if "algorithm" in package:
+                algorithm_properties["algorithmFamily"] = package["algorithm"]       
+            if "keysize" in package:
+                algorithm_properties["parameterSetIdentifier"] = package["keysize"]        
+            if len(algorithm_properties) > 0:
+                crypto_properties["algorithmProperties"] = algorithm_properties
+        elif asset_type == "certificate":
+            # Certiticate
+            if "subject" in package:
+                certificate_properties["subjectName"] = package["subject"]
+            if "issuer" in package:
+                certificate_properties["issuerName"] = package["issuer"]
+            if "format" in package:
+                 certificate_properties["certificateFormat"] = package["format"]               
+            if "state" in package:
+                certificate_properties["certificateState"] = package["state"]
+            for date_event in ["creationDate", "activationDate", "deactivationDate", "revocationDate", "destructionDate"]:
+                if date_event in package:
+                    certificate_properties[date_event] = package[date_event]
+            if "relatedCryptographicAssets" in package:
+                certificate_properties["relatedCryptographicAssets"] = package["relatedCryptographicAssets"]
+            if len(certificate_properties) > 0:
+                crypto_properties["certificateProperties"] = certificate_properties
+        elif asset_type == "protocol":
+            # Protocol
+            if "primitive" in package:
+                protocol_properties["type"] = package["primitive"]
+            if "version" in package:
+                protocol_properties["version"] = package["version"]
+            if "relatedCryptographicAssets" in package:
+                protocol_properties["relatedCryptographicAssets"] = package["relatedCryptographicAssets"]
+            if len(protocol_properties) > 0:
+                crypto_properties["protocolProperties"] = protocol_properties           
+        elif asset_type == "related-crypto-material":
+            # Crypto Material
+            if "primitive" in package:
+                material_properties["type"] = package["primitive"]
+            if "state" in package:
+                material_properties["state"] = package["state"]
+            for date_event in ["creationDate", "activationDate", "updateDate", "expirationDate"]:
+                if date_event in package:
+                    material_properties[date_event] = package[date_event]
+            if "value" in package:
+                material_properties["value"] = package["value"]             
+            if "keysize" in package:
+                material_properties["size"] = package["keysize"]
+            if "format" in package:
+                material_properties["format"] = package["format"] 
+            if "relatedCryptographicAssets" in package:
+                material_properties["relatedCryptographicAssets"] = package["relatedCryptographicAssets"]
+            if len(material_properties) > 0:
+                crypto_properties["relatedCryptoMaterialProperties"] = material_properties
+        if "oid" in package:
+            crypto_properties["oid"] = package["oid"]
+
+        return crypto_properties
