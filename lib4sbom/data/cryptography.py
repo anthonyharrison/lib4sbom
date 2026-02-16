@@ -105,7 +105,8 @@ class SBOMCryptography:
                 "Digital-Signature",
                 "Post-Quantum-Cryptography",
                 "Protocol",
-                "Hybrid-Cipher" or "Key-Exchange-Mechanism",
+                "Hybrid-Cipher",
+                "Key-Exchange-Mechanism",
             ],
         },
     ]
@@ -120,16 +121,18 @@ class SBOMCryptography:
             / "cryptography-defs.schema.json"
         )
         self.spdx_path = None
-        self._read_cdx(self.cyclonedx_crypto_config_file)
         self.algorithm_family = {}
 
     def _read_cdx(self, schema_path):
         with open(schema_path, encoding="utf-8") as schema_file:
             cdx_data = json.load(schema_file)
         for algorithm in cdx_data["algorithms"]:
-            self.algorithm_family[algorithm["family"]] = algorithm["primitive"]
+            if 'variant' in algorithm and 'primitive' in algorithm['variant']:
+                self.algorithm_family[algorithm["family"]] = algorithm['variant']["primitive"]
 
     def initialise(self):
+        if len(self.algorithm_family) == 0:
+            self._read_cdx(self.cyclonedx_crypto_config_file)
         self.cryptography = {}
 
     def set_id(self, id):
