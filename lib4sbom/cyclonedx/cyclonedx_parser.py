@@ -1040,7 +1040,7 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_purl(purl_validator.fix())
                 # Add comment
                 self.cyclonedx_package.set_property(
-                    "PURL Comments", f'{purl} is not a valid PURL'
+                    "PURL Comments", f"{purl} is not a valid PURL"
                 )
         # Potentially multiple entries
         for properties in component.findall(self.schema + "properties"):

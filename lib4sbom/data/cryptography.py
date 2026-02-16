@@ -127,8 +127,10 @@ class SBOMCryptography:
         with open(schema_path, encoding="utf-8") as schema_file:
             cdx_data = json.load(schema_file)
         for algorithm in cdx_data["algorithms"]:
-            if 'variant' in algorithm and 'primitive' in algorithm['variant']:
-                self.algorithm_family[algorithm["family"]] = algorithm['variant']["primitive"]
+            if "variant" in algorithm and "primitive" in algorithm["variant"]:
+                self.algorithm_family[algorithm["family"]] = algorithm["variant"][
+                    "primitive"
+                ]
 
     def initialise(self):
         if len(self.algorithm_family) == 0:

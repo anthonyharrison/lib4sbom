@@ -80,7 +80,7 @@ class SPDXValidator:
         sbom_data = json.load(open(sbom_file))
         # Might be in a protobuf
         if sbom_data.get("sbom") is not None:
-            sbom_dict = sbom_data["sbom"]
+            sbom_data = sbom_data["sbom"]
         # Might be an Into attestation
         if sbom_data.get("predicateType"):
             if "spdx.dev/Document" in sbom_data.get("predicateType"):

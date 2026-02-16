@@ -6,10 +6,10 @@ import re
 import uuid
 from datetime import datetime
 
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.license import LicenseScanner
 from lib4sbom.version import VERSION
-from lib4sbom.data.identifier import SBOMIdentifier
 
 
 class CycloneDXGenerator:
