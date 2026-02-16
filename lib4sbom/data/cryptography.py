@@ -1,9 +1,10 @@
 # Copyright (C) 2026 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 from datetime import datetime
 from pathlib import Path
-import json
+
 
 class SBOMCryptography:
 
@@ -26,13 +27,10 @@ class SBOMCryptography:
                 "combiner",
                 "key-wrap",
                 "other",
-                "unknown"
-              ]
+                "unknown",
+            ],
         },
-        {
-            "type": "certificate",
-            "option": []
-        },
+        {"type": "certificate", "option": []},
         {
             "type": "protocol",
             "option": [
@@ -49,8 +47,8 @@ class SBOMCryptography:
                 "prins",
                 "5g-aka",
                 "other",
-                "unknown"
-              ]
+                "unknown",
+            ],
         },
         {
             "type": "related-crypto-material",
@@ -73,31 +71,53 @@ class SBOMCryptography:
                 "credential",
                 "token",
                 "other",
-                "unknown"
-            ]
-        }
+                "unknown",
+            ],
+        },
     ]
 
     alg_type_spdx = [
         {
             "type": "Cryptographic-Hash-Function",
-            "option": ["Hash-Function" , "Password-Hashing" , "Message-Authentication-Code" , "Checksum"]
+            "option": [
+                "Hash-Function",
+                "Password-Hashing",
+                "Message-Authentication-Code",
+                "Checksum",
+            ],
         },
         {
             "type": "Symetric-Key-Algorithm",
-            "option": ["Block-Cipher" , "Stream-Cipher" , "Encoding" , "Random-Number-Generator" , "Key-Derivation"]
+            "option": [
+                "Block-Cipher",
+                "Stream-Cipher",
+                "Encoding",
+                "Random-Number-Generator",
+                "Key-Derivation",
+            ],
         },
         {
             "type": "Asymmetric-Key-Algorithm",
-            "option": ["Public-Key-Encryption" , "Public-Key-Cipher" , "Elliptic-Curve-Cryptography" , "Digital-Signature" , "Post-Quantum-Cryptography" , "Protocol", "Hybrid-Cipher" or "Key-Exchange-Mechanism"]
-        }
+            "option": [
+                "Public-Key-Encryption",
+                "Public-Key-Cipher",
+                "Elliptic-Curve-Cryptography",
+                "Digital-Signature",
+                "Post-Quantum-Cryptography",
+                "Protocol",
+                "Hybrid-Cipher" or "Key-Exchange-Mechanism",
+            ],
+        },
     ]
 
     def __init__(self):
         self.cryptography = {}
         # Read crypto files
         self.cyclonedx_crypto_config_file = (
-            Path(__file__).resolve().parent.parent / "schemas" / "cyclonedx" / "cryptography-defs.schema.json"
+            Path(__file__).resolve().parent.parent
+            / "schemas"
+            / "cyclonedx"
+            / "cryptography-defs.schema.json"
         )
         self.spdx_path = None
         self._read_cdx(self.cyclonedx_crypto_config_file)
@@ -106,9 +126,8 @@ class SBOMCryptography:
     def _read_cdx(self, schema_path):
         with open(schema_path, encoding="utf-8") as schema_file:
             cdx_data = json.load(schema_file)
-        for algorithm in cdx_data['algorithms']:
-            self.algorithm_family[algorithm['family']] = algorithm['primitive']
-
+        for algorithm in cdx_data["algorithms"]:
+            self.algorithm_family[algorithm["family"]] = algorithm["primitive"]
 
     def initialise(self):
         self.cryptography = {}
@@ -116,7 +135,7 @@ class SBOMCryptography:
     def set_id(self, id):
         self.cryptography["id"] = id
 
-    def set_type(self, crypto_type, crypto_attribute = ""):
+    def set_type(self, crypto_type, crypto_attribute=""):
         # only for CycloneDX
         for alg_class in self.alg_type_cdx:
             key = alg_class["type"]
@@ -135,10 +154,10 @@ class SBOMCryptography:
     def set_algorithm(self, algorithm):
         # cdx
         # check algorithm family matches primitive
-        if self.cryptography["type"] == "algorithm"
+        if self.cryptography["type"] == "algorithm":
             alg_family = self.algorithm_family.get(algorithm)
             if alg_family is not None and self.cryptography["primitive"] == alg_family:
-                self.cryptography["algorithm"] = algorithm        
+                self.cryptography["algorithm"] = algorithm
 
     def set_keysize(self, keysize):
         self.cryptography["keysize"] = keysize
@@ -152,29 +171,44 @@ class SBOMCryptography:
         except ValueError:
             return False
 
-    def set_certificate(self, subject = None, issuer = None):
+    def set_certificate(self, subject=None, issuer=None):
         if subject is not None:
             self.cryptography["subject"] = subject
         if issuer is not None:
             self.cryptography["issuer"] = issuer
 
     def set_format(self, cert_format):
-        if len(cert_format) >0:
+        if len(cert_format) > 0:
             self.cryptography["format"] = cert_format
 
     def set_date(self, date_event, date_value):
-        valid_event={"create": "creationDate", "activate": "activationDate", "update": "updateDate", "expire": "expirationDate",  "deactivate": "deactivationDate", "revoke": "revocationDate", "destroy": "destructionDate"}
+        valid_event = {
+            "create": "creationDate",
+            "activate": "activationDate",
+            "update": "updateDate",
+            "expire": "expirationDate",
+            "deactivate": "deactivationDate",
+            "revoke": "revocationDate",
+            "destroy": "destructionDate",
+        }
         event = valid_event[date_event]
         if event is not None and self._validate_date(date_value):
             self.cryptography[event] = date_value
 
     def set_state(self, certificate_state):
-        if certificate_state.lower() in ["pre-activation", "active", "suspended", "deactivated", "revoked", "destroyed"]:
+        if certificate_state.lower() in [
+            "pre-activation",
+            "active",
+            "suspended",
+            "deactivated",
+            "revoked",
+            "destroyed",
+        ]:
             self.cryptography["state"] = certificate_state.lower()
 
     def set_asset(self, asset_type, asset_value):
         # Allow multiple entries
-        asset_entry = {"type" :asset_type.strip(), "ref": asset_value}
+        asset_entry = {"type": asset_type.strip(), "ref": asset_value}
         if "relatedCryptographicAssets" in self.cryptography:
             self.cryptography["relatedCryptographicAssets"].append(asset_entry)
         else:
@@ -187,8 +221,6 @@ class SBOMCryptography:
 
     # Crypto Material
 
-
-
     def set_cryptography_property(self, crypto_class, class_option):
         # only for SPDX
         for alg_class in self.alg_type_spdx:
@@ -198,7 +230,7 @@ class SBOMCryptography:
                 self.cryptography["xxx"] = key
                 self.cryptography["class"] = class_option
                 break
-    
+
     def set_value(self, atribute, attribute_value):
         self.cryptography[atribute] = attribute_value
 

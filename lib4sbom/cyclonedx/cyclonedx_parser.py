@@ -7,12 +7,12 @@ import uuid
 
 import defusedxml.ElementTree as ET
 
+from lib4sbom.data.cryptography import SBOMCryptography
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.service import SBOMService
-from lib4sbom.data.cryptography import SBOMCryptography
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.exception import SBOMParserException
 from lib4sbom.sbom import ParserType
@@ -243,7 +243,7 @@ class CycloneDXParser:
         if asset_type == "algorithm":
             alg_properties = d.get("algorithmProperties")
             if alg_properties is not None:
-                for key,value in alg_properties.items():
+                for key, value in alg_properties.items():
                     if key == "primitive":
                         self.crypto.set_type(asset_type, value)
                     elif key == "algorithmFamily":
@@ -264,7 +264,7 @@ class CycloneDXParser:
                     issuer = certificate_properties["issuerName"]
                     keymap.append("issuertName")
                 if subject is not None or issuer is not None:
-                    self.crypto.set_certificate(subject = subject, issuer = issuer)
+                    self.crypto.set_certificate(subject=subject, issuer=issuer)
                 if "certificateFormat" in certificate_properties:
                     self.crypto.set_format(certificate_properties["certificateFormat"])
                     keymap.append("certificateFormat")
@@ -272,20 +272,25 @@ class CycloneDXParser:
                     self.crypto.set_state(certificate_properties["certificateState"])
                     keymap.append("certificateState")
                 # Date handling
-                event_mapping={"creationDate": "create",
-                    "activationDate":"activate", 
-                    "deactivationDate":"deactivate", 
-                    "revocationDate":"revoke", 
-                    "destructionDate":"destroy"}
+                event_mapping = {
+                    "creationDate": "create",
+                    "activationDate": "activate",
+                    "deactivationDate": "deactivate",
+                    "revocationDate": "revoke",
+                    "destructionDate": "destroy",
+                }
                 for date_event in event_mapping.keys():
                     if date_event in certificate_properties:
-                        self.crypto.set_date(event_mapping[date_event],certificate_properties[date_event])
+                        self.crypto.set_date(
+                            event_mapping[date_event],
+                            certificate_properties[date_event],
+                        )
                         keymap.append(date_event)
                 if "relatedCryptographicAssets" in certificate_properties:
                     for asset in certificate_properties["relatedCryptographicAssets"]:
                         self.crypto.set_asset(asset["type"], asset["ref"])
                     keymap.append("relatedCryptographicAssets")
-                for key,value in certificate_properties.items():
+                for key, value in certificate_properties.items():
                     if key not in keymap:
                         self.crypto.set_value(key, value)
         elif asset_type == "protocol":
@@ -301,9 +306,9 @@ class CycloneDXParser:
                     for asset in protocol_properties["relatedCryptographicAssets"]:
                         self.crypto.set_asset(asset["type"], asset["ref"])
                     keymap.append("relatedCryptographicAssets")
-                for key,value in protocol_properties.items():
+                for key, value in protocol_properties.items():
                     if key not in keymap:
-                        self.crypto.set_value(key, value)                
+                        self.crypto.set_value(key, value)
         elif asset_type == "related-crypto-material":
             material_properties = d.get("relatedCryptoMaterialProperties")
             if material_properties is not None:
@@ -323,21 +328,25 @@ class CycloneDXParser:
                     self.crypto.set_state(material_properties["state"])
                     keymap.append("state")
                 # Date handling
-                event_mapping={"creationDate": "create",
-                    "activationDate":"activate", 
-                    "updateDate":"update", 
-                    "rexpirationDate":"expire"}
+                event_mapping = {
+                    "creationDate": "create",
+                    "activationDate": "activate",
+                    "updateDate": "update",
+                    "rexpirationDate": "expire",
+                }
                 for date_event in event_mapping.keys():
                     if date_event in material_properties:
-                        self.crypto.set_date(event_mapping[date_event],material_properties[date_event])
+                        self.crypto.set_date(
+                            event_mapping[date_event], material_properties[date_event]
+                        )
                         keymap.append(date_event)
                 if "relatedCryptographicAssets" in material_properties:
                     for asset in material_properties["relatedCryptographicAssets"]:
                         self.crypto.set_asset(asset["type"], asset["ref"])
                     keymap.append("relatedCryptographicAssets")
-                for key,value in materiall_properties.items():
+                for key, value in material_properties.items():
                     if key not in keymap:
-                        self.crypto.set_value(key, value)      
+                        self.crypto.set_value(key, value)
         if "oid" in d:
             self.crypto.set_oid(d["oid"])
 
@@ -599,7 +608,9 @@ class CycloneDXParser:
                 )
             if "cryptoProperties" in d:
                 self._cyclonedx_crypto(d["cryptoProperties"])
-                self.cyclonedx_package.set_value("crypto", self.crypto.get_cryptography())
+                self.cyclonedx_package.set_value(
+                    "crypto", self.crypto.get_cryptography()
+                )
             # Save package metadata
             self.packages[(package, version)] = self.cyclonedx_package.get_package()
             self.id[bom_ref] = package
