@@ -40,10 +40,16 @@ for package in packages:
                     print (f"Purl mismatch: {[ref[2]]} {fixed_purl}")
                 purl_info = PackageURL.from_string(ref[2]).to_dict()
                 # print (purl_info)
-                modules.append([purl_info["name"], purl_info["version"]])
+                if "version" in purl_info:
+                    modules.append([purl_info["name"], purl_info["version"]])
+                else:
+                    modules.append([purl_info["name"], "UKNOWN"])
                 purl_found = True
     if not purl_found:
-        modules.append([package["name"], package["version"]])
+        if "version" in package:
+            modules.append([package["name"], package["version"]])
+        else:
+            modules.append([package["name"], "UNKNOWN"])
 
 # for module in modules:
 #     print (module)
