@@ -5,6 +5,7 @@ import os
 import uuid
 from datetime import datetime
 
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.license import LicenseScanner
 from lib4sbom.version import VERSION
 
@@ -397,13 +398,20 @@ class SPDXGenerator:
                     "PACKAGE_MANAGER",
                     "OTHER",
                 ]:
+                    ref_value = reference[2]
+                    if reference[1] == "purl":
+                        # Validate purl
+                        purl_validator = SBOMIdentifier(ref_value)
+                        if not purl_validator.validate():
+                            # correct PURL value
+                            ref_value = purl_validator.fix()
                     self.generateTag(
                         "ExternalRef",
                         reference[0].replace("_", "-")
                         + " "
                         + reference[1]
                         + " "
-                        + reference[2],
+                        + ref_value,
                     )
 
     def generateJSONPackageDetails(
@@ -549,10 +557,17 @@ class SPDXGenerator:
                     "PACKAGE_MANAGER",
                     "OTHER",
                 ]:
+                    ref_value = reference[2]
+                    if reference[1] == "purl":
+                        # Validate purl
+                        purl_validator = SBOMIdentifier(ref_value)
+                        if not purl_validator.validate():
+                            # correct PURL value
+                            ref_value = purl_validator.fix()
                     reference_data = dict()
                     reference_data["referenceCategory"] = reference[0].replace("_", "-")
                     reference_data["referenceType"] = reference[1]
-                    reference_data["referenceLocator"] = reference[2]
+                    reference_data["referenceLocator"] = ref_value
                     if "externalRefs" in component:
                         component["externalRefs"].append(reference_data)
                     else:

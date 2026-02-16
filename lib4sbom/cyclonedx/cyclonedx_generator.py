@@ -9,6 +9,7 @@ from datetime import datetime
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.license import LicenseScanner
 from lib4sbom.version import VERSION
+from lib4sbom.data.identifier import SBOMIdentifier
 
 
 class CycloneDXGenerator:
@@ -675,7 +676,18 @@ class CycloneDXGenerator:
                     ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
                     and ref_type == "purl"
                 ):
-                    component["purl"] = ref_value
+                    # Validate purl
+                    purl_validator = SBOMIdentifier(ref_value)
+                    if purl_validator.validate():
+                        component["purl"] = ref_value
+                    else:
+                        fixed_purl = purl_validator.fix()
+                        component["purl"] = fixed_purl
+                        # Add comment
+                        property_entry = dict()
+                        property_entry["name"] = "PURL Comments"
+                        property_entry["value"] = f"{ref_value} is not a valid PURL"
+                        component["properties"] = [property_entry]
                 else:
                     externalReference = dict()
                     externalReference["url"] = ref_value

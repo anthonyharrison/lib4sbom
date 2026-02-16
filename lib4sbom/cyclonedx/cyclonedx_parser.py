@@ -9,6 +9,7 @@ import defusedxml.ElementTree as ET
 
 from lib4sbom.data.cryptography import SBOMCryptography
 from lib4sbom.data.document import SBOMDocument
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
@@ -560,7 +561,16 @@ class CycloneDXParser:
                 elif d["cpe"].lower().startswith("cpe:/"):
                     self.cyclonedx_package.set_cpe(d["cpe"], cpetype="cpe22Type")
             if "purl" in d:
-                self.cyclonedx_package.set_purl(d["purl"])
+                # Validate purl
+                purl_validator = SBOMIdentifier(d["purl"])
+                if purl_validator.validate():
+                    self.cyclonedx_package.set_purl(d["purl"])
+                else:
+                    self.cyclonedx_package.set_purl(purl_validator.fix())
+                    # Add comment
+                    self.cyclonedx_package.set_property(
+                        "PURL Comments", f'{d["purl"]} is not a valid PURL'
+                    )
             if "group" in d:
                 self.cyclonedx_package.set_value("group", d["group"])
             if "evidence" in d:
@@ -1022,7 +1032,16 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_cpe(cpe, cpetype="cpe22Type")
         purl = self._xml_component(component, "purl")
         if purl != "":
-            self.cyclonedx_package.set_purl(purl)
+            # Validate purl
+            purl_validator = SBOMIdentifier(purl)
+            if purl_validator.validate():
+                self.cyclonedx_package.set_purl(purl)
+            else:
+                self.cyclonedx_package.set_purl(purl_validator.fix())
+                # Add comment
+                self.cyclonedx_package.set_property(
+                    "PURL Comments", f'{purl} is not a valid PURL'
+                )
         # Potentially multiple entries
         for properties in component.findall(self.schema + "properties"):
             for property in properties.findall(self.schema + "property"):

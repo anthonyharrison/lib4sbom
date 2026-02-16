@@ -9,6 +9,7 @@ import yaml
 
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.file import SBOMFile
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.license import SBOMLicense
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
@@ -343,6 +344,12 @@ class SPDXParser:
                 ref_category = ext_elements.split()[0]
                 ref_type = ext_elements.split()[1]
                 ref_locator = ext_elements.split()[2]
+                if ref_type == "purl":
+                    # Validate purl
+                    purl_validator = SBOMIdentifier(ref_locator)
+                    if not purl_validator.validate():
+                        # correct PURL value
+                        ref_locator = purl_validator.fix()
                 spdx_package.set_externalreference(ref_category, ref_type, ref_locator)
             elif line_elements[0] == "Relationship":
                 # Format is TAG SOURCE TYPE TARGET
@@ -555,10 +562,18 @@ class SPDXParser:
                             spdx_package.set_value("release_date", d["releaseDate"])
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
+                                ref_type = ext_ref["referenceType"]
+                                ref_locator = ext_ref["referenceLocator"]
+                                if ref_type == "purl":
+                                    # Validate purl
+                                    purl_validator = SBOMIdentifier(ref_locator)
+                                    if not purl_validator.validate():
+                                        # correct PURL value
+                                        ref_locator = purl_validator.fix()
                                 spdx_package.set_externalreference(
                                     ext_ref["referenceCategory"],
-                                    ext_ref["referenceType"],
-                                    ext_ref["referenceLocator"],
+                                    ref_type,
+                                    ref_locator,
                                 )
                         package_tuple = (package, version, id)
                         if package_tuple in packages:
