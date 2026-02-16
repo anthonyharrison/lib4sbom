@@ -3,18 +3,22 @@
 
 import contextlib
 import json
+import urllib.request
 from pathlib import Path
-from urllib.parse import urlparse, urldefrag
+from urllib.parse import urldefrag, urlparse
 
 import fastjsonschema
 import xmlschema
-import urllib.request
 
 
 class CycloneDXValidator:
 
     CYCLONEDX_VERSIONS = ["1.7", "1.6", "1.5", "1.4", "1.3"]
-    SUPPORT_SCHEMA = ["spdx.schema.json", "jsf-0.82.schema.json", "cryptography-defs.schema.json"]
+    SUPPORT_SCHEMA = [
+        "spdx.schema.json",
+        "jsf-0.82.schema.json",
+        "cryptography-defs.schema.json",
+    ]
     BASE_URI = "http://cyclonedx.org/schema/"
 
     def __init__(self, cyclonedx_version=None, debug=False):
@@ -88,7 +92,11 @@ class CycloneDXValidator:
                 schema = self._load_schema_with_local_refs(
                     schema_file, self.schemas_path
                 )
-                validate = fastjsonschema.compile(schema, detailed_exceptions=True, handlers={'http': debug_handler, 'https': debug_handler})
+                validate = fastjsonschema.compile(
+                    schema,
+                    detailed_exceptions=True,
+                    handlers={"http": debug_handler, "https": debug_handler},
+                )
                 validate_result = validate(sbom_data)
                 # if a validation error occurs, won't get here
                 if self.debug:

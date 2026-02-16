@@ -426,4 +426,5 @@ class SBOMGenerator:
                     ),
                 )
 
+
 # End of file
