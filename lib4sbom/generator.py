@@ -11,6 +11,7 @@ from lib4sbom.data.document import SBOMDocument
 from lib4sbom.output import SBOMOutput
 from lib4sbom.sbom import SBOMData
 from lib4sbom.spdx.spdx_generator import SPDXGenerator
+from lib4sbom.spdx.spdx3_generator import SPDX3Generator
 from lib4sbom.version import VERSION
 
 
@@ -33,7 +34,7 @@ class SBOMGenerator:
         if self.format not in ["tag", "json", "yaml"]:
             # Set a default format
             self.format = "json"
-        if self.sbom_type not in ["spdx", "cyclonedx"]:
+        if self.sbom_type not in ["spdx", "spdx3", "cyclonedx"]:
             # Set a default SBOM type
             self.sbom_type = "spdx"
         # Ensure format is compatible with SBOM type
@@ -41,9 +42,12 @@ class SBOMGenerator:
             # Tag and YAML not valid for CycloneDX
             if self.format in ["tag", "yaml"]:
                 self.format = "json"
-
         if self.sbom_type == "spdx":
             self.bom = SPDXGenerator(
+                validate_license, self.format, application, version
+            )
+        elif self.sbom_type == "spdx3":
+            self.bom = SPDX3Generator(
                 validate_license, self.format, application, version
             )
         else:
@@ -79,6 +83,9 @@ class SBOMGenerator:
             if self.sbom_type == "spdx":
                 self._generate_spdx(project_name, sbom_data)
                 self.sbom = self._get_spdx()
+            elif self.sbom_type == "spdx3":
+                self._generate_spdx3(project_name, sbom_data)
+                self.sbom = self._get_spdx3()
             else:
                 self._generate_cyclonedx(project_name, sbom_data)
                 self.sbom = self._get_cyclonedx()
@@ -219,6 +226,139 @@ class SBOMGenerator:
                     )
 
     def _get_spdx(self):
+        if not self.sbom_complete:
+            self.bom.showRelationship()
+            self.sbom_complete = True
+        return self.bom.getBOM()
+
+    def _generate_spdx3(self, project_name: str, sbom_data: SBOMData) -> None:
+        self.sbom_complete = False
+        # Set spec version if explicitly specified
+        if "version" in sbom_data:
+            self.bom.spec_version(sbom_data["version"])
+        if "uuid" in sbom_data:
+            uuid = sbom_data["uuid"]
+        else:
+            uuid = None
+        name = None
+        lifecycle = None
+        organisation = self.organisation
+        if "document" in sbom_data:
+            doc = SBOMDocument()
+            doc.copy_document(sbom_data["document"])
+            name = doc.get_name()
+            lifecycle = doc.get_value("lifecycle")
+            if doc.get_value("metadata_supplier") is not None:
+                organisation = doc.get_value("metadata_supplier")
+        if name is not None and name != "NOT DEFINED":
+            # Use existing document name
+            project_id = self.bom.generateDocumentHeader(
+                name, uuid, lifecycle, organisation
+            )
+            self._save_element(name, project_id)
+        else:
+            project_id = self.bom.generateDocumentHeader(
+                project_name, uuid, lifecycle, organisation
+            )
+            self._save_element(project_name, project_id)
+        if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
+            # Load user defined licences
+            self.bom.addLicenseDetails(sbom_data["licenses"])
+        if "files" in sbom_data:
+            # Process list of files
+            if len(sbom_data["files"]) is not None:
+                sbom_files = [x for x in sbom_data["files"].values()]
+                id = 1
+                relationship = "CONTAINS"
+                for file in sbom_files:
+                    file_id = file["id"]
+                    if file_id == "NOT_DEFINED" or not self._validate_id(file_id):
+                        file_id = str(id) + "-" + file["name"]
+                    self.bom.generateFileDetails(
+                        file["name"],
+                        file_id,
+                        file,
+                        project_id,
+                        relationship,
+                    )
+                    self._save_element(file["name"], file_id)
+                    id = id + 1
+        # Process list of packages
+        if "packages" in sbom_data:
+            id = 1
+            sbom_packages = [x for x in sbom_data["packages"].values()]
+            for package in sbom_packages:
+                if "name" not in package:
+                    if self.debug:
+                        print(f"[ERROR] Name missing in {package}")
+                    continue
+                product = package["name"]
+                my_id = package.get("id", None)
+                if not self._validate_id(my_id):
+                    my_id = f"{id}-{product}"
+                parent = "-"
+                self._save_element(product, my_id, my_id)
+                if parent == "-":
+                    parent_id = project_id
+                    relationship = "DESCRIBES"
+                else:
+                    if parent in self.element_set:
+                        parent_id = self._get_element(parent)
+                        relationship = "DEPENDS_ON"
+                self.bom.generatePackageDetails(
+                    product,
+                    my_id,
+                    package,
+                    parent_id,
+                    relationship,
+                )
+                id = id + 1
+        # If user defined licenses defined, generate details
+        self.bom.generateLicenseDetails()
+        if "relationships" in sbom_data:
+            for relationship in sbom_data["relationships"]:
+                if (
+                    relationship["source"] in self.element_set
+                    and relationship["target"] in self.element_set
+                ):
+                    if relationship.get("source_type") == "file":
+                        source_ident = self.bom.file_ident(
+                            self._get_element(
+                                relationship["source"], relationship["source_id"]
+                            )
+                        )
+                    else:
+                        source_ident = self.bom.package_ident(
+                            self._get_element(
+                                relationship["source"], relationship["source_id"]
+                            )
+                        )
+                    if relationship.get("target_type") == "file":
+                        target_ident = self.bom.file_ident(
+                            self._get_element(
+                                relationship["target"], relationship["target_id"]
+                            )
+                        )
+                    else:
+                        target_ident = self.bom.package_ident(
+                            self._get_element(
+                                relationship["target"], relationship["target_id"]
+                            )
+                        )
+                    self.bom.generateRelationship(
+                        source_ident,
+                        target_ident,
+                        " " + relationship["type"] + " ",
+                    )
+                elif self.debug:
+                    print(
+                        "[ERROR] Relationship not copied between",
+                        relationship["source"],
+                        " and ",
+                        relationship["target"],
+                    )
+
+    def _get_spdx3(self):
         if not self.sbom_complete:
             self.bom.showRelationship()
             self.sbom_complete = True
