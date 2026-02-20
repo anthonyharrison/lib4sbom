@@ -16,6 +16,7 @@ my_package.set_name("glibc")
 my_package.set_version("2.15")
 my_package.set_supplier("organisation", "gnu")
 my_package.set_licensedeclared("GPL3")
+my_package.set_externalreference("PACKAGE-MANAGER", "purl", "pkg/pypi:glibc@2.15")
 sbom_packages[
     (my_package.get_name(), my_package.get_value("version"))
 ] = my_package.get_package()

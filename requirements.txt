@@ -4,3 +4,4 @@ defusedxml
 fastjsonschema
 jsonschema
 xmlschema
+packageurl-python
