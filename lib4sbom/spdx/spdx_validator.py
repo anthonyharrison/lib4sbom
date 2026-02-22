@@ -69,11 +69,13 @@ class SPDXValidator:
                     print(
                         f"[Schema Error] Failed to validate against SPDX {spdx_version} JSON schema"
                     )
-            except jsonschema.exceptions.ValidationError:
+            except jsonschema.exceptions.ValidationError as e:
                 if self.debug:
                     print(
                         f"[ValidationError] Failed to validate against SPDX {spdx_version} JSON schema"
                     )
+                print (e)
+
         return {"SPDX": False}
 
     def validate_spdx_json(self, sbom_file):
