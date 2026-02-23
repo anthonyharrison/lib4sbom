@@ -18,7 +18,9 @@ The following facilities are provided:
 - Create and manipulate a SBOM dependency relationship object
 - Create and manipulate a Vulnerability object
 - Create and manipulate a Software Service object
+- Create and manipulate a Cryptography object
 - Generated SBOM can be output to a file or to the console
+- Parse a SBOM embedded in an Intoto attestaion or Protobom object.
 
 ## Installation
 
@@ -56,8 +58,9 @@ SBOMs are supported in the following formats and versions
 | SPDX      | 2.3     | TagValue |
 | SPDX      | 2.3     | JSON     |
 | SPDX      | 2.3     | YAML     |
-| SPDX      | 2.3     | RDF       |
+| SPDX      | 2.3     | RDF      |
 | SPDX      | 2.3     | XML      |
+| SPDX      | 3.0     | JSON-LD  |
 | CycloneDX | 1.4     | JSON     |
 | CycloneDX | 1.4     | XML      |
 | CycloneDX | 1.5     | JSON     |
@@ -82,6 +85,7 @@ following filename conventions.
 | --------- |----------|--------------------|
 | SPDX      | TagValue | .spdx              |
 | SPDX      | JSON     | .spdx.json         |
+| SPDX      | JSON-LD  | .json              |
 | SPDX      | YAML     | .spdx.yaml         |
 | SPDX      | YAML     | .spdx.yml          |
 | SPDX      | RDF      | .spdx.rdf          |
@@ -142,7 +146,7 @@ LicenseListVersion: 3.18
 Creator: Tool: sbom4python-0.4.0
 Created: 2022-11-16T10:14:26Z
 CreatorComment: <text>This document has been automatically generated.</text>
-##### 
+#####
 
 PackageName: virtualenv
 SPDXID: SPDXRef-Package-1-virtualenv
@@ -154,7 +158,7 @@ PackageLicenseConcluded: MIT
 PackageLicenseDeclared: MIT
 PackageCopyrightText: NOASSERTION
 ExternalRef: PACKAGE-MANAGER purl pkg:pypi/virtualenv@20.16.7
-##### 
+#####
 
 PackageName: distlib
 SPDXID: SPDXRef-Package-2-distlib
@@ -166,7 +170,7 @@ PackageLicenseConcluded: NOASSERTION
 PackageLicenseDeclared: NOASSERTION
 PackageCopyrightText: NOASSERTION
 ExternalRef: PACKAGE-MANAGER purl pkg:pypi/distlib@0.3.6
-##### 
+#####
 
 PackageName: filelock
 SPDXID: SPDXRef-Package-3-filelock
@@ -178,7 +182,7 @@ PackageLicenseConcluded: Unlicense
 PackageLicenseDeclared: Unlicense
 PackageCopyrightText: NOASSERTION
 ExternalRef: PACKAGE-MANAGER purl pkg:pypi/filelock@3.8.0
-##### 
+#####
 
 PackageName: platformdirs
 SPDXID: SPDXRef-Package-4-platformdirs
@@ -202,14 +206,14 @@ The following code sample shows the use of the SBOMParser module.
 ```python
 >>> from lib4sbom.parser import SBOMParser
 >>> test_parser = SBOMParser()
->>> print (f"SBOM type {test_parser.get_type()}")                                                                                                                                             
-SBOM type auto                                                                                                                                                                                
->>> test_parser.parse_file("test_sbom.spdx")                                                                                                                                                                                                                                                                                            
->>> print (f"SBOM type {test_parser.get_type()}")                                                                                                                                             
-SBOM type spdx                                                                                                                                                                                
+>>> print (f"SBOM type {test_parser.get_type()}")
+SBOM type auto
+>>> test_parser.parse_file("test_sbom.spdx")
+>>> print (f"SBOM type {test_parser.get_type()}")
+SBOM type spdx
 >>> sbom_files = test_parser.get_files()
->>> print (sbom_files)                                                                                                                                                                        
-[]                                                                                                                                                                                            
+>>> print (sbom_files)
+[]
 >>> sbom_packages = test_parser.get_packages()
 >>> print (sbom_packages)
 [{'name': 'virtualenv', 'type': 'library', 'id': 'SPDXRef-Package-1-virtualenv', 'supplier_type': 'Person', 'supplier': 'Bernat_Gabor', 'version': '20.16.7', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'MIT', 'licensedeclared': 'MIT', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/virtualenv@20.16.7']]}, {'name': 'distlib', 'type': 'library', 'id': 'SPDXRef-Package-2-distlib', 'supplier_type': 'Person', 'supplier': 'Vinay_Sajip', 'version': '0.3.6', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'NOASSERTION', 'licensedeclared': 'NOASSERTION', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/distlib@0.3.6']]}, {'name': 'filelock', 'type': 'library', 'id': 'SPDXRef-Package-3-filelock', 'supplier_type': 'Person', 'supplier': 'Benedikt_Schmitt', 'version': '3.8.0', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'Unlicense', 'licensedeclared': 'Unlicense', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/filelock@3.8.0']]}, {'name': 'platformdirs', 'type': 'library', 'id': 'SPDXRef-Package-4-platformdirs', 'supplier_type': 'Organization', 'supplier': 'Unknown', 'version': '2.5.4', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'NOASSERTION', 'licensedeclared': 'NOASSERTION', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/platformdirs@2.5.4']]}]
@@ -222,7 +226,7 @@ SBOM type spdx
 [{'source': 'TestDocument', 'type': 'DESCRIBES', 'target': 'virtualenv', 'source_id': 'SPDXRef-DOCUMENT', 'target_id': 'SPDXRef-Package-1-virtualenv'}, {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'distlib', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-2-distlib'}, {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'filelock', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-3-filelock'}, {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'platformdirs', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-4-platformdirs'}]
 >>> sbom_relationships[2]
 {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'filelock', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-3-filelock'}
->>> 
+>>>
 ```
 
 _class_ **SBOMValidator**(_sbom_type='auto', version=None, debug=False_)
@@ -238,6 +242,7 @@ following filename conventions.
 | --------- |----------|--------------------|
 | SPDX      | TagValue | .spdx              |
 | SPDX      | JSON     | .spdx.json         |
+| SPDX      | JSON-LD  | .json              |
 | SPDX      | YAML     | .spdx.yaml         |
 | SPDX      | YAML     | .spdx.yml          |
 | SPDX      | RDF      | .spdx.rdf          |
@@ -289,6 +294,7 @@ SBOMs can be generated in the following formats
 | SPDX      | 2.3     | Tag       |
 | SPDX      | 2.3     | JSON      |
 | SPDX      | 2.3     | YAML      |
+| SPDX      | 3.0     | JSON-LD   |
 | CycloneDX | 1.4     | JSON      |
 | CycloneDX | 1.5     | JSON      |
 | CycloneDX | 1.6     | JSON      |
@@ -308,7 +314,7 @@ This creates a simple SBOM Generator object. The following optional parameters c
 _validate_license_ indicates if license information is validated against the set of [SPDX license identifiers](https://spdx.org/licenses/). This option only applies for SPDX SBOMs
 as this is mandatory for CycloneDX SBOMs.
 
-_sbom_type_ indicates the type of SBOM to be generated. Valid options are spdx or cyclonedx
+_sbom_type_ indicates the type of SBOM to be generated. Valid options are spdx or cyclonedx. Support for SPDX3 is currently experimental but can be enabled by setting the sbom_type to spdx3.
 
 _format_ indicates the format that the SBOM is to be generated in. Valid options are Tag, JSON or YAML. If an invalid format is specified,
 a default format of JSON will be assumed. If an unsupported format is specified for the type of SBOM (e.g. Tag or YAML for CycloneDX), a default
@@ -381,7 +387,7 @@ name: TestDocument
 spdxVersion: SPDX-2.3
 >>> test_generator.get_sbom()
 {'SPDXID': 'SPDXRef-DOCUMENT', 'spdxVersion': 'SPDX-2.3', 'creationInfo': {'comment': 'This document has been automatically generated.', 'creators': ['Tool: lib4sbom-0.1.0'], 'created': '2023-01-24T13:51:36Z', 'licenseListVersion': '3.18'}, 'name': 'TestDocument', 'dataLicense': 'CC0-1.0', 'documentNamespace': 'http://spdx.org/spdxdocs/TestDocument-817c4e4c-eac4-49d9-bc41-65f0972edce8', 'packages': [{'SPDXID': 'SPDXRef-Package-1-virtualenv', 'name': 'virtualenv', 'versionInfo': '20.16.7', 'supplier': 'Person: Bernat_Gabor', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'MIT', 'licenseDeclared': 'MIT', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/virtualenv@20.16.7'}]}, {'SPDXID': 'SPDXRef-Package-2-distlib', 'name': 'distlib', 'versionInfo': '0.3.6', 'supplier': 'Person: Vinay_Sajip', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'NOASSERTION', 'licenseDeclared': 'NOASSERTION', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/distlib@0.3.6'}]}, {'SPDXID': 'SPDXRef-Package-3-filelock', 'name': 'filelock', 'versionInfo': '3.8.0', 'supplier': 'Person: Benedikt_Schmitt', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'Unlicense', 'licenseDeclared': 'Unlicense', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/filelock@3.8.0'}]}, {'SPDXID': 'SPDXRef-Package-4-platformdirs', 'name': 'platformdirs', 'versionInfo': '2.5.4', 'supplier': 'Organization: Unknown', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'NOASSERTION', 'licenseDeclared': 'NOASSERTION', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/platformdirs@2.5.4'}]}], 'relationships': [{'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-1-virtualenv', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-2-distlib', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-3-filelock', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-4-platformdirs', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-Package-1-virtualenv', 'relatedSpdxElement': 'SPDXRef-Package-2-distlib', 'relationshipType': 'CONTAINS'}, {'spdxElementId': 'SPDXRef-Package-1-virtualenv', 'relatedSpdxElement': 'SPDXRef-Package-3-filelock', 'relationshipType': 'CONTAINS'}, {'spdxElementId': 'SPDXRef-Package-1-virtualenv', 'relatedSpdxElement': 'SPDXRef-Package-4-platformdirs', 'relationshipType': 'CONTAINS'}]}
->>> 
+>>>
 ```
 
 ### SBOMOutput
@@ -424,10 +430,10 @@ The following code sample shows the use of the SBOMOutput module.
 >>> from lib4sbom.output import SBOMOutput
 >>> sbom_output = SBOMOutput(filename="testapp.json", output_format="json")
 >>> sbom_output.generate_output(test_generator.get_sbom())
->>> 
+>>>
 ```
 
-### SBOM Object 
+### SBOM Object
 
 _class_ **SBOM**()
 
@@ -479,7 +485,7 @@ Returns the SBOM object as a dictionary.
 >>> sbom.add_document(my_doc.get_document())
 ```
 
-### SBOMDocument Object 
+### SBOMDocument Object
 
 _class_ **SBOMDocument**()
 
@@ -608,10 +614,10 @@ initialise() Reinitialises a SBOMFile Object. All data associated with the objec
 >>> sbom_file.set_checksum("SHA1", file_hash)
 >>> sbom_file.set_id("SPDXRef-File-0001")
 >>> sbom_files[sbom_file.get_name()] = sbom_file.get_file()
->>> sbom_file.initialise()                                  
->>> sbom_file.set_name("makefile")                       
->>> sbom_file.set_licenseconcluded("NOASSERTION")                    
->>> sbom_file.set_id("SPDXRef-File-0002")                   
+>>> sbom_file.initialise()
+>>> sbom_file.set_name("makefile")
+>>> sbom_file.set_licenseconcluded("NOASSERTION")
+>>> sbom_file.set_id("SPDXRef-File-0002")
 >>> sbom_files[sbom_file.get_name()] = sbom_file.get_file()
 >>> from lib4sbom.sbom import SBOM
 >>> my_sbom = SBOM()
@@ -619,7 +625,7 @@ initialise() Reinitialises a SBOMFile Object. All data associated with the objec
 ```
 
 ### SBOMPackage Object
-                
+
 _class_ **SBOMPackage**()
 
 This creates a simple SBOM Package object. This object contains the values of the attributes
@@ -898,11 +904,18 @@ Returns the service object as a dictionary.
 >>> my_sbom = SBOM()
 >>> my_sbom.add_services(sbom_services)
 ```
+### Cryptpgraphy Object
+
+_class_ **SBOMCryptography**(validation = None)
+
+TBC
+
+**NOTE** Cryptography objects are only included in CyclonedDX SBOMs
 
 ## Examples
 
 A number of example scripts are included in the _examples_ subdirectory.
-						
+
 ## Implementation Notes
 
 The following design decisions have been made in processing the SBOM files:
