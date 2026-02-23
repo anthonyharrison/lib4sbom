@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import re
 import uuid
 from datetime import datetime
 
@@ -125,11 +126,15 @@ class SPDX3Generator:
     # Helper classes
 
     def create_doc(self):
-        self.doc["@context"] = f"https://spdx.org/rdf/{self.SPDX_VERSION}/spdx-context.jsonld"
+        self.doc["@context"] = (
+            f"https://spdx.org/rdf/{self.SPDX_VERSION}/spdx-context.jsonld"
+        )
         self.doc["@graph"] = []
         self.creationid = 0
         self.id = 1
         self.document_generation_time = self.generateTime()
+        self.license_list_id = self.license.get_license_version()
+        self.license_list_id = "3.27.0"
 
     def creation_info(self):
         creation = {}
@@ -140,8 +145,11 @@ class SPDX3Generator:
         if self.organisation is not None:
             creation["createdBy"] = [self.organisation]
         else:
-            creation["createdBy"] = ["urn:spdx.dev:person"]
-        # Meeds to reference tool element
+            # Need to create an agent
+            creation["createdBy"] = [
+                self.create_type("SoftwareAgent", {"name": self.application})
+            ]
+        # Needs to reference tool element
         if self.tool is not None:
             creation["createdUsing"] = [self.tool]
         creation["specVersion"] = self.SPDX_VERSION
@@ -152,22 +160,31 @@ class SPDX3Generator:
         # self.creationid = self.creationid + 1
 
     def create_document(self, bom_id, project_name):
-        # document_properties = {"dataLicense" : self.DATA_LICENSE, "name" : project_name, "rootElement": bom_id, "profileConformance" : ["core", 'software', "security", "license"]}
-        document_properties = {"name" : project_name, "rootElement": [bom_id], "profileConformance" : ["core", 'software', "security", "simpleLicensing"]}
-        self.create_type ("SpdxDocument", document_properties)
+        # Create data licence
+        data_licence_id = self.create_type(
+            "simplelicensing_LicenseExpression",
+            {"simplelicensing_licenseExpression": self.DATA_LICENSE},
+        )
+        document_properties = {
+            "name": project_name,
+            "dataLicense": data_licence_id,
+            "rootElement": [bom_id],
+            "profileConformance": ["core", "software", "security", "simpleLicensing"],
+        }
+        self.create_type("SpdxDocument", document_properties)
 
     def create_type(self, element_type, element_info):
-        if len (element_info) > 0:
+        if len(element_info) > 0:
             # Need to reference a creation item
             type_element = {}
             type_element["type"] = element_type
             if element_info.get("spdxId") is None:
-                element_id = f"{self.SPDX_PREAMBLE}{element_type.split('_')[-1]}-{self.id}"
+                element_id = (
+                    f"{self.SPDX_PREAMBLE}{element_type.split('_')[-1]}-{self.id}"
+                )
                 type_element["spdxId"] = element_id
             else:
                 element_id = element_info.get("spdxId")
-            # Which one?
-            # type_element["@id"] = f"_:creationinfo{self.creationid}"
             type_element["creationInfo"] = f"_:creationinfo{self.creationid}"
             for key, value in element_info.items():
                 type_element[key] = value
@@ -177,49 +194,81 @@ class SPDX3Generator:
         return None
 
     def create_package(self, component_details):
+        # Map spdx2 attributes to SPDX3 attributes
         package_attributes = {
-            "downloadLocation" : "software_downloadLocation",
-            "homepage" : "software_homePage",
-            "url" : "packageURL",
-            "name" : "name",
-            "versionInfo" : "software_packageVersion",
-            "sourceInfo" : "sourceInfo",
-            "builtDate" : "builtTime",
-            "primaryPackagePurpose" : "software_primaryPurpose",
-            "description" : "description",
-            "summary" : "summary",
-            "comment" : "comment",
+            "downloadLocation": "software_downloadLocation",
+            "homepage": "software_homePage",
+            "url": "packageURL",
+            "name": "name",
+            "versionInfo": "software_packageVersion",
+            "sourceInfo": "sourceInfo",
+            "builtDate": "builtTime",
+            "primaryPackagePurpose": "software_primaryPurpose",
+            "description": "description",
+            "summary": "summary",
+            "comment": "comment",
             "SPDXID": "spdxId",
             "copyrightText": "software_copyrightText",
-            # "supplier": "originatedBy"
-            # "externalRefs": "externalIdentifier"
         }
         package_details = {}
+        # map licence attributes to SPDX3 relationships
         license_attributes = {
-            "licenseConcluded" : "hasConcludedLicense",
-            "licenseDeclared" : "hasDeclaredLicense",
+            "licenseConcluded": "hasConcludedLicense",
+            "licenseDeclared": "hasDeclaredLicense",
             # "licenseList" : "licenseList",
             # "licenseComments" : "licenseComments",
             # "licenseInfoInFiles" : "licenseInfoInFiles",
         }
         license_details = {}
-        external_attributes = [""]
         external_details = []
         for key, value in component_details.items():
             if key in package_attributes.keys():
                 package_details[package_attributes[key]] = value
         # convert primary purpose to SPDX3
         if package_details.get("software_primaryPurpose") is not None:
-            package_details["software_primaryPurpose"] = package_details["software_primaryPurpose"].lower()
-        # TODO Need to convert supplier info
+            package_details["software_primaryPurpose"] = package_details[
+                "software_primaryPurpose"
+            ].lower()
+        if "supplier" in component_details:
+            supplier = component_details["supplier"].split(":")
+            # Extract details of the supplier. Assume format is name (email address)
+            pattern = r"^(.*?)(?:\s*\((.*?)\))?\s*$"
+            match = re.search(pattern, supplier[1])
+            if match:
+                name = match.group(1).strip()
+                email = match.group(2)
+                supplier_info = {"name": name}
+                if email is not None:
+                    ext_id = {
+                        "type": "ExternalIdentifier",
+                        "identifier": email.strip(),
+                        "externalIdentifierType": "email",
+                    }
+                    supplier_info["externalIdentifier"] = [ext_id]
+                supplier_id = self.create_type(supplier[0].capitalize(), supplier_info)
+                package_details["suppliedBy"] = supplier_id
         if "externalRefs" in component_details:
             for ref in component_details["externalRefs"]:
                 external_element = {}
                 external_element["type"] = "ExternalIdentifier"
-                # Need to translate from SPDX2 types to SPDX3 types
-                external_element["externalIdentiferType"] = ref["referenceType"].lower().replace("purl","packageURL").replace("type","")
-                external_element["idenfiier"] = ref["referenceLocator"]
-                external_details.append(external_element)
+                # translate from SPDX2 types to SPDX3 types
+                convert_type = {
+                    "cpe22type": "cpe22",
+                    "cpe23type": "cpe23",
+                    "purl": "packageUrl",
+                }
+                # if PURL prefer to use dedicated attribute
+                if ref["referenceType"].lower() == "purl":
+                    package_details["software_packageUrl"] = ref["referenceLocator"]
+                else:
+                    if convert_type.get(ref["referenceType"].lower()) is not None:
+                        external_element["externalIdentifierType"] = convert_type.get(
+                            ref["referenceType"].lower()
+                        )
+                    else:
+                        external_element["externalIdentifierType"] = "other"
+                    external_element["identifier"] = ref["referenceLocator"]
+                    external_details.append(external_element)
         if len(external_details) > 0:
             package_details["externalIdentifier"] = external_details
         for key, _ in license_attributes.items():
@@ -229,13 +278,32 @@ class SPDX3Generator:
                 licence_id = self.license.find_license_id(component_details[key])
                 licence_url = self.license.get_license_url(licence_id)
                 if licence_url is not None:
-                    license_details["to"] = [licence_url]
+                    # create a license object and reference it
+                    licence_ref = self.create_type(
+                        "simplelicensing_LicenseExpression",
+                        {
+                            "simplelicensing_licenseExpression": component_details[key],
+                            "simplelicensing_licenseListVersion": self.license_list_id,
+                        },
+                    )
+                    license_details["to"] = [licence_ref]
                 else:
-                    license_details["to"] = ["https://spdx.org/rdf/3.0.1/terms/ExpandedLicensing/NoAssertionLicense" ]           
+                    license_details["to"] = [
+                        "https://spdx.org/rdf/3.0.1/terms/ExpandedLicensing/NoAssertionLicense"
+                    ]
                 license_details["from"] = package_details.get("spdxId")
-                # license_details["licenseListVersion"] = self.license.get_license_version()
                 self.create_type("Relationship", license_details)
         package_id = self.create_type("software_Package", package_details)
+        if self.bom_id is None:
+            self.bom_id = self.create_type(
+                "software_Sbom",
+                {
+                    "name": self.project_name,
+                    "rootElement": [package_id],
+                    "software_sbomType": [self.lifecycle],
+                },
+            )
+            self.create_document(self.bom_id, self.project_name)
 
     def create_file(self, file_details):
         self.create_type("software_File", file_details)
@@ -243,7 +311,11 @@ class SPDX3Generator:
     def create_relationship(self, relationship_details):
         relationship_info = {}
         relationship_info["from"] = relationship_details["spdxElementId"]
-        relationship_info["relationshipType"] = relationship_details["relationshipType"].lower().replace("depends_on","dependsOn")
+        relationship_info["relationshipType"] = (
+            relationship_details["relationshipType"]
+            .lower()
+            .replace("depends_on", "dependsOn")
+        )
         relationship_info["to"] = [relationship_details["relatedSpdxElement"]]
         relationship_info["completeness"] = "noAssertion"
         self.create_type("Relationship", relationship_info)
@@ -261,14 +333,22 @@ class SPDX3Generator:
         self.file_component = []
         self.relationships = []
         self.create_doc()
-        self.tool = self.create_type("Tool", {"name" : f"{self.application}-{self.application_version}"})
+        self.tool = self.create_type(
+            "Tool", {"name": f"{self.application}-{self.application_version}"}
+        )
         self.creation_info()
         if self.organisation is not None:
-            self.organisation = self.create_type("Organization", {"name": self.organisation} )
-        # self.creation_info()
-        bom_id = self.create_type("software_Sbom", {"name": project_name, "rootElement": ["urn:spdex.dev:base"], "software_sbomType": [ lifecycle if lifecycle is not None else "build"]})
-        self.create_document(bom_id, project_name)
-        return self.id
+            self.organisation = self.create_type(
+                "Organization", {"name": self.organisation}
+            )
+        self.bom_id = None
+        self.lifecycle = lifecycle if lifecycle is not None else "build"
+        self.project_name = project_name
+        # root_element = self.create_type("", {""})
+        # bom_id = self.create_type("software_Sbom", {"name": project_name, "rootElement": [root_element], "software_sbomType": [ lifecycle if lifecycle is not None else "build"]})
+        # self.create_document(bom_id, project_name)
+        # return self.id
+        return self.SPDX_PROJECT_ID
 
     def _validate_spdxid(self, id, preamble):
         spdx_id = ""
@@ -489,7 +569,6 @@ class SPDX3Generator:
                     else:
                         component["externalRefs"] = [reference_data]
         self.create_package(component)
-        #self.component.append(component)
 
     def generateJSONFileDetails(self, file, id, file_info, parent_id, relationship):
         component = dict()
@@ -536,7 +615,7 @@ class SPDX3Generator:
                     component["fileContributor"].append(contributor)
                 else:
                     component["fileContributor"] = [contributor]
-        #self.file_component.append(component)
+        # self.file_component.append(component)
         self.create_file(component)
 
     def generateJSONLicenseDetails(self, id, name, license_text, comment):
@@ -575,13 +654,16 @@ class SPDX3Generator:
     def generateLicenseDetails(self):
         for license_info in self.license_info:
             self.generateJSONLicenseDetails(
-                    license_info.get("id", ""),
-                    license_info.get("name", ""),
-                    license_info.get("text", ""),
-                    license_info.get("comment", ""),
-                )
+                license_info.get("id", ""),
+                license_info.get("name", ""),
+                license_info.get("text", ""),
+                license_info.get("comment", ""),
+            )
 
     def generateRelationship(self, from_id, to_id, relationship_type):
+        # May need to update id to refere to SPDX document.
+        if self.SPDX_PROJECT_ID in from_id:
+            from_id = self.bom_id
         if (
             from_id != to_id
             and [from_id, to_id, relationship_type] not in self.relationship
@@ -590,8 +672,6 @@ class SPDX3Generator:
 
     def showRelationship(self):
         # self.relationship.sort()
-        if self.format == "tag":
-            self.generateComment("\n")
         for r in self.relationship:
             relation = dict()
             relation["spdxElementId"] = r[0]

@@ -10,8 +10,8 @@ from lib4sbom.cyclonedx.cyclonedx_generator import CycloneDXGenerator
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.output import SBOMOutput
 from lib4sbom.sbom import SBOMData
-from lib4sbom.spdx.spdx_generator import SPDXGenerator
 from lib4sbom.spdx.spdx3_generator import SPDX3Generator
+from lib4sbom.spdx.spdx_generator import SPDXGenerator
 from lib4sbom.version import VERSION
 
 

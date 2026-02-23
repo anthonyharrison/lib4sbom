@@ -36,9 +36,12 @@ def parse_jsonld_semantic(file_path):
 
         print(f"Graph has {len(g)} triples.\n")
 
-        # Iterate through triples: Subject, Predicate, Object
-        for s, p, o in g:
-            print(f"Subject: {s}\nPredicate: {p}\nObject: {o}\n{'-'*20}")
+        for a in g:
+            print (a)
+
+        # # Iterate through triples: Subject, Predicate, Object
+        # for s, p, o in g:
+        #     print(f"Subject: {s}\nPredicate: {p}\nObject: {o}\n{'-'*20}")
 
     except Exception as e:
         print(f"Error parsing JSON-LD: {e}")
