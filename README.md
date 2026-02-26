@@ -20,7 +20,8 @@ The following facilities are provided:
 - Create and manipulate a Software Service object
 - Create and manipulate a Cryptography object
 - Generated SBOM can be output to a file or to the console
-- Parse a SBOM embedded in an Intoto attestaion or Protobom object.
+- Parse a SBOM embedded in an Intoto attestaion
+- Parse a SPDX or CycloneDX SBOM embedded in a Protobom object
 
 ## Installation
 
@@ -258,6 +259,8 @@ The optional parameter, _version_, can be used to specify a single version of th
 
 The optional parameter, _debug_, can be used to generate debug output.
 
+**Note** To validate a SPDX SBOM in version 3.0 format, the version must be explictedly specified,
+
 **Methods**
 
 validate_file(filename)
@@ -303,6 +306,8 @@ SBOMs can be generated in the following formats
 The default version for CycloneDX is version 1.7. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4", "1.5" or "1.6" as required.
 
 The default version for SPDX is version 2.3. However, the version can be overridden by setting the environment variable LIB4SBOM_SPDX_VERSION to "SPDX-2.2" if required.
+
+**Note** To generate a SPDX SBOM in 3.0 format, the enviornment variable LIB4SBOM_SPDX3 must be set.
 
 The organization creating the SBOM can be set be setting the environment variable SBOM_ORGANIZATION. This can be overriden by setting the value of the Metadata_Supplier attribute
 within the SBOM Document.
@@ -908,9 +913,114 @@ Returns the service object as a dictionary.
 
 _class_ **SBOMCryptography**(validation = None)
 
-TBC
 
-**NOTE** Cryptography objects are only included in CyclonedDX SBOMs
+This creates a simple cryptograpy object which is used to define the details of a cryptogrtahiic item (an algorithm, certificate, protool or related material).
+
+As there are multiple ways of specifying a cryptograpy object, it is left to the
+application manipulating the object to apply validation as appropriate to ensure the semantics are correct. Reference
+to the [CycloneDX guide to CBOMs](https://cyclonedx.org/guides/OWASP_CycloneDX-Authoritative-Guide-to-CBOM-en.pdf) is
+strongly recommended.
+
+**NOTE** Cryptography objects are only included in CyclonedDX SBOMs and are attributes of a component.
+
+**_Setter Methods_**
+
+The **set_type** method must be called to define the type of cryptography object being defined. This method takes the type of object being created (one of 'a)gorithm', 'certifciate', 'protocol', or 'related-crypto-material'.
+
+Supporting methoda are provided for each type as follows:
+
+- Algorithm
+  - set_algorithm
+  - set_keysize
+- Certificate
+  - set_certificate
+  - set_format
+  - set_date
+  - set_state
+  - set_asset
+- Protocol
+  - set_version
+- Material
+  - set_property
+  - set_value
+-
+The example below provides guidance on how to use each method.
+
+**_Getter Methods_**
+
+get_cryptography()
+Returns the cryptography object as a dictionary.
+
+**Example**
+
+```python
+from lib4sbom.data.cryptography import SBOMCryptoography
+from lib4sbom.data.package import SBOMPackage
+
+my_package = SBOMPackage()
+my_crypto = SBOMCryptography()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("RSA-PKCS1-1.5-SHA-256-2048")
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_oid("1.3.4.5.6")
+my_crypto.set_type("algorithm","signature")
+my_crypto.set_keysize("2048")
+my_crypto.set_algorithm("RSASSA-PKCS1")
+my_crypto.set_value("elipticCurve","bn/bn158")
+# Add crypto element to component
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("Wikipedia-cert",)
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_type("certificate")
+my_crypto.set_certificate(subject = "C=US, ST=California, O=San Fransico, O=Wikipedia",
+issuer='C=BE, O=GlbalSign, CN=Acme')
+my_crypto.set_state("pre-activation")
+my_crypto.set_date("create", "2026-02-13")
+my_crypto.set_date("activate", "2026-02-14")
+my_crypto.set_asset("publickey","abcd")
+my_crypto.set_format("X.509")
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("Wikipedia",)
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_type("protocol", "tls")
+my_crypto.set_version("1.3")
+my_crypto.set_asset("publickey","abcd")
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("WikipediaData",)
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_type("related-crypto-material", "private-key")
+my_crypto.set_state("active")
+my_crypto.set_date("activate", "2026-02-16")
+my_crypto.set_asset("privatekey","abcd")
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+```
 
 ## Examples
 
