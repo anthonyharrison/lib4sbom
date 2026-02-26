@@ -46,52 +46,21 @@ class SPDX3Generator:
         self.licenses = []
         self.include_purl = False
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
-        # Can specify version of SPDX through environment variable
-        self.spdx_version = os.getenv("LIB4SBOM_SPDX_VERSION")
         self.organisation = None
         self.tool = None
-        # Check valid version
-        self.spec_version(self.spdx_version)
-        if self.spdx_version is None:
-            self.spdx_version = self.SPDX_VERSION
+        self.spdx_version = self.SPDX_VERSION
         self.license_info = []
         self.license_id = 1
 
-    def show(self, message):
-        self.doc.append(message)
-
     def getBOM(self):
-        # Add subcomponents to SBOM
-        # if len(self.licenses) > 0:
-        #     self.doc["hasExtractedLicensingInfos"] = self.licenses
-        # if len(self.file_component) > 0:
-        #     self.doc["files"] = self.file_component
-        # self.doc["packages"] = self.component
-        # self.doc["relationships"] = self.relationships
         return self.doc
 
     def getRelationships(self):
         return self.relationship
 
-    def generateTag(self, tag, value):
-        if value is not None:
-            if len(value) > 0:
-                self.show(tag + ": " + value)
-        elif self.debug:
-            print(f"[ERROR] with value for {tag}")
-
-    def generateComment(self, comment):
-        self.show("##### " + comment)
-
     def generateTime(self):
         # Generate data/time label in format YYYY-MM-DDThh:mm:ssZ
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    def spec_version(self, version):
-        if version in ["SPDX-2.2", "SPDX-2.3"]:
-            self.spdx_version = version
-        else:
-            self.spdx_version = None
 
     def _uuid(self, id=None):
         if id is None:
@@ -123,7 +92,7 @@ class SPDX3Generator:
                 return f"SBOM Type: {lifecycle.capitalize()} - {default_text}"
         return default_text
 
-    # Helper classes
+    # SPDX3 Helper classes
 
     def create_doc(self):
         self.doc["@context"] = (
@@ -134,7 +103,6 @@ class SPDX3Generator:
         self.id = 1
         self.document_generation_time = self.generateTime()
         self.license_list_id = self.license.get_license_version()
-        self.license_list_id = "3.27.0"
 
     def creation_info(self):
         creation = {}
@@ -215,9 +183,6 @@ class SPDX3Generator:
         license_attributes = {
             "licenseConcluded": "hasConcludedLicense",
             "licenseDeclared": "hasDeclaredLicense",
-            # "licenseList" : "licenseList",
-            # "licenseComments" : "licenseComments",
-            # "licenseInfoInFiles" : "licenseInfoInFiles",
         }
         license_details = {}
         external_details = []
@@ -247,6 +212,16 @@ class SPDX3Generator:
                     supplier_info["externalIdentifier"] = [ext_id]
                 supplier_id = self.create_type(supplier[0].capitalize(), supplier_info)
                 package_details["suppliedBy"] = supplier_id
+        if "checksums" in component_details:
+            for checksum in component_details["checksums"]:
+                checksum_entry = dict()
+                checksum_entry["type"] = "Hash"
+                checksum_entry["algorithm"] = checksum["algorithm"].lower()
+                checksum_entry["hashValue"] = checksum["checksumValue"]
+                if "verifiedUsing" in package_details:
+                    package_details["verifiedUsing"].append(checksum_entry)
+                else:
+                    package_details["verifiedUsing"] = [checksum_entry]
         if "externalRefs" in component_details:
             for ref in component_details["externalRefs"]:
                 external_element = {}
@@ -344,10 +319,7 @@ class SPDX3Generator:
         self.bom_id = None
         self.lifecycle = lifecycle if lifecycle is not None else "build"
         self.project_name = project_name
-        # root_element = self.create_type("", {""})
-        # bom_id = self.create_type("software_Sbom", {"name": project_name, "rootElement": [root_element], "software_sbomType": [ lifecycle if lifecycle is not None else "build"]})
-        # self.create_document(bom_id, project_name)
-        # return self.id
+        # Default value will be updated when SBOM element created
         return self.SPDX_PROJECT_ID
 
     def _validate_spdxid(self, id, preamble):
@@ -661,7 +633,7 @@ class SPDX3Generator:
             )
 
     def generateRelationship(self, from_id, to_id, relationship_type):
-        # May need to update id to refere to SPDX document.
+        # May need to update id to refer to SPDX document.
         if self.SPDX_PROJECT_ID in from_id:
             from_id = self.bom_id
         if (

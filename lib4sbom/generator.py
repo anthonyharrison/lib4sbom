@@ -30,11 +30,12 @@ class SBOMGenerator:
     ):
         self.format = format.lower()
         self.sbom_type = sbom_type.lower()
+        self.generate_spdx3 = os.getenv("LIB4SBOM_SPDX3") is not None
         # Ensure specified format is supported
         if self.format not in ["tag", "json", "yaml"]:
             # Set a default format
             self.format = "json"
-        if self.sbom_type not in ["spdx", "spdx3", "cyclonedx"]:
+        if self.sbom_type not in ["spdx", "cyclonedx"]:
             # Set a default SBOM type
             self.sbom_type = "spdx"
         # Ensure format is compatible with SBOM type
@@ -43,13 +44,14 @@ class SBOMGenerator:
             if self.format in ["tag", "yaml"]:
                 self.format = "json"
         if self.sbom_type == "spdx":
-            self.bom = SPDXGenerator(
-                validate_license, self.format, application, version
-            )
-        elif self.sbom_type == "spdx3":
-            self.bom = SPDX3Generator(
-                validate_license, self.format, application, version
-            )
+            if not self.generate_spdx3:
+                self.bom = SPDXGenerator(
+                    validate_license, self.format, application, version
+                )
+            else:
+                self.bom = SPDX3Generator(
+                    validate_license, self.format, application, version
+                )
         else:
             self.bom = CycloneDXGenerator(self.format, application, version)
         self.sbom_complete = False
@@ -81,11 +83,12 @@ class SBOMGenerator:
                     print("[ERROR] Project name missing")
                 project_name = "Default_project"
             if self.sbom_type == "spdx":
-                self._generate_spdx(project_name, sbom_data)
-                self.sbom = self._get_spdx()
-            elif self.sbom_type == "spdx3":
-                self._generate_spdx3(project_name, sbom_data)
-                self.sbom = self._get_spdx3()
+                if not self.generate_spdx3:
+                    self._generate_spdx(project_name, sbom_data)
+                    self.sbom = self._get_spdx()
+                else:
+                    self._generate_spdx3(project_name, sbom_data)
+                    self.sbom = self._get_spdx3()
             else:
                 self._generate_cyclonedx(project_name, sbom_data)
                 self.sbom = self._get_cyclonedx()
