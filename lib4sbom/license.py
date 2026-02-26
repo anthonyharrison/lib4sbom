@@ -8,7 +8,7 @@ import os
 
 class LicenseScanner:
     DEFAULT_LICENSE = "UNKNOWN"
-    SPDX_LICENSE_VERSION = "3.27"
+    SPDX_LICENSE_VERSION = "3.28.0"
 
     def __init__(self):
         # Load licenses
@@ -52,14 +52,7 @@ class LicenseScanner:
 
     def get_license_version(self):
         if self.licenses.get("licenseListVersion") is not None:
-            # Ensure string is only of format M.N
             license_version_release = self.licenses.get("licenseListVersion")
-            if "." in license_version_release:
-                return (
-                    license_version_release.split(".")[0]
-                    + "."
-                    + license_version_release.split(".")[1]
-                )
             return license_version_release
         return self.SPDX_LICENSE_VERSION
 
