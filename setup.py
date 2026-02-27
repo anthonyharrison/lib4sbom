@@ -28,7 +28,6 @@ setup_kwargs = dict(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.9",
@@ -41,9 +40,11 @@ setup_kwargs = dict(
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
     python_requires=">=3.9",
+
     packages=find_packages(
-        exclude=["test"],
+        exclude=["test/*", "tools/*"],
     ),
+
     package_data={
         "lib4sbom": [
             "license_data/*.*",
