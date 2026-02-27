@@ -1038,21 +1038,22 @@ class CycloneDXGenerator:
                 certificate_properties["issuerName"] = package["issuer"]
             if "format" in package:
                 certificate_properties["certificateFormat"] = package["format"]
-            if "state" in package:
-                certificate_properties["certificateState"] = package["state"]
-            for date_event in [
-                "creationDate",
-                "activationDate",
-                "deactivationDate",
-                "revocationDate",
-                "destructionDate",
-            ]:
-                if date_event in package:
-                    certificate_properties[date_event] = package[date_event]
-            if "relatedCryptographicAssets" in package:
-                certificate_properties["relatedCryptographicAssets"] = package[
-                    "relatedCryptographicAssets"
-                ]
+            if self._cyclonedx_17():
+                if "state" in package:
+                    certificate_properties["certificateState"] = package["state"]
+                for date_event in [
+                    "creationDate",
+                    "activationDate",
+                    "deactivationDate",
+                    "revocationDate",
+                    "destructionDate",
+                ]:
+                    if date_event in package:
+                        certificate_properties[date_event] = package[date_event]
+                if "relatedCryptographicAssets" in package:
+                    certificate_properties["relatedCryptographicAssets"] = package[
+                        "relatedCryptographicAssets"
+                    ]
             if len(certificate_properties) > 0:
                 crypto_properties["certificateProperties"] = certificate_properties
         elif asset_type == "protocol":
@@ -1061,10 +1062,11 @@ class CycloneDXGenerator:
                 protocol_properties["type"] = package["primitive"]
             if "version" in package:
                 protocol_properties["version"] = package["version"]
-            if "relatedCryptographicAssets" in package:
-                protocol_properties["relatedCryptographicAssets"] = package[
-                    "relatedCryptographicAssets"
-                ]
+            if self._cyclonedx_17():
+                if "relatedCryptographicAssets" in package:
+                    protocol_properties["relatedCryptographicAssets"] = package[
+                        "relatedCryptographicAssets"
+                    ]
             if len(protocol_properties) > 0:
                 crypto_properties["protocolProperties"] = protocol_properties
         elif asset_type == "related-crypto-material":
@@ -1087,10 +1089,11 @@ class CycloneDXGenerator:
                 material_properties["size"] = package["keysize"]
             if "format" in package:
                 material_properties["format"] = package["format"]
-            if "relatedCryptographicAssets" in package:
-                material_properties["relatedCryptographicAssets"] = package[
-                    "relatedCryptographicAssets"
-                ]
+            if self._cyclonedx_17():
+                if "relatedCryptographicAssets" in package:
+                    material_properties["relatedCryptographicAssets"] = package[
+                        "relatedCryptographicAssets"
+                    ]
             if len(material_properties) > 0:
                 crypto_properties["relatedCryptoMaterialProperties"] = (
                     material_properties
