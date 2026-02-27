@@ -224,10 +224,11 @@ class CycloneDXGenerator:
                 metadata_property.append(property_entry)
             metadata["properties"] = metadata_property
         metadata["component"] = component
-        if component_type["distribution"] is not None:
-            distributionConstraints = dict()
-            distributionConstraints["tlp"] = component_type["distribution"]
-            metadata["distributionConstraints"] = distributionConstraints
+        if self._cyclonedx_17():
+            if component_type["distribution"] is not None:
+                distributionConstraints = dict()
+                distributionConstraints["tlp"] = component_type["distribution"]
+                metadata["distributionConstraints"] = distributionConstraints
         self.doc["metadata"] = metadata
         return component["bom-ref"]
 
