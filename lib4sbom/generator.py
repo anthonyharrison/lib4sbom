@@ -49,6 +49,8 @@ class SBOMGenerator:
                     validate_license, self.format, application, version
                 )
             else:
+                # Only Json format for SPDX3
+                self.format = "json"
                 self.bom = SPDX3Generator(
                     validate_license, self.format, application, version
                 )
