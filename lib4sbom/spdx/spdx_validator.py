@@ -74,7 +74,7 @@ class SPDXValidator:
                     print(
                         f"[ValidationError] Failed to validate against SPDX {spdx_version} JSON schema"
                     )
-                print(e)
+                    print(e)
 
         return {"SPDX": False}
 
