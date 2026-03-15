@@ -927,7 +927,7 @@ strongly recommended.
 
 The **set_type** method must be called to define the type of cryptography object being defined. This method takes the type of object being created (one of 'a)gorithm', 'certifciate', 'protocol', or 'related-crypto-material'.
 
-Supporting methoda are provided for each type as follows:
+Supporting methods are provided for each type as follows:
 
 - Algorithm
   - set_algorithm
@@ -943,7 +943,7 @@ Supporting methoda are provided for each type as follows:
 - Material
   - set_property
   - set_value
--
+
 The example below provides guidance on how to use each method.
 
 **_Getter Methods_**
