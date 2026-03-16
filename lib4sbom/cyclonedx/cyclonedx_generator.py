@@ -536,8 +536,8 @@ class CycloneDXGenerator:
                     contact["email"] = supplier_email
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
-                # Not for machine learning model
-                if component["type"] != "machine-learning-model":
+                # Not for crypto assets or machine learning model
+                if component["type"] not in ["cryptographic-asset", "machine-learning-model"]:
                     if "version" in package:
                         if component["type"] == "operating-system":
                             cpe_type = "/o"
