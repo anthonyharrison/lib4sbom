@@ -70,16 +70,16 @@ class SBOMIdentifier:
             self.fixed_parts["subpath"] = None
 
         # Qualifier Validation
-        if p.qualifiers:
-            clean_quals = {
-                k: v for k, v in p.qualifiers.items() if k in rules["qualifiers"]
-            }
-            if len(clean_quals) < len(p.qualifiers):
-                removed = set(p.qualifiers.keys()) - set(clean_quals.keys())
-                self.errors.append(
-                    f"Prohibited qualifiers removed: {', '.join(removed)}"
-                )
-            self.fixed_parts["qualifiers"] = clean_quals
+        # if p.qualifiers:
+        #     clean_quals = {
+        #         k: v for k, v in p.qualifiers.items() if k in rules["qualifiers"]
+        #     }
+        #     if len(clean_quals) < len(p.qualifiers):
+        #         removed = set(p.qualifiers.keys()) - set(clean_quals.keys())
+        #         self.errors.append(
+        #             f"Prohibited qualifiers removed: {', '.join(removed)}"
+        #         )
+        #     self.fixed_parts["qualifiers"] = clean_quals
 
         return len(self.errors) == 0
 
