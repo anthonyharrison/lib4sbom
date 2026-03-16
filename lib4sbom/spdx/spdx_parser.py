@@ -3,6 +3,7 @@
 
 import json
 import re
+from datetime import datetime
 
 import defusedxml.ElementTree as ET
 import yaml
@@ -622,10 +623,12 @@ class SPDXParser:
                 spdx_relationship.set_relationship_id(rel["source"], rel["target"])
                 relationships.append(spdx_relationship.get_relationship())
             else:
-                print(rel)
-                print(
-                    rel["source"] in element_mapping, rel["target"] in element_mapping
-                )
+                # Elements not found
+                # print(rel)
+                # print(
+                #     rel["source"] in element_mapping, rel["target"] in element_mapping
+                # )
+                pass
         return relationships
 
     def parse_spdx_rdf(self, lines: list[str]):
@@ -707,6 +710,9 @@ class SPDXParser:
         licence_expression = {}
         licence_list_version = None
         lifecycle = None
+        specversion = "3.0.1"
+        # Default creation time
+        created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
         for element in data:
             # Get type and identifier. Mulitple ways of specifying type and id!
@@ -718,9 +724,9 @@ class SPDXParser:
                 element_id = element.get("@id")
             if element_id not in processed_elements:
                 processed_elements[element_id] = []
-            if element_type == "software_Package":
+            if element_type in ["software_Package", "Package"]:
                 processed_elements[element_id].append(element)
-            elif element_type == "software_File":
+            elif element_type in ["software_File", "File"]:
                 processed_elements[element_id].append(element)
             elif element_type == "Relationship":
                 from_id = element.get("from")
@@ -811,7 +817,7 @@ class SPDXParser:
                                 element.get("to")[0],
                             )
                             relationships.append(spdx_relationship.get_relationship())
-                    elif element_type == "software_File":
+                    elif element_type in ["software_File", "File"]:
                         name = element.get("name")
                         id = element.get("spdxId")
                         spdx_file.set_id(id)
@@ -819,35 +825,38 @@ class SPDXParser:
                         spdx_file.set_name(name)
                         # Save file metadata
                         files[name] = spdx_file.get_file()
-                    elif element_type == "software_Package":
+                    elif element_type in ["software_Package", "Package"]:
                         name = element.get("name")
                         id = element.get("spdxId")
                         spdx_package.set_id(id)
                         elements[id] = name
                         spdx_package.set_name(name)
-                        version = element.get("software_packageVersion")
+                        version = element.get("software_packageVersion") or element.get("packageVersion")
                         if version is not None:
                             spdx_package.set_version(version)
-                        download = element.get("software_downloadLocation")
+                        download = element.get("software_downloadLocation") or element.get("downloadLocation")
                         if download is not None:
                             spdx_package.set_downloadlocation(download)
-                        homepage = element.get("software_homePage")
+                        homepage = element.get("software_homePage") or element.get("homePage")
                         if homepage is not None:
                             spdx_package.set_homepage(homepage)
                         description = element.get("description")
                         if description is not None:
                             spdx_package.set_description(description)
-                        purpose = element.get("software_primaryPurpose")
+                        purpose = element.get("software_primaryPurpose")  or element.get("primaryPurpose")
                         if purpose is not None:
                             spdx_package.set_type(purpose)
                         else:
                             # default
                             spdx_package.set_type("library")
-                        copyright = element.get("software_copyrightText")
+                        copyright = element.get("software_copyrightText")  or element.get("copyrightText")
                         if copyright is not None:
                             spdx_package.set_copyrighttext(copyright)
                         supplier = element.get("suppliedBy")
                         if supplier is not None:
+                            # Some SPDX3 documents have suppliedBy as a list
+                            if type(supplier) is list:
+                                supplier = supplier[0]
                             supplier_info = agent[supplier]
                             spdx_package.set_supplier(
                                 supplier_info[1], supplier_info[0]
@@ -883,11 +892,11 @@ class SPDXParser:
                                             ref_type,
                                             ref_locator,
                                         )
-                        if "software_packageUrl" in element:
+                        if "software_packageUrl" in element or "packageUrl" in element:
                             spdx_package.set_externalreference(
                                 "PACKAGE-MANAGER",
                                 "purl",
-                                element.get("software_packageUrl"),
+                                element.get("software_packageUrl") or element.get("packageUrl"),
                             )
                         # TODO add more attributes
                 if declared_licence is not None:
