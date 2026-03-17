@@ -133,3 +133,4 @@ class ParserType(Enum):
     SPDX_YML = 5
     SPDX_RDF = 6
     SPDX_TAG = 7
+    SPDX_JSONLD = 8

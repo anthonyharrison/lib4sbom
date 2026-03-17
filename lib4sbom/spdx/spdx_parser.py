@@ -33,6 +33,7 @@ class SPDXParser:
         # Check for SPDX JSON
         if (
             parser_type == ParserType.SPDX_JSON
+            or parser_type == ParserType.SPDX_JSONLD
             or parser_type == ParserType.JSON
             or sbom_string.startswith("{")
         ):

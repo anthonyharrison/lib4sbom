@@ -86,7 +86,7 @@ following filename conventions.
 | --------- |----------|--------------------|
 | SPDX      | TagValue | .spdx              |
 | SPDX      | JSON     | .spdx.json         |
-| SPDX      | JSON-LD  | .json              |
+| SPDX      | JSON-LD  | .jsonld            |
 | SPDX      | YAML     | .spdx.yaml         |
 | SPDX      | YAML     | .spdx.yml          |
 | SPDX      | RDF      | .spdx.rdf          |
@@ -100,6 +100,8 @@ following filename conventions.
 
 The parser will check that the correct JSON files is being processed by the correct parser.
 A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
+
+**Note** SPDX files with an extension of .json will be checked for JSON_LD and SJON formats.
 
 Errors in the parsing process will result in the exception SBOMParserException being raised.
 

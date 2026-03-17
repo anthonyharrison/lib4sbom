@@ -66,6 +66,9 @@ class SBOMParser:
 
         elif filename.endswith(".spdx"):
             parser_type = ParserType.SPDX_TAG
+        elif filename.endswith(".jsonld"):
+            # SPDX3
+            parser_type = ParserType.SPDX_JSONLD
         elif filename.endswith(".spdx.json"):
             parser_type = ParserType.SPDX_JSON
         elif filename.endswith((".spdx.yaml", "spdx.yml")):
