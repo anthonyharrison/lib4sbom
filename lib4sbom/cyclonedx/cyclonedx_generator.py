@@ -130,7 +130,7 @@ class CycloneDXGenerator:
     def generateJSONDocumentHeader(
         self, project_name, component_type, uuid=None, bom_version="1", property=None
     ):
-        if uuid is None:
+        if uuid is None or not uuid.startswith("urn:uuid:"):
             urn = self._generate_urn()
         else:
             urn = uuid
@@ -233,7 +233,7 @@ class CycloneDXGenerator:
         return component["bom-ref"]
 
     def generateXMLDocumentHeader(self, project_name, uuid=None):
-        if uuid is None:
+        if uuid is None or not uuid.startswith("urn:uuid:"):
             urn = self._generate_urn()
         else:
             urn = uuid
@@ -537,7 +537,10 @@ class CycloneDXGenerator:
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
                 # Not for crypto assets or machine learning model
-                if component["type"] not in ["cryptographic-asset", "machine-learning-model"]:
+                if component["type"] not in [
+                    "cryptographic-asset",
+                    "machine-learning-model",
+                ]:
                     if "version" in package:
                         if component["type"] == "operating-system":
                             cpe_type = "/o"

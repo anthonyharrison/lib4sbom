@@ -122,6 +122,13 @@ class SBOMGenerator:
             lifecycle = doc.get_value("lifecycle")
             if doc.get_value("metadata_supplier") is not None:
                 organisation = doc.get_value("metadata_supplier")
+            if doc.get_value("uuid") is not None:
+                uuid = doc.get_value("uuid")
+            # check if preserving metadata
+            if os.getenv("LIB4SBOM_PRESERVE") is not None:
+                created = doc.get_value("created")
+                creator = doc.get_value("creator")
+                self.bom.preserve_metadata(created, creator)
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(

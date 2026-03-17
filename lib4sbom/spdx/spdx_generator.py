@@ -57,6 +57,7 @@ class SPDXGenerator:
             self.spdx_version = self.SPDX_VERSION
         self.license_info = []
         self.license_id = 1
+        self.metadata = {}
 
     def show(self, message):
         self.doc.append(message)
@@ -87,7 +88,9 @@ class SPDXGenerator:
 
     def generateTime(self):
         # Generate data/time label in format YYYY-MM-DDThh:mm:ssZ
-        return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        if self.metadata.get("created") is None:
+            return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        return self.metadata["created"]
 
     def spec_version(self, version):
         if version in ["SPDX-2.2", "SPDX-2.3"]:
@@ -99,6 +102,11 @@ class SPDXGenerator:
         if id is None:
             return str(uuid.uuid4())
         return id
+
+    def preserve_metadata(self, created, creator):
+        self.metadata["created"] = created
+        for info in creator:
+            self.metadata[info[0]] = info[1].strip()
 
     def _creatorcomment(self, lifecycle=None):
         lifecycle_to_sbomtype = {
@@ -132,17 +140,26 @@ class SPDXGenerator:
         self.generateTag("SPDXID", self.SPDX_PROJECT_ID)
         # Project name mustn't have spaces in. Covert spaces to '-'
         self.generateTag("DocumentName", project_name.replace(" ", "-"))
-        self.generateTag(
-            "DocumentNamespace",
-            self.SPDX_NAMESPACE
-            + project_name.replace(" ", "-")
-            + "-"
-            + self._uuid(uuid),
-        )
+        if uuid is None or uuid.startswith("urn:uuid:"):
+            self.generateTag(
+                "DocumentNamespace",
+                self.SPDX_NAMESPACE
+                + project_name.replace(" ", "-")
+                + "-"
+                + self._uuid(uuid),
+            )
+        else:
+            self.generateTag(
+                "DocumentNamespace",
+                self._uuid(uuid),
+            )
         self.generateTag("LicenseListVersion", self.license.get_license_version())
-        self.generateTag(
-            "Creator: Tool", self.application + "-" + self.application_version
-        )
+        if self.metadata.get("Tool") is None:
+            self.generateTag(
+                "Creator: Tool", self.application + "-" + self.application_version
+            )
+        else:
+            self.generateTag("Creator: Tool", self.metadata.get("Tool"))
         if self.organisation is not None:
             self.generateTag("Creator: Organization", self.organisation)
         self.generateTag("Created", self.generateTime())
@@ -158,9 +175,15 @@ class SPDXGenerator:
         self.doc["spdxVersion"] = self.spdx_version
         creation_info = dict()
         creation_info["comment"] = self._creatorcomment(lifecycle)
-        creators = ["Tool: " + self.application + "-" + self.application_version]
+        if self.metadata.get("Tool") is None:
+            creators = ["Tool: " + self.application + "-" + self.application_version]
+        else:
+            creators = ["Tool: " + self.metadata.get("Tool")]
         if self.organisation is not None:
-            creators.append("Organization: " + self.organisation)
+            if self.metadata.get("Organization") is None:
+                creators.append("Organization: " + self.organisation)
+            else:
+                creators.append("Organization: " + self.metadata.get("Organization"))
         creation_info["creators"] = creators
         creation_info["created"] = self.generateTime()
         creation_info["licenseListVersion"] = self.license.get_license_version()
@@ -168,12 +191,15 @@ class SPDXGenerator:
         # Project name mustn't have spaces in. Covert spaces to '-'
         self.doc["name"] = project_name.replace(" ", "-")
         self.doc["dataLicense"] = self.DATA_LICENSE
-        self.doc["documentNamespace"] = (
-            self.SPDX_NAMESPACE
-            + project_name.replace(" ", "-")
-            + "-"
-            + self._uuid(uuid)
-        )
+        if uuid is None or uuid.startswith("urn:uuid:"):
+            self.doc["documentNamespace"] = (
+                self.SPDX_NAMESPACE
+                + project_name.replace(" ", "-")
+                + "-"
+                + self._uuid(uuid)
+            )
+        else:
+            self.doc["documentNamespace"] = self._uuid(uuid)
         return self.SPDX_PROJECT_ID
 
     def generateDocumentHeader(

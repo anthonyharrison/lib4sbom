@@ -245,7 +245,7 @@ following filename conventions.
 | --------- |----------|--------------------|
 | SPDX      | TagValue | .spdx              |
 | SPDX      | JSON     | .spdx.json         |
-| SPDX      | JSON-LD  | .json              |
+| SPDX      | JSON-LD  | .jsonld            |
 | SPDX      | YAML     | .spdx.yaml         |
 | SPDX      | YAML     | .spdx.yml          |
 | SPDX      | RDF      | .spdx.rdf          |
@@ -311,8 +311,9 @@ The default version for SPDX is version 2.3. However, the version can be overrid
 
 **Note** To generate a SPDX SBOM in 3.0 format, the enviornment variable LIB4SBOM_SPDX3 must be set.
 
-The organization creating the SBOM can be set be setting the environment variable SBOM_ORGANIZATION. This can be overriden by setting the value of the Metadata_Supplier attribute
-within the SBOM Document.
+**Note** Top preserve existing SBOM metadata, e.g. the creation time, the environment variable LIB4SBOM_PRESERVE must be set.
+
+The organization creating the SBOM can be set be setting the environment variable SBOM_ORGANIZATION. This can be overriden by setting the value of the Metadata_Supplier attribute within the SBOM Document.
 
 _class_ **SBOMGenerator**(_validate_license: True, sbom_type="spdx", format="tag", application="lib4sbom", version="0.1"_)
 
