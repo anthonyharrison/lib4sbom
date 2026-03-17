@@ -23,7 +23,7 @@ class SPDXValidator:
         """validates SPDX SBOM file"""
         if sbom_file.endswith(".spdx"):
             return self.validate_spdx_tag(sbom_file)
-        elif sbom_file.endswith((".spdx.json", ".json")):
+        elif sbom_file.endswith((".spdx.json", ".json", ".jsonld")):
             # Convention for SPDX is to use .spdx.json extension but
             # check any json file just in case. Attempts to validate a CycloneDX JSON
             # file will result in no data being returned.
