@@ -832,25 +832,35 @@ class SPDXParser:
                         spdx_package.set_id(id)
                         elements[id] = name
                         spdx_package.set_name(name)
-                        version = element.get("software_packageVersion") or element.get("packageVersion")
+                        version = element.get("software_packageVersion") or element.get(
+                            "packageVersion"
+                        )
                         if version is not None:
                             spdx_package.set_version(version)
-                        download = element.get("software_downloadLocation") or element.get("downloadLocation")
+                        download = element.get(
+                            "software_downloadLocation"
+                        ) or element.get("downloadLocation")
                         if download is not None:
                             spdx_package.set_downloadlocation(download)
-                        homepage = element.get("software_homePage") or element.get("homePage")
+                        homepage = element.get("software_homePage") or element.get(
+                            "homePage"
+                        )
                         if homepage is not None:
                             spdx_package.set_homepage(homepage)
                         description = element.get("description")
                         if description is not None:
                             spdx_package.set_description(description)
-                        purpose = element.get("software_primaryPurpose")  or element.get("primaryPurpose")
+                        purpose = element.get("software_primaryPurpose") or element.get(
+                            "primaryPurpose"
+                        )
                         if purpose is not None:
                             spdx_package.set_type(purpose)
                         else:
                             # default
                             spdx_package.set_type("library")
-                        copyright = element.get("software_copyrightText")  or element.get("copyrightText")
+                        copyright = element.get(
+                            "software_copyrightText"
+                        ) or element.get("copyrightText")
                         if copyright is not None:
                             spdx_package.set_copyrighttext(copyright)
                         supplier = element.get("suppliedBy")
@@ -897,7 +907,8 @@ class SPDXParser:
                             spdx_package.set_externalreference(
                                 "PACKAGE-MANAGER",
                                 "purl",
-                                element.get("software_packageUrl") or element.get("packageUrl"),
+                                element.get("software_packageUrl")
+                                or element.get("packageUrl"),
                             )
                         # TODO add more attributes
                 if declared_licence is not None:
