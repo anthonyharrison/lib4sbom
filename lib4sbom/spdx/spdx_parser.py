@@ -15,8 +15,8 @@ from lib4sbom.data.license import SBOMLicense
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.exception import SBOMParserException
-from lib4sbom.sbom import ParserType
 from lib4sbom.license import LicenseScanner
+from lib4sbom.sbom import ParserType
 
 
 class SPDXParser:
@@ -226,7 +226,9 @@ class SPDXParser:
                 spdx_file.set_checksum(checksum_type, checksum)
             elif line_elements[0] == "LicenseConcluded":
                 license_concluded = line_elements[1].strip().rstrip("\n")
-                spdx_file.set_licenseconcluded(self._validate_license(license_concluded))
+                spdx_file.set_licenseconcluded(
+                    self._validate_license(license_concluded)
+                )
             elif line_elements[0] == "LicenseInfoInFile":
                 license_info = line_elements[1].strip().rstrip("\n")
                 spdx_file.set_licenseinfoinfile(license_info)
@@ -316,10 +318,14 @@ class SPDXParser:
                 spdx_package.set_sourceinfo(sourceinfo)
             elif line_elements[0] == "PackageLicenseConcluded":
                 license_concluded = line_elements[1].strip().rstrip("\n")
-                spdx_package.set_licenseconcluded(self._validate_license(license_concluded))
+                spdx_package.set_licenseconcluded(
+                    self._validate_license(license_concluded)
+                )
             elif line_elements[0] == "PackageLicenseDeclared":
                 license_declared = line_elements[1].strip().rstrip("\n")
-                spdx_package.set_licensedeclared(self._validate_license(license_declared))
+                spdx_package.set_licensedeclared(
+                    self._validate_license(license_declared)
+                )
             elif line_elements[0] == "PackageLicenseComments":
                 license_comments = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_licensecomments(license_comments)
@@ -481,7 +487,9 @@ class SPDXParser:
                             for filetype in d["fileTypes"]:
                                 spdx_file.set_filetype(filetype)
                         if "licenseConcluded" in d:
-                            spdx_file.set_licenseconcluded(self._validate_license(d["licenseConcluded"]))
+                            spdx_file.set_licenseconcluded(
+                                self._validate_license(d["licenseConcluded"])
+                            )
                         if "copyrightText" in d:
                             spdx_file.set_copyrighttext(d["copyrightText"])
                         if "comment" in d:
@@ -548,9 +556,13 @@ class SPDXParser:
                         if "sourceInfo" in d:
                             spdx_package.set_sourceinfo(d["sourceInfo"])
                         if "licenseConcluded" in d:
-                            spdx_package.set_licenseconcluded(self._validate_license(d["licenseConcluded"]))
+                            spdx_package.set_licenseconcluded(
+                                self._validate_license(d["licenseConcluded"])
+                            )
                         if "licenseDeclared" in d:
-                            spdx_package.set_licensedeclared(self._validate_license(d["licenseDeclared"]))
+                            spdx_package.set_licensedeclared(
+                                self._validate_license(d["licenseDeclared"])
+                            )
                         if "licenseComments" in d:
                             spdx_package.set_licensecomments(d["licenseComments"])
                         if "copyrightText" in d:
@@ -925,7 +937,9 @@ class SPDXParser:
                     else:
                         if spdx_package.get_name() is not None:
                             spdx_package.set_licensedeclared(
-                                self._validate_license(licence_expression[declared_licence])
+                                self._validate_license(
+                                    licence_expression[declared_licence]
+                                )
                             )
                 if concluded_licence is not None:
                     if "NoAssertionLicense" in concluded_licence:
@@ -935,7 +949,9 @@ class SPDXParser:
                     else:
                         if spdx_package.get_name() is not None:
                             spdx_package.set_licenseconcluded(
-                                self._validate_license(licence_expression[concluded_licence])
+                                self._validate_license(
+                                    licence_expression[concluded_licence]
+                                )
                             )
                 if spdx_package.get_name() is not None:
                     package_tuple = (name, version, id)

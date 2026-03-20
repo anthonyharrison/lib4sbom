@@ -16,8 +16,8 @@ from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.service import SBOMService
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.exception import SBOMParserException
-from lib4sbom.sbom import ParserType
 from lib4sbom.license import LicenseScanner
+from lib4sbom.sbom import ParserType
 
 
 class CycloneDXParser:
@@ -369,7 +369,9 @@ class CycloneDXParser:
                     id = self.license_scanner.find_license_id(name)
                     if len(id) > 0:
                         license["license"]["id"] = id
-                        license["license"]["name"] = self.license_scanner.get_license_name(id)
+                        license["license"]["name"] = (
+                            self.license_scanner.get_license_name(id)
+                        )
                 if id is None and name is None:
                     print(
                         f"[ERROR] Invalid license specified {license} - missing id or name."
@@ -395,7 +397,10 @@ class CycloneDXParser:
                         )
                     else:
                         license_info.append(
-                            {"expression": license_identity, "acknowledgement": license_type}
+                            {
+                                "expression": license_identity,
+                                "acknowledgement": license_type,
+                            }
                         )
         return license_info
 
