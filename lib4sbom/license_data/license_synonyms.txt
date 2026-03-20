@@ -19,6 +19,8 @@ AGPL-3
 AGPLv3
 AGPL-3.0
 GNU Affero General Public License v3
+GNU AGPL3
+GNU AGPL 3
 [AGPL-3.0-or-later]
 AGPL3+
 AGPL-3+
@@ -26,6 +28,8 @@ AGPLv3+
 AGPL-3.0+
 GNU Affero General Public License v3 or later
 GNU Affero General Public License v3 or later (AGPLv3+)
+GNU AGPL3+
+GNU AGPL 3+
 [Apache-2.0]
 Apache Software License
 Apache License, Version 2.0
@@ -142,12 +146,16 @@ GPL1
 GPL-1
 GPLv1
 GPL-1.0
+GNU GPL1
+GNU GPL 1
 [GPL-1.0-or-later]
 GPL+
 GPL1+
 GPL-1+
 GPLv1+
 GPL-1.0+
+GNU GPL1+
+GNU GPL 1+
 [GPL-2.0-only]
 GPL
 GPL2
@@ -157,6 +165,8 @@ GPL-2.0
 GNU General Public License v2
 GNU General Public License v2 (GPLv2)
 GNU General Public License (GPL)
+GNU GPL2
+GNU GPL 2
 [GPL-2.0-or-later]
 GPL2+
 GPL-2+
@@ -166,6 +176,8 @@ GNU General Public License GPL, version 2 or later
 GPL-2.0+
 GNU General Public License v2 or later
 GNU General Public License v2 or later (GPLv2+)
+GNU GPL2+
+GNU GPL 2+
 [GPL-3.0-only]
 GPL3
 GPL-3
@@ -173,6 +185,8 @@ GPLv3
 GPL-3.0
 GNU General Public License v3
 GNU General Public License v3 (GPLv3)
+GNU GPL3
+GNU GPL 3
 [GPL-3.0-or-later]
 GPL3+
 GPL-3+
@@ -180,6 +194,8 @@ GPLv3+
 GPL-3.0+
 GNU General Public License v3 or later
 GNU General Public License v3 or later (GPLv3+)
+GNU GPL3+
+GNU GPL 3+
 [HPND]
 Historical Permission Notice and Disclaimer (HPND)
 [IPL-1.0]
@@ -198,6 +214,8 @@ LGPL-2.0
 LGPLv2
 GNU Lesser General Public License v2
 GNU Lesser General Public License v2 (LGPLv2)
+GNU LGPL2
+GNU LGPL 2
 [LGPL-2.0-or-later]
 LGPL
 LGPL2+
@@ -206,15 +224,21 @@ LGPLv2+
 LGPL-2.0+
 GNU Lesser General Public License v2 or later
 GNU Lesser General Public License v2 or later (LGPLv2+)
+GNU LGPL2+
+GNU LGPL 2+
 [LGPL-2.1-only]
 LGPL2.1
 LGPL-2.1
 LGPLv2.1
+GNU LGPL2.1
+GNU LGPL 2.1
 [LGPL-2.1-or-later]
 LGPL2.1+
 LGPL-2.1+
 LGPLv2.1+
 LGPL 2.1+
+GNU LGPL2.1+
+GNU LGPL 2.1+
 [LGPL-3.0-only]
 LGPL3
 LGPL-3
@@ -222,6 +246,8 @@ LGPLv3
 LGPL-3.0
 GNU Lesser General Public License v3
 GNU Lesser General Public License v3 (LGPLv3)
+GNU LGPL3
+GNU LGPL 3
 [LGPL-3.0-or-later]
 LGPL3+
 LGPL-3+
@@ -229,6 +255,8 @@ LGPLv3+
 LGPL-3.0+
 GNU Lesser General Public License v3 or later
 GNU Lesser General Public License v3 or later (LGPLv3+)
+GNU LGPL3+
+GNU LGPL 3+
 [LPPL-1.3c]
 LPPL
 [MIT]
