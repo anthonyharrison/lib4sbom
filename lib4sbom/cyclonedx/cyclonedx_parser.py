@@ -17,6 +17,7 @@ from lib4sbom.data.service import SBOMService
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.exception import SBOMParserException
 from lib4sbom.sbom import ParserType
+from lib4sbom.license import LicenseScanner
 
 
 class CycloneDXParser:
@@ -30,6 +31,7 @@ class CycloneDXParser:
         self.model_card = SBOMModelCard()
         self.crypto = SBOMCryptography()
         self.cyclonedx_version = None
+        self.license_scanner = LicenseScanner()
 
     def parse(self, sbom_string: str, parser_type: ParserType = None):
         """parses CycloneDX BOM string extracting package name, version and license"""
@@ -363,6 +365,11 @@ class CycloneDXParser:
                     id = license["license"]["id"]
                 if "name" in license["license"]:
                     name = license["license"]["name"]
+                    # check if the name is really an id!
+                    id = self.license_scanner.find_license_id(name)
+                    if len(id) > 0:
+                        license["license"]["id"] = id
+                        license["license"]["name"] = self.license_scanner.get_license_name(id)
                 if id is None and name is None:
                     print(
                         f"[ERROR] Invalid license specified {license} - missing id or name."
@@ -376,19 +383,19 @@ class CycloneDXParser:
                         f"[ERROR] Invalid license specified {license}  - only one SPDX expression allowed."
                     )
                 else:
-                    type = None
+                    license_type = None
                     license_identity = None
                     if "expression" in license:
                         license_identity = license["expression"]
                     if "acknowledgement" in license:
-                        type = license["acknowledgement"]
+                        license_type = license["acknowledgement"]
                     if license_identity is None:
                         print(
                             f"[ERROR] Invalid license specified {license}  - expression missing."
                         )
                     else:
                         license_info.append(
-                            {"expression": license_identity, "acknowledgement": type}
+                            {"expression": license_identity, "acknowledgement": license_type}
                         )
         return license_info
 
