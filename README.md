@@ -96,12 +96,12 @@ following filename conventions.
 | CycloneDX | JSON     | .bom.json          |
 | CycloneDX | XML      | .xml               |
 | CycloneDX | XML      | .cdx.xml           |
-| CycloneDX | XML      | .bom..xml          |
+| CycloneDX | XML      | .bom.xml           |
 
 The parser will check that the correct JSON files is being processed by the correct parser.
 A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
 
-**Note** SPDX files with an extension of .json will be checked for JSON_LD and SJON formats.
+**Note** SPDX files with an extension of .json will be checked for JSON-LD and JSON formats.
 
 Errors in the parsing process will result in the exception SBOMParserException being raised.
 
