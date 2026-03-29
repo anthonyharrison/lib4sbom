@@ -1,0 +1,137 @@
+# Copyright (C) 2026 Anthony Harrison
+# SPDX-License-Identifier: Apache-2.0
+
+# Rule Definitions (N=Namespace, V=Version, S=Subpath, Q=Qualifiers)
+# R = Required, O = Optional, P = Prohibited
+
+RULES = {
+    "alpm": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": ["arch"]},
+    "apk": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": ["arch"]},
+    "bazel": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["repository_url"],
+    },
+    "bitbucket": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": []},
+    "bitnami": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["arch", "distro"],
+    },
+    "cargo": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": []},
+    "cocoapods": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": []},
+    "composer": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": []},
+    "conan": {
+        "namespace": "O",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["user", "channel", "rrev", "prev"],
+    },
+    "conda": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["build", "channel", "subdir", "type"],
+    },
+    "cpan": {
+        "namespace": "R",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["repository_url", "download_url", "vcs_url", "ext"],
+    },
+    "cran": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": []},
+    "deb": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": ["arch"]},
+    "docker": {"namespace": "O", "version": "O", "subpath": "O", "qualifiers": []},
+    "gem": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["platform"],
+    },
+    "generic": {
+        "namespace": "O",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["download_url", "checksum"],
+    },
+    "github": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": []},
+    "golang": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": []},
+    "hackage": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": []},
+    "hex": {"namespace": "O", "version": "O", "subpath": "O", "qualifiers": []},
+    "huggingface": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": []},
+    "julia": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": ["uuid"]},
+    "luarocks": {
+        "namespace": "O",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["repository_url"],
+    },
+    "maven": {
+        "namespace": "R",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["classifier", "type"],
+    },
+    "mlflow": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["model_uuid", "run_id"],
+    },
+    "npm": {"namespace": "O", "version": "O", "subpath": "O", "qualifiers": []},
+    "nuget": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": []},
+    "oci": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["arch", "repository_url", "tag"],
+    },
+    "opam": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": []},
+    "otp": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["repository_url", "platform", "arch"],
+    },
+    "pub": {"namespace": "P", "version": "O", "subpath": "O", "qualifiers": []},
+    "pypi": {
+        "namespace": "P",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["file_name"],
+    },
+    "qpkg": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": []},
+    "rpm": {
+        "namespace": "R",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["epoch", "arch"],
+    },
+    "swid": {
+        "namespace": "O",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": [
+            "tag_id",
+            "tag_version",
+            "patch",
+            "tag_creator_name",
+            "tag_creator_regid",
+        ],
+    },
+    "swift": {"namespace": "R", "version": "O", "subpath": "O", "qualifiers": []},
+    "vscode-extension": {
+        "namespace": "R",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["platform"],
+    },
+    "yocto": {
+        "namespace": "O",
+        "version": "O",
+        "subpath": "O",
+        "qualifiers": ["repository_url", "layer_version"],
+    },
+}

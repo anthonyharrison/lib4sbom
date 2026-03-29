@@ -5,6 +5,7 @@ import os
 import uuid
 from datetime import datetime
 
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.license import LicenseScanner
 from lib4sbom.version import VERSION
 
@@ -49,12 +50,14 @@ class SPDXGenerator:
         self.debug = os.getenv("LIB4SBOM_DEBUG") is not None
         # Can specify version of SPDX through environment variable
         self.spdx_version = os.getenv("LIB4SBOM_SPDX_VERSION")
+        self.organisation = None
         # Check valid version
         self.spec_version(self.spdx_version)
         if self.spdx_version is None:
             self.spdx_version = self.SPDX_VERSION
         self.license_info = []
         self.license_id = 1
+        self.metadata = {}
 
     def show(self, message):
         self.doc.append(message)
@@ -85,7 +88,9 @@ class SPDXGenerator:
 
     def generateTime(self):
         # Generate data/time label in format YYYY-MM-DDThh:mm:ssZ
-        return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        if self.metadata.get("created") is None:
+            return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        return self.metadata["created"]
 
     def spec_version(self, version):
         if version in ["SPDX-2.2", "SPDX-2.3"]:
@@ -98,65 +103,122 @@ class SPDXGenerator:
             return str(uuid.uuid4())
         return id
 
-    def generateTagDocumentHeader(self, project_name, uuid=None):
+    def preserve_metadata(self, created, creator):
+        self.metadata["created"] = created
+        for info in creator:
+            self.metadata[info[0]] = info[1].strip()
+
+    def _creatorcomment(self, lifecycle=None):
+        lifecycle_to_sbomtype = {
+            "design": "Design",
+            "pre-build": "Source",
+            "build": "Build",
+            "post-build": "Analyzed",
+            "operations": "Deployed",
+            "discovery": "Runtime",
+        }
+        default_text = "This document has been automatically generated."
+        if lifecycle is not None:
+            # Might not be using CISA SBOM types
+            if lifecycle_to_sbomtype.get(lifecycle.lower()) is not None:
+                return f"SBOM Type: {lifecycle_to_sbomtype[lifecycle]} - {default_text}"
+            if lifecycle.lower() in [
+                "design",
+                "source",
+                "build",
+                "analyzed",
+                "deployed",
+                "runtime",
+            ]:
+                return f"SBOM Type: {lifecycle.capitalize()} - {default_text}"
+        return default_text
+
+    def generateTagDocumentHeader(self, project_name, uuid=None, lifecycle=None):
         # Geerate SPDX Document Header
         self.generateTag("SPDXVersion", self.spdx_version)
         self.generateTag("DataLicense", self.DATA_LICENSE)
         self.generateTag("SPDXID", self.SPDX_PROJECT_ID)
         # Project name mustn't have spaces in. Covert spaces to '-'
         self.generateTag("DocumentName", project_name.replace(" ", "-"))
-        self.generateTag(
-            "DocumentNamespace",
-            self.SPDX_NAMESPACE
-            + project_name.replace(" ", "-")
-            + "-"
-            + self._uuid(uuid),
-        )
+        if uuid is None or uuid.startswith("urn:uuid:"):
+            self.generateTag(
+                "DocumentNamespace",
+                self.SPDX_NAMESPACE
+                + project_name.replace(" ", "-")
+                + "-"
+                + self._uuid(uuid),
+            )
+        else:
+            self.generateTag(
+                "DocumentNamespace",
+                self._uuid(uuid),
+            )
         self.generateTag("LicenseListVersion", self.license.get_license_version())
-        self.generateTag(
-            "Creator: Tool", self.application + "-" + self.application_version
-        )
+        if self.metadata.get("Tool") is None:
+            self.generateTag(
+                "Creator: Tool", self.application + "-" + self.application_version
+            )
+        else:
+            self.generateTag("Creator: Tool", self.metadata.get("Tool"))
+        if self.organisation is not None:
+            self.generateTag("Creator: Organization", self.organisation)
         self.generateTag("Created", self.generateTime())
         self.generateTag(
             "CreatorComment",
-            self._text("This document has been automatically generated."),
+            self._text(self._creatorcomment(lifecycle)),
         )
         return self.SPDX_PROJECT_ID
 
-    def generateJSONDocumentHeader(self, project_name, uuid=None):
+    def generateJSONDocumentHeader(self, project_name, uuid=None, lifecycle=None):
         # Generate SPDX Document Header
         self.doc["SPDXID"] = self.SPDX_PROJECT_ID
         self.doc["spdxVersion"] = self.spdx_version
         creation_info = dict()
-        creation_info["comment"] = "This document has been automatically generated."
-        creation_info["creators"] = [
-            "Tool: " + self.application + "-" + self.application_version
-        ]
+        creation_info["comment"] = self._creatorcomment(lifecycle)
+        if self.metadata.get("Tool") is None:
+            creators = ["Tool: " + self.application + "-" + self.application_version]
+        else:
+            creators = ["Tool: " + self.metadata.get("Tool")]
+        if self.organisation is not None:
+            if self.metadata.get("Organization") is None:
+                creators.append("Organization: " + self.organisation)
+            else:
+                creators.append("Organization: " + self.metadata.get("Organization"))
+        creation_info["creators"] = creators
         creation_info["created"] = self.generateTime()
         creation_info["licenseListVersion"] = self.license.get_license_version()
         self.doc["creationInfo"] = creation_info
         # Project name mustn't have spaces in. Covert spaces to '-'
         self.doc["name"] = project_name.replace(" ", "-")
         self.doc["dataLicense"] = self.DATA_LICENSE
-        self.doc["documentNamespace"] = (
-            self.SPDX_NAMESPACE
-            + project_name.replace(" ", "-")
-            + "-"
-            + self._uuid(uuid)
-        )
+        if uuid is None or uuid.startswith("urn:uuid:"):
+            self.doc["documentNamespace"] = (
+                self.SPDX_NAMESPACE
+                + project_name.replace(" ", "-")
+                + "-"
+                + self._uuid(uuid)
+            )
+        else:
+            self.doc["documentNamespace"] = self._uuid(uuid)
         return self.SPDX_PROJECT_ID
 
-    def generateDocumentHeader(self, project_name, uuid=None):
+    def generateDocumentHeader(
+        self, project_name, uuid=None, lifecycle=None, organisation=None
+    ):
+        if organisation is not None:
+            self.organisation = organisation
+            if len(self.organisation) == 0:
+                self.organisation = None
         # Assume a new document being created
         if self.format == "tag":
             self.doc = []
-            return self.generateTagDocumentHeader(project_name, uuid)
+            return self.generateTagDocumentHeader(project_name, uuid, lifecycle)
         else:
             self.doc = {}
             self.component = []
             self.file_component = []
             self.relationships = []
-            return self.generateJSONDocumentHeader(project_name, uuid)
+            return self.generateJSONDocumentHeader(project_name, uuid, lifecycle)
 
     def _validate_spdxid(self, id, preamble):
         spdx_id = ""
@@ -195,7 +257,7 @@ class SPDXGenerator:
         elif self.validate_license:
             if license != "UNKNOWN":
                 derived_license = self.license.find_license(license)
-                if derived_license != "UNKNOWN":
+                if derived_license not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                     return derived_license
                 # Not an SPDX License id
             return "NOASSERTION"
@@ -233,7 +295,7 @@ class SPDXGenerator:
         if "type" in package_info:
             # Handle SPDX mismatch of - and _ in OPERATING-SYSTEM
             self.generateTag(
-                "PrimaryPackagePurpose", package_info["type"].upper().replace("-", "_")
+                "PrimaryPackagePurpose", package_info["type"].upper().replace("_", "-")
             )
         else:
             self.generateTag("PrimaryPackagePurpose", "LIBRARY")
@@ -282,7 +344,7 @@ class SPDXGenerator:
                     {
                         "id": self.license_ref(),
                         "name": package_info["licensename"],
-                        "text": package_info["licensedeclared"],
+                        "text": package_info.get("licensetext", ""),
                     }
                 )
                 self.license_id = self.license_id + 1
@@ -292,10 +354,22 @@ class SPDXGenerator:
                     self.license_ident(package_info["licensedeclared"]),
                 )
         if "licenseconcluded" in package_info:
-            self.generateTag(
-                "PackageLicenseConcluded",
-                self.license_ident(package_info["licenseconcluded"]),
-            )
+            if "licensename" in package_info:
+                # User defined license
+                self.generateTag("PackageLicenseConcluded", self.license_ref())
+                self.license_info.append(
+                    {
+                        "id": self.license_ref(),
+                        "name": package_info["licensename"],
+                        "text": package_info.get("licensetext", ""),
+                    }
+                )
+                self.license_id = self.license_id + 1
+            else:
+                self.generateTag(
+                    "PackageLicenseConcluded",
+                    self.license_ident(package_info["licenseconcluded"]),
+                )
         if "licenselist" in package_info:
             # Handle multiple licenses from a CycloneDX SBOM
             license_expression = ""
@@ -350,13 +424,20 @@ class SPDXGenerator:
                     "PACKAGE_MANAGER",
                     "OTHER",
                 ]:
+                    ref_value = reference[2]
+                    if reference[1] == "purl":
+                        # Validate purl
+                        purl_validator = SBOMIdentifier(ref_value)
+                        if not purl_validator.validate():
+                            # correct PURL value
+                            ref_value = purl_validator.fix()
                     self.generateTag(
                         "ExternalRef",
                         reference[0].replace("_", "-")
                         + " "
                         + reference[1]
                         + " "
-                        + reference[2],
+                        + ref_value,
                     )
 
     def generateJSONPackageDetails(
@@ -416,9 +497,21 @@ class SPDXGenerator:
         if "sourceinfo" in package_info:
             component["sourceInfo"] = package_info["sourceinfo"]
         if "licenseconcluded" in package_info:
-            component["licenseConcluded"] = self.license_ident(
-                package_info["licenseconcluded"]
-            )
+            if "licensename" in package_info:
+                # User defined license
+                component["licenseConcluded"] = self.license_ref()
+                self.license_info.append(
+                    {
+                        "id": self.license_ref(),
+                        "name": package_info["licensename"],
+                        "text": package_info.get("licensetext", ""),
+                    }
+                )
+                self.license_id = self.license_id + 1
+            else:
+                component["licenseConcluded"] = self.license_ident(
+                    package_info["licenseconcluded"]
+                )
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
@@ -427,7 +520,7 @@ class SPDXGenerator:
                     {
                         "id": self.license_ref(),
                         "name": package_info["licensename"],
-                        "text": package_info["licensedeclared"],
+                        "text": package_info.get("licensetext", ""),
                     }
                 )
                 self.license_id = self.license_id + 1
@@ -473,9 +566,14 @@ class SPDXGenerator:
                 else:
                     component["attribution"] = [attribution_data]
         if "release_date" in package_info:
-            component["releaseDate"] = package_info["release_date"]
+            if (
+                package_info["release_date"] is not None
+                and len(package_info["release_date"]) > 0
+            ):
+                component["releaseDate"] = package_info["release_date"]
         if "build_date" in package_info:
-            component["builtDate"] = package_info["build_date"]
+            if len(package_info["build_date"]) > 0:
+                component["builtDate"] = package_info["build_date"]
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
@@ -485,10 +583,17 @@ class SPDXGenerator:
                     "PACKAGE_MANAGER",
                     "OTHER",
                 ]:
+                    ref_value = reference[2]
+                    if reference[1] == "purl":
+                        # Validate purl
+                        purl_validator = SBOMIdentifier(ref_value)
+                        if not purl_validator.validate():
+                            # correct PURL value
+                            ref_value = purl_validator.fix()
                     reference_data = dict()
                     reference_data["referenceCategory"] = reference[0].replace("_", "-")
                     reference_data["referenceType"] = reference[1]
-                    reference_data["referenceLocator"] = reference[2]
+                    reference_data["referenceLocator"] = ref_value
                     if "externalRefs" in component:
                         component["externalRefs"].append(reference_data)
                     else:
@@ -631,14 +736,14 @@ class SPDXGenerator:
                 self.generateTagLicenseDetails(
                     license_info.get("id", ""),
                     license_info.get("name", ""),
-                    license_info["text"],
+                    license_info.get("text", ""),
                     license_info.get("comment", ""),
                 )
             else:
                 self.generateJSONLicenseDetails(
                     license_info.get("id", ""),
                     license_info.get("name", ""),
-                    license_info["text"],
+                    license_info.get("text", ""),
                     license_info.get("comment", ""),
                 )
 
@@ -650,7 +755,7 @@ class SPDXGenerator:
             self.relationship.append([from_id, to_id, relationship_type])
 
     def showRelationship(self):
-        self.relationship.sort()
+        # self.relationship.sort()
         if self.format == "tag":
             self.generateComment("\n")
         for r in self.relationship:

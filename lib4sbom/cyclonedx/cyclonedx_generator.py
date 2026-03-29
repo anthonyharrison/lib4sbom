@@ -6,6 +6,7 @@ import re
 import uuid
 from datetime import datetime
 
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.license import LicenseScanner
 from lib4sbom.version import VERSION
@@ -16,7 +17,7 @@ class CycloneDXGenerator:
     Generate CycloneDX SBOM.
     """
 
-    CYCLONEDX_VERSION = "1.6"
+    CYCLONEDX_VERSION = "1.7"
     DATA_LICENCE = "CC0-1.0"
     PROJECT_ID = "CDXRef-DOCUMENT"
     PACKAGE_PREAMBLE = "CDXRef-Package-"
@@ -42,6 +43,8 @@ class CycloneDXGenerator:
         self.relationship = []
         self.vulnerability = []
         self.service = []
+        self.service_number = 1
+        self.annotation = []
         self.sbom_complete = False
         self.include_purl = False
         # Can specify version of CycloneDX through environment variable
@@ -74,12 +77,14 @@ class CycloneDXGenerator:
                 # Add set of detected components to SBOM
                 if len(self.component) > 0:
                     self.doc["components"] = self.component
+                if len(self.service) > 0:
+                    self.doc["services"] = self.service
                 if len(self.relationship) > 0:
                     self.doc["dependencies"] = self.relationship
                 if len(self.vulnerability) > 0:
                     self.doc["vulnerabilities"] = self.vulnerability
-                if len(self.service) > 0:
-                    self.doc["services"] = self.service
+                if len(self.annotation) > 0:
+                    self.doc["annotations"] = self.annotation
             self.sbom_complete = True
         return self.doc
 
@@ -88,18 +93,22 @@ class CycloneDXGenerator:
         return datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def spec_version(self, version):
-        if version in ["1.3", "1.4", "1.5", "1.6"]:
+        if version in ["1.3", "1.4", "1.5", "1.6", "1.7"]:
             self.cyclonedx_version = version
         else:
             self.cyclonedx_version = None
 
     def _cyclonedx_15(self):
         # utility for features introduced in version 1.5
-        return self.cyclonedx_version in ["1.5", "1.6"]
+        return self.cyclonedx_version in ["1.5", "1.6", "1.7"]
 
     def _cyclonedx_16(self):
         # utility for features introduced in version 1.6
-        return self.cyclonedx_version in ["1.6"]
+        return self.cyclonedx_version in ["1.6", "1.7"]
+
+    def _cyclonedx_17(self):
+        # utility for features introduced in version 1.7
+        return self.cyclonedx_version in ["1.7"]
 
     def generateDocumentHeader(
         self, project_name, component_type, uuid=None, bom_version="1", property=None
@@ -123,7 +132,7 @@ class CycloneDXGenerator:
     def generateJSONDocumentHeader(
         self, project_name, component_type, uuid=None, bom_version="1", property=None
     ):
-        if uuid is None:
+        if uuid is None or not uuid.startswith("urn:uuid:"):
             urn = self._generate_urn()
         else:
             urn = uuid
@@ -142,8 +151,20 @@ class CycloneDXGenerator:
         else:
             metadata["timestamp"] = component_type["timestamp"]
         if component_type.get("lifecycle") is not None:
+            sbom_lifecycle = component_type.get("lifecycle").lower()
+            # Convert from CISA sbomtypes if required
+            lifecycle_to_sbomtype = {
+                "design": "design",
+                "source": "pre-build",
+                "build": "build",
+                "analyzed": "post-build",
+                "deployed": "operations",
+                "runtime": "discovery",
+            }
+            if lifecycle_to_sbomtype.get(sbom_lifecycle) is not None:
+                sbom_lifecycle = lifecycle_to_sbomtype.get(sbom_lifecycle)
             # Validate lifecycle phase
-            if component_type["lifecycle"].lower() in [
+            if sbom_lifecycle in [
                 "design",
                 "pre-build",
                 "build",
@@ -153,7 +174,7 @@ class CycloneDXGenerator:
                 "decommission",
             ]:
                 lifecycle = {}
-                lifecycle["phase"] = component_type["lifecycle"].lower()
+                lifecycle["phase"] = sbom_lifecycle
                 metadata["lifecycles"] = [lifecycle]
         tool = {}
         author = {}
@@ -205,11 +226,16 @@ class CycloneDXGenerator:
                 metadata_property.append(property_entry)
             metadata["properties"] = metadata_property
         metadata["component"] = component
+        if self._cyclonedx_17():
+            if component_type["distribution"] is not None:
+                distributionConstraints = dict()
+                distributionConstraints["tlp"] = component_type["distribution"]
+                metadata["distributionConstraints"] = distributionConstraints
         self.doc["metadata"] = metadata
         return component["bom-ref"]
 
     def generateXMLDocumentHeader(self, project_name, uuid=None):
-        if uuid is None:
+        if uuid is None or not uuid.startswith("urn:uuid:"):
             urn = self._generate_urn()
         else:
             urn = uuid
@@ -254,11 +280,11 @@ class CycloneDXGenerator:
             dependency["dependsOn"] = [package_id]
             self.relationship.append(dependency)
 
-    def generateComponent(self, id, type, package):
+    def generateComponent(self, id, type, package, user_licenses=None):
         if self.format == "xml":
             self.generateXMLComponent(id, type, package)
         else:
-            self.generateJSONComponent(id, type, package)
+            self.generateJSONComponent(id, type, package, user_licenses)
 
     def _process_supplier_info(self, supplier_info):
         # Get email addresses
@@ -479,14 +505,7 @@ class CycloneDXGenerator:
                 ml_model["properties"] = ml_properties
         return ml_model
 
-    def addLicenseDetails(self, user_licenses):
-        for user_license in user_licenses:
-            license_item = dict()
-            license_item["name"] = user_license.get("name", "")
-            license_item["text"] = user_license.get("text", "")
-            self.license_info[user_license["id"]] = license_item
-
-    def generateJSONComponent(self, id, type, package):
+    def generateJSONComponent(self, id, type, package, user_licenses):
         component = dict()
         if "type" in package:
             component["type"] = package["type"].lower()
@@ -520,7 +539,13 @@ class CycloneDXGenerator:
                     supplier["contact"] = [contact]
                 component["supplier"] = supplier
         if "originator" in package:
-            component["author"] = package["originator"]
+            if self._cyclonedx_17():
+                # author is deprecated
+                author = {}
+                author["name"] = package["originator"]
+                component["authors"] = [author]
+            else:
+                component["author"] = package["originator"]
         if "description" in package:
             component["description"] = package["description"]
         elif "summary" in package:
@@ -528,7 +553,10 @@ class CycloneDXGenerator:
         if "checksum" in package:
             for checksum in package["checksum"]:
                 checksum_entry = dict()
-                checksum_entry["alg"] = checksum[0].replace("SHA", "SHA-")
+                if checksum[0].startswith("SHA") and "-" not in checksum[0]:
+                    checksum_entry["alg"] = checksum[0].replace("SHA", "SHA-")
+                else:
+                    checksum_entry["alg"] = checksum[0]
                 checksum_entry["content"] = checksum[1]
                 if "hashes" in component:
                     component["hashes"].append(checksum_entry)
@@ -548,24 +576,17 @@ class CycloneDXGenerator:
                 license_definition = package["licensedeclared"]
                 acknowledgement = "declared"
             license_id = self.license.find_license(license_definition)
-
-            if license_id.startswith(self.LICENSE_PREAMBLE):
-                if license_id in self.license_info:
-                    license_item = self.license_info[license_id]
-                    component["licenses"] = [license_item]
-                else:
-                    #user license info is missing, just put license_id into 'name' property
-                    print(f'license {license_id} not found in extracted licenses')
-                    license_item = dict()
-                    license_item["name"] = license_id.replace(self.LICENSE_PREAMBLE, "")
-                    component["licenses"] = [license_item]
-
-            elif license_id not in ["UNKNOWN", "NOASSERTION", "NONE"]:
+            if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"] and (
+                self.license.valid_spdx_license(license_id)
+                or self.license.license_expression(license_id)
+            ):
                 # A valid SPDX license
                 license = dict()
                 # SPDX license expression handled separately to single license
                 if self.license.license_expression(license_id):
                     license["expression"] = license_id
+                    if self._cyclonedx_16():
+                        license["acknowledgement"] = acknowledgement
                     component["licenses"] = [license]
                 else:
                     license["id"] = license_id
@@ -580,13 +601,25 @@ class CycloneDXGenerator:
             elif license_definition not in ["UNKNOWN", "NOASSERTION", "NONE"]:
                 # Not a valid SPDX license
                 license = dict()
+                license_text = None
+                if user_licenses is not None:
+                    for u in user_licenses:
+                        if u.get("id") == license_definition:
+                            license_text = u.get("text")
+                            break
                 if "licensename" in package:
                     license["name"] = package["licensename"]
                     text = {}
-                    text["content"] = license_definition
+                    text["content"] = package.get("licensetext", license_definition)
                     license["text"] = text
                 else:
                     license["name"] = license_definition
+                if license_text is not None:
+                    text = {}
+                    text["content"] = license_text
+                    license["text"] = text
+                if self._cyclonedx_16():
+                    license["acknowledgement"] = acknowledgement
                 item = dict()
                 item["license"] = license
                 component["licenses"] = [item]
@@ -635,7 +668,18 @@ class CycloneDXGenerator:
                     ref_category in ["PACKAGE-MANAGER", "PACKAGE_MANAGER"]
                     and ref_type == "purl"
                 ):
-                    component["purl"] = ref_value
+                    # Validate purl
+                    purl_validator = SBOMIdentifier(ref_value)
+                    if purl_validator.validate():
+                        component["purl"] = ref_value
+                    else:
+                        fixed_purl = purl_validator.fix()
+                        component["purl"] = fixed_purl
+                        # Add comment
+                        property_entry = dict()
+                        property_entry["name"] = "PURL Comments"
+                        property_entry["value"] = f"{ref_value} is not a valid PURL"
+                        component["properties"] = [property_entry]
                 else:
                     externalReference = dict()
                     externalReference["url"] = ref_value
@@ -646,14 +690,15 @@ class CycloneDXGenerator:
                     else:
                         component["externalReferences"] = [externalReference]
         if "release_date" in package:
-            property_entry = dict()
-            property_entry["name"] = "release_date"
-            property_entry["value"] = package["release_date"]
-            component["properties"] = [property_entry]
+            if package["release_date"] is not None:
+                property_entry = dict()
+                property_entry["name"] = "release_date"
+                property_entry["value"] = package["release_date"]
+                component["properties"] = [property_entry]
         if "build_date" in package:
             property_entry = dict()
             property_entry["name"] = "build_date"
-            property_entry["value"] = package["rbuild_date"]
+            property_entry["value"] = package["build_date"]
             if "properties" in component:
                 component["properties"].append(property_entry)
             else:
@@ -667,11 +712,17 @@ class CycloneDXGenerator:
                     component["properties"].append(property_entry)
                 else:
                     component["properties"] = [property_entry]
+        if "tag" in package:
+            for tag in package["tag"]:
+                if "tags" in component:
+                    component["tags"].append(tag)
+                else:
+                    component["tags"] = [tag]
         # SPDX items with no corresponding entry are created as properties
-        if "licensecomment" in package:
+        if "licensecomments" in package:
             property_entry = dict()
             property_entry["name"] = "License Comments"
-            property_entry["value"] = package["licensecomment"]
+            property_entry["value"] = package["licensecomments"]
             if "properties" in component:
                 component["properties"].append(property_entry)
             else:
@@ -689,6 +740,9 @@ class CycloneDXGenerator:
             component["modelCard"] = self._generate_mlmodel(
                 package, component["bom-ref"]
             )
+        if self._cyclonedx_16() and component["type"] == "cryptographic-asset":
+            # Only for version 1.6 or later
+            component["cryptoProperties"] = self._generate_crypto(package["crypto"])
         self.component.append(component)
 
     def generateXMLComponent(self, id, type, package):
@@ -830,86 +884,212 @@ class CycloneDXGenerator:
             statements.append(vulnerability)
         self.vulnerability = statements
 
-    def generate_service_data(self, services):
-        service_definitions = []
-        service_number = 1
-        sbom_services = [x for x in services.values()]
-        for serv in sbom_services:
-            service = {}
-            if "id" in serv:
-                service["bom-ref"] = serv["id"]
-            else:
-                service["bom-ref"] = f"Service-{service_number}"
-            service["name"] = serv["name"]
-            if "version" in serv:
-                service["version"] = serv["version"]
-            if "description" in serv:
-                service["description"] = serv["description"]
-            if "provider" in serv:
-                provider = {}
-                if "name" in serv["provider"]:
-                    provider["name"] = serv["provider"]["name"]
-                if "url" in serv["provider"]:
-                    provider["url"] = serv["provider"]["url"]
-                contact = {}
-                if "contact" in serv["provider"]:
-                    contact["name"] = serv["provider"]["contact"]
-                if "email" in serv["provider"]:
-                    contact["email"] = serv["provider"]["email"]
-                if "phone" in serv["provider"]:
-                    contact["email"] = serv["provider"]["phone"]
-                if len(contact) > 0:
-                    provider["contact"] = contact
-                service["provider"] = provider
-            if "endpoints" in serv:
-                service["endpoints"] = serv["endpoints"]
-            if "authenticated" in serv:
-                service["authenticated"] = serv["authenticated"]
-            if "x-trust-boundary" in serv:
-                service["x-trust-boundary"] = serv["x-trust-boundary"]
-            if "trustZone" in serv:
-                service["trustZone"] = serv["trustZone"]
-            if "data" in serv:
-                data = []
-                for data_item in serv["data"]:
-                    data_element = {}
-                    data_element["flow"] = data_item.get("flow")
-                    data_element["classification"] = data_item.get("classification")
-                    if "name" in data_item:
-                        data_element["name"] = data_item.get("name")
-                    if "description" in data_item:
-                        data_element["description"] = data_item.get("description")
-                    data.append(data_element)
-                service["data"] = data
-            if "licenseinfo" in serv:
-                licenses = []
-                for license_item in serv["licenseinfo"]:
-                    licenses.append({"license": license_item})
-                service["licenses"] = licenses
-            if "property" in serv:
-                for property in serv["property"]:
-                    property_entry = dict()
-                    property_entry["name"] = property[0]
-                    property_entry["value"] = property[1]
-                    if "properties" in service:
-                        service["properties"].append(property_entry)
-                    else:
-                        service["properties"] = [property_entry]
-            if "externalreference" in serv:
-                # Potentially multiple entries
-                for reference in serv["externalreference"]:
-                    url = reference[0]
-                    ref_type = reference[1]
-                    ref_comment = reference[2]
-                    externalReference = dict()
-                    externalReference["url"] = url
-                    externalReference["type"] = ref_type
-                    if len(ref_comment) > 0:
-                        externalReference["comment"] = ref_comment
-                    if "externalReferences" in service:
-                        service["externalReferences"].append(externalReference)
-                    else:
-                        service["externalReferences"] = [externalReference]
-            service_definitions.append(service)
-            service_number += 1
-        self.service = service_definitions
+    def process_service(self, serv):
+        service = {}
+        if "id" in serv:
+            service["bom-ref"] = serv["id"]
+        else:
+            service["bom-ref"] = f"Service-{self.service_number}"
+        service["name"] = serv["name"]
+        if "version" in serv:
+            service["version"] = serv["version"]
+        if "description" in serv:
+            service["description"] = serv["description"]
+        if "provider" in serv:
+            provider = {}
+            if "name" in serv["provider"]:
+                provider["name"] = serv["provider"]["name"]
+            if "url" in serv["provider"]:
+                provider["url"] = serv["provider"]["url"]
+            contact = {}
+            if "contact" in serv["provider"]:
+                contact["name"] = serv["provider"]["contact"]
+            if "email" in serv["provider"]:
+                contact["email"] = serv["provider"]["email"]
+            if "phone" in serv["provider"]:
+                contact["email"] = serv["provider"]["phone"]
+            if len(contact) > 0:
+                provider["contact"] = contact
+            service["provider"] = provider
+        if "endpoints" in serv:
+            service["endpoints"] = serv["endpoints"]
+        if "authenticated" in serv:
+            service["authenticated"] = serv["authenticated"]
+        if "x-trust-boundary" in serv:
+            service["x-trust-boundary"] = serv["x-trust-boundary"]
+        if "trustZone" in serv:
+            service["trustZone"] = serv["trustZone"]
+        if "data" in serv:
+            data = []
+            for data_item in serv["data"]:
+                data_element = {}
+                data_element["flow"] = data_item.get("flow")
+                data_element["classification"] = data_item.get("classification")
+                if "name" in data_item:
+                    data_element["name"] = data_item.get("name")
+                if "description" in data_item:
+                    data_element["description"] = data_item.get("description")
+                data.append(data_element)
+            service["data"] = data
+        if "licenseinfo" in serv:
+            licenses = []
+            for license_item in serv["licenseinfo"]:
+                licenses.append({"license": license_item})
+            service["licenses"] = licenses
+        if "property" in serv:
+            for property in serv["property"]:
+                property_entry = dict()
+                property_entry["name"] = property[0]
+                property_entry["value"] = property[1]
+                if "properties" in service:
+                    service["properties"].append(property_entry)
+                else:
+                    service["properties"] = [property_entry]
+        if "externalreference" in serv:
+            # Potentially multiple entries
+            for reference in serv["externalreference"]:
+                url = reference[0]
+                ref_type = reference[1]
+                ref_comment = reference[2]
+                externalReference = dict()
+                externalReference["url"] = url
+                externalReference["type"] = ref_type
+                if len(ref_comment) > 0:
+                    externalReference["comment"] = ref_comment
+                if "externalReferences" in service:
+                    service["externalReferences"].append(externalReference)
+                else:
+                    service["externalReferences"] = [externalReference]
+        self.service.append(service)
+        self.service_number += 1
+        return service
+
+    def generate_annotation_data(self, annotations, idents):
+        annotation_definitions = []
+        for annotation in annotations:
+            annotation_record = {}
+            # Get Annotator
+            if "annotator" in annotation:
+                annotator_record = {}
+                if annotation["annotator"]["annotator_type"] == "organization":
+                    annotator_record["organization"] = {
+                        "name": annotation["annotator"]["name"],
+                        "contact": [{"email": annotation["annotator"]["email"]}],
+                    }
+                else:
+                    annotator_record["individual"] = {
+                        "name": annotation["annotator"]["name"],
+                        "contact": [{"email": annotation["annotator"]["email"]}],
+                    }
+                annotation_record["annotator"] = annotator_record
+            # Get Subject
+            if "subject" in annotation:
+                subjects = []
+                for subject in annotation["subject"]:
+                    subjects.append(idents[subject][0][0])
+                annotation_record["subjects"] = subjects
+            if "text" in annotation:
+                annotation_record["text"] = annotation["text"]
+            annotation_record["timestamp"] = self.generateTime()
+            annotation_definitions.append(annotation_record)
+        self.annotation = annotation_definitions
+
+    def _generate_crypto(self, package):
+        crypto_properties = {}
+        algorithm_properties = {}
+        certificate_properties = {}
+        material_properties = {}
+        protocol_properties = {}
+        asset_type = None
+        # check for a valid type
+        if "type" in package:
+            if package["type"] in [
+                "algorithm",
+                "certificate",
+                "protocol",
+                "related-crypto-material",
+            ]:
+                asset_type = package["type"]
+                crypto_properties["assetType"] = asset_type
+        if asset_type == "algorithm":
+            # Algorithm
+            if "primitive" in package:
+                algorithm_properties["primitive"] = package["primitive"]
+            if "algorithm" in package:
+                algorithm_properties["algorithmFamily"] = package["algorithm"]
+            if "keysize" in package:
+                algorithm_properties["parameterSetIdentifier"] = package["keysize"]
+            if len(algorithm_properties) > 0:
+                crypto_properties["algorithmProperties"] = algorithm_properties
+        elif asset_type == "certificate":
+            # Certiticate
+            if "subject" in package:
+                certificate_properties["subjectName"] = package["subject"]
+            if "issuer" in package:
+                certificate_properties["issuerName"] = package["issuer"]
+            if "format" in package:
+                certificate_properties["certificateFormat"] = package["format"]
+            if self._cyclonedx_17():
+                if "state" in package:
+                    certificate_properties["certificateState"] = package["state"]
+                for date_event in [
+                    "creationDate",
+                    "activationDate",
+                    "deactivationDate",
+                    "revocationDate",
+                    "destructionDate",
+                ]:
+                    if date_event in package:
+                        certificate_properties[date_event] = package[date_event]
+                if "relatedCryptographicAssets" in package:
+                    certificate_properties["relatedCryptographicAssets"] = package[
+                        "relatedCryptographicAssets"
+                    ]
+            if len(certificate_properties) > 0:
+                crypto_properties["certificateProperties"] = certificate_properties
+        elif asset_type == "protocol":
+            # Protocol
+            if "primitive" in package:
+                protocol_properties["type"] = package["primitive"]
+            if "version" in package:
+                protocol_properties["version"] = package["version"]
+            if self._cyclonedx_17():
+                if "relatedCryptographicAssets" in package:
+                    protocol_properties["relatedCryptographicAssets"] = package[
+                        "relatedCryptographicAssets"
+                    ]
+            if len(protocol_properties) > 0:
+                crypto_properties["protocolProperties"] = protocol_properties
+        elif asset_type == "related-crypto-material":
+            # Crypto Material
+            if "primitive" in package:
+                material_properties["type"] = package["primitive"]
+            if "state" in package:
+                material_properties["state"] = package["state"]
+            for date_event in [
+                "creationDate",
+                "activationDate",
+                "updateDate",
+                "expirationDate",
+            ]:
+                if date_event in package:
+                    material_properties[date_event] = package[date_event]
+            if "value" in package:
+                material_properties["value"] = package["value"]
+            if "keysize" in package:
+                material_properties["size"] = package["keysize"]
+            if "format" in package:
+                material_properties["format"] = package["format"]
+            if self._cyclonedx_17():
+                if "relatedCryptographicAssets" in package:
+                    material_properties["relatedCryptographicAssets"] = package[
+                        "relatedCryptographicAssets"
+                    ]
+            if len(material_properties) > 0:
+                crypto_properties["relatedCryptoMaterialProperties"] = (
+                    material_properties
+                )
+        if "oid" in package:
+            crypto_properties["oid"] = package["oid"]
+
+        return crypto_properties

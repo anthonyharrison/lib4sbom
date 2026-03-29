@@ -10,13 +10,18 @@ The following facilities are provided:
 - Generate SPDX SBOM in TagValue, JSON and YAML formats
 - Generate CycloneDX SBOM in JSON format
 - Parse SPDX SBOM in TagValue, JSON, YAML, XML and RDF formats
+- Validate CycloneDX SBOM in JSON and XML format
+- Validate SPDX SBOM in TagValue, JSON, YAML, XML and RDF formats
 - Parse CycloneDX SBOM in JSON and XMLformat
 - Create and manipulate a SBOM file object
 - Create and manipulate a SBOM package object
 - Create and manipulate a SBOM dependency relationship object
 - Create and manipulate a Vulnerability object
 - Create and manipulate a Software Service object
+- Create and manipulate a Cryptography object
 - Generated SBOM can be output to a file or to the console
+- Parse a SBOM embedded in an Intoto attestaion
+- Parse a SPDX or CycloneDX SBOM embedded in a Protobom object
 
 ## Installation
 
@@ -28,7 +33,7 @@ Alternatively, just clone the repo and install dependencies using the following 
 
 `pip install -U -r requirements.txt`
 
-The tool requires Python 3 (3.7+). It is recommended to use a virtual python environment especially
+The tool requires a recent version of Python 3 (3.9+). It is recommended to use a virtual python environment especially
 if you are using different versions of python. `virtualenv` is a tool for setting up virtual python environments which
 allows you to have all the dependencies for the tool set up in a single environment, or have different environments set
 up for testing using different versions of Python.
@@ -42,7 +47,7 @@ returns the file, package and relationship information from within the SBOM.
 
 The focus of the implementation is on providing a common set of SBOM data regardless of the SBOM format.
 
-SBOMs are supported in the following formats
+SBOMs are supported in the following formats and versions
 
 | SBOM Type | Version | Format   |
 | --------- |---------|----------|
@@ -54,16 +59,21 @@ SBOMs are supported in the following formats
 | SPDX      | 2.3     | TagValue |
 | SPDX      | 2.3     | JSON     |
 | SPDX      | 2.3     | YAML     |
-| SPDX      | 2.3     | RDF       |
+| SPDX      | 2.3     | RDF      |
 | SPDX      | 2.3     | XML      |
+| SPDX      | 3.0     | JSON-LD  |
 | CycloneDX | 1.4     | JSON     |
 | CycloneDX | 1.4     | XML      |
 | CycloneDX | 1.5     | JSON     |
 | CycloneDX | 1.5     | XML      |
 | CycloneDX | 1.6     | JSON     |
 | CycloneDX | 1.6     | XML      |
+| CycloneDX | 1.7     | JSON     |
+| CycloneDX | 1.7     | XML      |
 
 **Note** that support for SPDX RDF and XML formats is limited to a few package attributes.
+
+**Note** support for parsing SBOMs embedded as [In-Toto](https://in-toto.io/) statements is supported for SPDX documents.
 
 _class_ **SBOMParser**(_sbom_type='auto_')
 
@@ -76,6 +86,7 @@ following filename conventions.
 | --------- |----------|--------------------|
 | SPDX      | TagValue | .spdx              |
 | SPDX      | JSON     | .spdx.json         |
+| SPDX      | JSON-LD  | .jsonld            |
 | SPDX      | YAML     | .spdx.yaml         |
 | SPDX      | YAML     | .spdx.yml          |
 | SPDX      | RDF      | .spdx.rdf          |
@@ -85,10 +96,12 @@ following filename conventions.
 | CycloneDX | JSON     | .bom.json          |
 | CycloneDX | XML      | .xml               |
 | CycloneDX | XML      | .cdx.xml           |
-| CycloneDX | XML      | .bom..xml          |
+| CycloneDX | XML      | .bom.xml           |
 
 The parser will check that the correct JSON files is being processed by the correct parser.
 A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
+
+**Note** SPDX files with an extension of .json will be checked for JSON-LD and JSON formats.
 
 Errors in the parsing process will result in the exception SBOMParserException being raised.
 
@@ -96,6 +109,11 @@ Errors in the parsing process will result in the exception SBOMParserException b
 
 parse_file(filename)
 Parses the SBOM file. If the file does not exist, a FileNotFoundError exception is raised.
+
+If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
+
+parse_string(sbom_string)
+Parses the SBOM content from sbom_string.
 
 If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
 
@@ -131,7 +149,7 @@ LicenseListVersion: 3.18
 Creator: Tool: sbom4python-0.4.0
 Created: 2022-11-16T10:14:26Z
 CreatorComment: <text>This document has been automatically generated.</text>
-##### 
+#####
 
 PackageName: virtualenv
 SPDXID: SPDXRef-Package-1-virtualenv
@@ -143,7 +161,7 @@ PackageLicenseConcluded: MIT
 PackageLicenseDeclared: MIT
 PackageCopyrightText: NOASSERTION
 ExternalRef: PACKAGE-MANAGER purl pkg:pypi/virtualenv@20.16.7
-##### 
+#####
 
 PackageName: distlib
 SPDXID: SPDXRef-Package-2-distlib
@@ -155,7 +173,7 @@ PackageLicenseConcluded: NOASSERTION
 PackageLicenseDeclared: NOASSERTION
 PackageCopyrightText: NOASSERTION
 ExternalRef: PACKAGE-MANAGER purl pkg:pypi/distlib@0.3.6
-##### 
+#####
 
 PackageName: filelock
 SPDXID: SPDXRef-Package-3-filelock
@@ -167,7 +185,7 @@ PackageLicenseConcluded: Unlicense
 PackageLicenseDeclared: Unlicense
 PackageCopyrightText: NOASSERTION
 ExternalRef: PACKAGE-MANAGER purl pkg:pypi/filelock@3.8.0
-##### 
+#####
 
 PackageName: platformdirs
 SPDXID: SPDXRef-Package-4-platformdirs
@@ -191,14 +209,14 @@ The following code sample shows the use of the SBOMParser module.
 ```python
 >>> from lib4sbom.parser import SBOMParser
 >>> test_parser = SBOMParser()
->>> print (f"SBOM type {test_parser.get_type()}")                                                                                                                                             
-SBOM type auto                                                                                                                                                                                
->>> test_parser.parse_file("test_sbom.spdx")                                                                                                                                                                                                                                                                                            
->>> print (f"SBOM type {test_parser.get_type()}")                                                                                                                                             
-SBOM type spdx                                                                                                                                                                                
+>>> print (f"SBOM type {test_parser.get_type()}")
+SBOM type auto
+>>> test_parser.parse_file("test_sbom.spdx")
+>>> print (f"SBOM type {test_parser.get_type()}")
+SBOM type spdx
 >>> sbom_files = test_parser.get_files()
->>> print (sbom_files)                                                                                                                                                                        
-[]                                                                                                                                                                                            
+>>> print (sbom_files)
+[]
 >>> sbom_packages = test_parser.get_packages()
 >>> print (sbom_packages)
 [{'name': 'virtualenv', 'type': 'library', 'id': 'SPDXRef-Package-1-virtualenv', 'supplier_type': 'Person', 'supplier': 'Bernat_Gabor', 'version': '20.16.7', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'MIT', 'licensedeclared': 'MIT', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/virtualenv@20.16.7']]}, {'name': 'distlib', 'type': 'library', 'id': 'SPDXRef-Package-2-distlib', 'supplier_type': 'Person', 'supplier': 'Vinay_Sajip', 'version': '0.3.6', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'NOASSERTION', 'licensedeclared': 'NOASSERTION', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/distlib@0.3.6']]}, {'name': 'filelock', 'type': 'library', 'id': 'SPDXRef-Package-3-filelock', 'supplier_type': 'Person', 'supplier': 'Benedikt_Schmitt', 'version': '3.8.0', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'Unlicense', 'licensedeclared': 'Unlicense', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/filelock@3.8.0']]}, {'name': 'platformdirs', 'type': 'library', 'id': 'SPDXRef-Package-4-platformdirs', 'supplier_type': 'Organization', 'supplier': 'Unknown', 'version': '2.5.4', 'downloadlocation': 'NOASSERTION', 'filesanalysis': 'false', 'licenseconcluded': 'NOASSERTION', 'licensedeclared': 'NOASSERTION', 'externalreference': [['PACKAGE-MANAGER', 'purl', 'pkg:pypi/platformdirs@2.5.4']]}]
@@ -211,8 +229,59 @@ SBOM type spdx
 [{'source': 'TestDocument', 'type': 'DESCRIBES', 'target': 'virtualenv', 'source_id': 'SPDXRef-DOCUMENT', 'target_id': 'SPDXRef-Package-1-virtualenv'}, {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'distlib', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-2-distlib'}, {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'filelock', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-3-filelock'}, {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'platformdirs', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-4-platformdirs'}]
 >>> sbom_relationships[2]
 {'source': 'virtualenv', 'type': 'CONTAINS', 'target': 'filelock', 'source_id': 'SPDXRef-Package-1-virtualenv', 'target_id': 'SPDXRef-Package-3-filelock'}
->>> 
+>>>
 ```
+
+_class_ **SBOMValidator**(_sbom_type='auto', version=None, debug=False_)
+
+This creates a simple SBOM Validator object.
+
+The optional parameter, _sbom_type_, can be specified
+which represents the type of SBOM (either spdx, cyclonedx or auto). The default is auto in
+which case the parser will automatically work out the SBOM type using the
+following filename conventions.
+
+| SBOM      | Format   | Filename extension |
+| --------- |----------|--------------------|
+| SPDX      | TagValue | .spdx              |
+| SPDX      | JSON     | .spdx.json         |
+| SPDX      | JSON-LD  | .jsonld            |
+| SPDX      | YAML     | .spdx.yaml         |
+| SPDX      | YAML     | .spdx.yml          |
+| SPDX      | RDF      | .spdx.rdf          |
+| SPDX      | XML      | .spdx.xml          |
+| CycloneDX | JSON     | .json              |
+| CycloneDX | JSON     | .cdx.json          |
+| CycloneDX | JSON     | .bom.json          |
+| CycloneDX | XML      | .xml               |
+| CycloneDX | XML      | .cdx.xml           |
+| CycloneDX | XML      | .bom.xml           |
+
+The optional parameter, _version_, can be used to specify a single version of the SBOM to be validated against e.g. "1.6".
+
+The optional parameter, _debug_, can be used to generate debug output.
+
+**Note** To validate a SPDX SBOM in version 3.0 format, the version must be explictedly specified,
+
+**Methods**
+
+validate_file(filename)
+Validates the SBOM file. If the file does not exist, a FileNotFoundError exception is raised.
+
+The validator will check that the correct JSON files is being processed by the correct parser.
+A SPDX JSON file submitted to the CycloneDX parser will result in no data being processed.
+
+If an error occurs during the validation of the file, a SBOMValidatorException exception is raised.
+
+The return value is a dictionary representing the type of SBOM and the version. e.g. {"SPDX" : 2.3}.
+If the SBOM fails to validate the return value is the type of SBOM and a boolean value e.g. e.g. {"SPDX" : False}.
+If the SBOM cannot be validated the return value is the type of SBOM and "Unknown" i.e. {"SPDX" : "Unknown"}.
+
+Validation rules:
+- The validation for SPDX JSON and YAML files is against the SPDX JSON schema.
+- The validation for SPDX TagValue, RDF and XML files is simply vaerification that a valid version of the SDPX specification is detected.
+- The validation for CycloneDX JSON files is against the CycloneDX JSON schema.
+- The validation for CycloneDX XML files is against the CycloneDX XML schema.
 
 ### SBOMGenerator
 
@@ -230,13 +299,21 @@ SBOMs can be generated in the following formats
 | SPDX      | 2.3     | Tag       |
 | SPDX      | 2.3     | JSON      |
 | SPDX      | 2.3     | YAML      |
+| SPDX      | 3.0     | JSON-LD   |
 | CycloneDX | 1.4     | JSON      |
 | CycloneDX | 1.5     | JSON      |
 | CycloneDX | 1.6     | JSON      |
+| CycloneDX | 1.7     | JSON      |
 
-The default version for CycloneDX is version 1.6. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4" if required.
+The default version for CycloneDX is version 1.7. However, the version can be overridden by setting the environment variable LIB4SBOM_CYCLONEDX_VERSION to "1.4", "1.5" or "1.6" as required.
 
 The default version for SPDX is version 2.3. However, the version can be overridden by setting the environment variable LIB4SBOM_SPDX_VERSION to "SPDX-2.2" if required.
+
+**Note** To generate a SPDX SBOM in 3.0 format, the enviornment variable LIB4SBOM_SPDX3 must be set.
+
+**Note** Top preserve existing SBOM metadata, e.g. the creation time, the environment variable LIB4SBOM_PRESERVE must be set.
+
+The organization creating the SBOM can be set be setting the environment variable SBOM_ORGANIZATION. This can be overriden by setting the value of the Metadata_Supplier attribute within the SBOM Document.
 
 _class_ **SBOMGenerator**(_validate_license: True, sbom_type="spdx", format="tag", application="lib4sbom", version="0.1"_)
 
@@ -245,7 +322,7 @@ This creates a simple SBOM Generator object. The following optional parameters c
 _validate_license_ indicates if license information is validated against the set of [SPDX license identifiers](https://spdx.org/licenses/). This option only applies for SPDX SBOMs
 as this is mandatory for CycloneDX SBOMs.
 
-_sbom_type_ indicates the type of SBOM to be generated. Valid options are spdx or cyclonedx
+_sbom_type_ indicates the type of SBOM to be generated. Valid options are spdx or cyclonedx. Support for SPDX3 is currently experimental but can be enabled by setting the sbom_type to spdx3.
 
 _format_ indicates the format that the SBOM is to be generated in. Valid options are Tag, JSON or YAML. If an invalid format is specified,
 a default format of JSON will be assumed. If an unsupported format is specified for the type of SBOM (e.g. Tag or YAML for CycloneDX), a default
@@ -318,7 +395,7 @@ name: TestDocument
 spdxVersion: SPDX-2.3
 >>> test_generator.get_sbom()
 {'SPDXID': 'SPDXRef-DOCUMENT', 'spdxVersion': 'SPDX-2.3', 'creationInfo': {'comment': 'This document has been automatically generated.', 'creators': ['Tool: lib4sbom-0.1.0'], 'created': '2023-01-24T13:51:36Z', 'licenseListVersion': '3.18'}, 'name': 'TestDocument', 'dataLicense': 'CC0-1.0', 'documentNamespace': 'http://spdx.org/spdxdocs/TestDocument-817c4e4c-eac4-49d9-bc41-65f0972edce8', 'packages': [{'SPDXID': 'SPDXRef-Package-1-virtualenv', 'name': 'virtualenv', 'versionInfo': '20.16.7', 'supplier': 'Person: Bernat_Gabor', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'MIT', 'licenseDeclared': 'MIT', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/virtualenv@20.16.7'}]}, {'SPDXID': 'SPDXRef-Package-2-distlib', 'name': 'distlib', 'versionInfo': '0.3.6', 'supplier': 'Person: Vinay_Sajip', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'NOASSERTION', 'licenseDeclared': 'NOASSERTION', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/distlib@0.3.6'}]}, {'SPDXID': 'SPDXRef-Package-3-filelock', 'name': 'filelock', 'versionInfo': '3.8.0', 'supplier': 'Person: Benedikt_Schmitt', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'Unlicense', 'licenseDeclared': 'Unlicense', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/filelock@3.8.0'}]}, {'SPDXID': 'SPDXRef-Package-4-platformdirs', 'name': 'platformdirs', 'versionInfo': '2.5.4', 'supplier': 'Organization: Unknown', 'downloadLocation': 'NONE', 'filesAnalyzed': 'false', 'licenseConcluded': 'NOASSERTION', 'licenseDeclared': 'NOASSERTION', 'copyrightText': 'NOASSERTION', 'externalRefs': [{'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': 'pkg:pypi/platformdirs@2.5.4'}]}], 'relationships': [{'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-1-virtualenv', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-2-distlib', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-3-filelock', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-DOCUMENT', 'relatedSpdxElement': 'SPDXRef-Package-4-platformdirs', 'relationshipType': 'DESCRIBES'}, {'spdxElementId': 'SPDXRef-Package-1-virtualenv', 'relatedSpdxElement': 'SPDXRef-Package-2-distlib', 'relationshipType': 'CONTAINS'}, {'spdxElementId': 'SPDXRef-Package-1-virtualenv', 'relatedSpdxElement': 'SPDXRef-Package-3-filelock', 'relationshipType': 'CONTAINS'}, {'spdxElementId': 'SPDXRef-Package-1-virtualenv', 'relatedSpdxElement': 'SPDXRef-Package-4-platformdirs', 'relationshipType': 'CONTAINS'}]}
->>> 
+>>>
 ```
 
 ### SBOMOutput
@@ -361,10 +438,10 @@ The following code sample shows the use of the SBOMOutput module.
 >>> from lib4sbom.output import SBOMOutput
 >>> sbom_output = SBOMOutput(filename="testapp.json", output_format="json")
 >>> sbom_output.generate_output(test_generator.get_sbom())
->>> 
+>>>
 ```
 
-### SBOM Object 
+### SBOM Object
 
 _class_ **SBOM**()
 
@@ -416,7 +493,7 @@ Returns the SBOM object as a dictionary.
 >>> sbom.add_document(my_doc.get_document())
 ```
 
-### SBOMDocument Object 
+### SBOMDocument Object
 
 _class_ **SBOMDocument**()
 
@@ -545,10 +622,10 @@ initialise() Reinitialises a SBOMFile Object. All data associated with the objec
 >>> sbom_file.set_checksum("SHA1", file_hash)
 >>> sbom_file.set_id("SPDXRef-File-0001")
 >>> sbom_files[sbom_file.get_name()] = sbom_file.get_file()
->>> sbom_file.initialise()                                  
->>> sbom_file.set_name("makefile")                       
->>> sbom_file.set_licenseconcluded("NOASSERTION")                    
->>> sbom_file.set_id("SPDXRef-File-0002")                   
+>>> sbom_file.initialise()
+>>> sbom_file.set_name("makefile")
+>>> sbom_file.set_licenseconcluded("NOASSERTION")
+>>> sbom_file.set_id("SPDXRef-File-0002")
 >>> sbom_files[sbom_file.get_name()] = sbom_file.get_file()
 >>> from lib4sbom.sbom import SBOM
 >>> my_sbom = SBOM()
@@ -556,7 +633,7 @@ initialise() Reinitialises a SBOMFile Object. All data associated with the objec
 ```
 
 ### SBOMPackage Object
-                
+
 _class_ **SBOMPackage**()
 
 This creates a simple SBOM Package object. This object contains the values of the attributes
@@ -835,11 +912,123 @@ Returns the service object as a dictionary.
 >>> my_sbom = SBOM()
 >>> my_sbom.add_services(sbom_services)
 ```
+### Cryptpgraphy Object
+
+_class_ **SBOMCryptography**(validation = None)
+
+
+This creates a simple cryptograpy object which is used to define the details of a cryptogrtahiic item (an algorithm, certificate, protool or related material).
+
+As there are multiple ways of specifying a cryptograpy object, it is left to the
+application manipulating the object to apply validation as appropriate to ensure the semantics are correct. Reference
+to the [CycloneDX guide to CBOMs](https://cyclonedx.org/guides/OWASP_CycloneDX-Authoritative-Guide-to-CBOM-en.pdf) is
+strongly recommended.
+
+**NOTE** Cryptography objects are only included in CyclonedDX SBOMs and are attributes of a component.
+
+**_Setter Methods_**
+
+The **set_type** method must be called to define the type of cryptography object being defined. This method takes the type of object being created (one of 'a)gorithm', 'certifciate', 'protocol', or 'related-crypto-material'.
+
+Supporting methods are provided for each type as follows:
+
+- Algorithm
+  - set_algorithm
+  - set_keysize
+- Certificate
+  - set_certificate
+  - set_format
+  - set_date
+  - set_state
+  - set_asset
+- Protocol
+  - set_version
+- Material
+  - set_property
+  - set_value
+
+The example below provides guidance on how to use each method.
+
+**_Getter Methods_**
+
+get_cryptography()
+Returns the cryptography object as a dictionary.
+
+**Example**
+
+```python
+from lib4sbom.data.cryptography import SBOMCryptoography
+from lib4sbom.data.package import SBOMPackage
+
+my_package = SBOMPackage()
+my_crypto = SBOMCryptography()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("RSA-PKCS1-1.5-SHA-256-2048")
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_oid("1.3.4.5.6")
+my_crypto.set_type("algorithm","signature")
+my_crypto.set_keysize("2048")
+my_crypto.set_algorithm("RSASSA-PKCS1")
+my_crypto.set_value("elipticCurve","bn/bn158")
+# Add crypto element to component
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("Wikipedia-cert",)
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_type("certificate")
+my_crypto.set_certificate(subject = "C=US, ST=California, O=San Fransico, O=Wikipedia",
+issuer='C=BE, O=GlbalSign, CN=Acme')
+my_crypto.set_state("pre-activation")
+my_crypto.set_date("create", "2026-02-13")
+my_crypto.set_date("activate", "2026-02-14")
+my_crypto.set_asset("publickey","abcd")
+my_crypto.set_format("X.509")
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("Wikipedia",)
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_type("protocol", "tls")
+my_crypto.set_version("1.3")
+my_crypto.set_asset("publickey","abcd")
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+
+# Include crypto with a component
+my_package.initialise()
+my_package.set_name("WikipediaData",)
+my_package.set_type("cryptographic-asset")
+my_crypto.initialise()
+my_crypto.set_type("related-crypto-material", "private-key")
+my_crypto.set_state("active")
+my_crypto.set_date("activate", "2026-02-16")
+my_crypto.set_asset("privatekey","abcd")
+my_package.set_value("crypto", my_crypto.get_cryptography())
+sbom_packages[
+    (my_package.get_name(), my_package.get_value("version"))
+] = my_package.get_package()
+```
 
 ## Examples
 
 A number of example scripts are included in the _examples_ subdirectory.
-						
+
 ## Implementation Notes
 
 The following design decisions have been made in processing the SBOM files:
@@ -855,6 +1044,8 @@ user of the tool is reminded that they should assert the quality of any data whi
 
 5. When parsing an SBOM with multiple instances of a component with the same name and version, only one instance of the comnponent is retained. If mulitple instances are
 required to be preserved, consider ensuring that the component name is unique.
+
+6. When validating an SBOM in SPDX format, as there are no offocial schemas published, the validation is limited to checking for the presence for some mandatory fields.
 
 ## Future Development
 
@@ -880,6 +1071,8 @@ Licensed under the Apache 2.0 Licence.
 
 The tool uses a local copy of the [SPDX Licenses List](https://github.com/spdx/license-list-data) which is released under
 [Creative Commons Attribution 3.0 (CC-BY-3.0)](http://creativecommons.org/licenses/by/3.0/).
+
+This tools uses a local copy of the CycloneDX schemas which are released under [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 This tool uses information sourced from the [Blue Oak Council's License List](https://blueoakcouncil.org/list) which is released under
 [Creative Commons Attribution 1.0 (CC-BY-1.0)](https://creativecommons.org/licenses/by/1.0/).

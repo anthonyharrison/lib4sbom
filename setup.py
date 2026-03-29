@@ -28,24 +28,29 @@ setup_kwargs = dict(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
         "Natural Language :: English",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
-    python_requires=">=3.7",
-    packages=find_packages(),
+    python_requires=">=3.9",
+
+    packages=find_packages(
+        exclude=["test/*", "tools/*"],
+    ),
+
     package_data={
         "lib4sbom": [
             "license_data/*.*",
             "license_data/text/*.*",
+            "schemas/cyclonedx/*.*",
+            "schemas/spdx/*.*",
         ],
     },
 )

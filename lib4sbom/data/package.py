@@ -131,14 +131,27 @@ class SBOMPackage:
 
     def set_property(self, name, value):
         # Allow multiple entries
-        property_entry = [name.strip(), value]
-        if "property" in self.package:
-            self.package["property"].append(property_entry)
-        else:
-            self.package["property"] = [property_entry]
+        if value is not None:
+            property_entry = [name.strip(), value]
+            if "property" in self.package:
+                self.package["property"].append(property_entry)
+            else:
+                self.package["property"] = [property_entry]
 
-    def set_licenseconcluded(self, license):
+    def set_tag(self, name):
+        # Allow multiple entries
+        if name is not None:
+            tag_entry = name.strip()
+            if "tag" in self.package:
+                self.package["tag"].append(tag_entry)
+            else:
+                self.package["tag"] = [tag_entry]
+
+    def set_licenseconcluded(self, license, name=None):
         self.package["licenseconcluded"] = license
+        if name is not None:
+            # Use name if not SPDX license. license is then assumed to be the license text
+            self.package["licensename"] = name
 
     def set_licensedeclared(self, license, name=None):
         self.package["licensedeclared"] = license

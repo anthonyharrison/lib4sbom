@@ -19,7 +19,7 @@ class SBOMLicense:
         self.license["id"] = id
 
     def set_value(self, key, value):
-        self.license[key] = value
+        self.license[key] = self._text(value)
 
     def get_license(self):
         return self.license

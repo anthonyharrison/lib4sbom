@@ -2,7 +2,7 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid204f4b8e-5eb7-45a4-9300-40195afe9af2",
+  "serialNumber": "urn:uuid:204f4b8e-5eb7-45a4-9300-40195afe9af2",
   "version": 1,
   "metadata": {
     "timestamp": "2023-01-24T12:57:29Z",
@@ -12,13 +12,11 @@
         "version": "0.1.0"
       }
     ],
-    "component": [
-      {
+    "component": {
         "type": "application",
         "bom-ref": "CDXRef-DOCUMENT",
         "name": "TestDocument"
       }
-    ]
   },
   "components": [
     {

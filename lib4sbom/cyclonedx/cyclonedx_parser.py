@@ -7,13 +7,17 @@ import uuid
 
 import defusedxml.ElementTree as ET
 
+from lib4sbom.data.cryptography import SBOMCryptography
 from lib4sbom.data.document import SBOMDocument
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.data.service import SBOMService
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.exception import SBOMParserException
+from lib4sbom.license import LicenseScanner
+from lib4sbom.sbom import ParserType
 
 
 class CycloneDXParser:
@@ -25,16 +29,38 @@ class CycloneDXParser:
         self.licences = []
         self.component_id = 0
         self.model_card = SBOMModelCard()
+        self.crypto = SBOMCryptography()
         self.cyclonedx_version = None
+        self.license_scanner = LicenseScanner()
 
-    def parse(self, sbom_file):
-        """parses CycloneDX BOM file extracting package name, version and license"""
-        if sbom_file.endswith((".bom.json", ".cdx.json", ".json")):
-            return self.parse_cyclonedx_json(sbom_file)
-        elif sbom_file.endswith((".bom.xml", ".cdx.xml", ".xml")):
-            return self.parse_cyclonedx_xml(sbom_file)
-        else:
-            return {}, {}, {}, [], [], [], []
+    def parse(self, sbom_string: str, parser_type: ParserType = None):
+        """parses CycloneDX BOM string extracting package name, version and license"""
+        # Check for CycloneDX JSON
+        if (
+            parser_type == ParserType.CYCLONEDX_JSON
+            or parser_type == ParserType.JSON
+            or sbom_string.startswith("{")
+        ):
+            try:
+                sbom_dict = json.loads(sbom_string)
+                if sbom_dict["bomFormat"] == "CycloneDX":
+                    return self.parse_cyclonedx_json(sbom_dict)
+            except json.JSONDecodeError:
+                # Unable to process file. Probably not a JSON file
+                raise SBOMParserException
+            except KeyError:
+                pass
+
+        # Check for CycloneDX XML
+        if parser_type == ParserType.CYCLONEDX_XML or sbom_string.startswith("<"):
+            try:
+                root = ET.fromstring(sbom_string)
+                if "cyclonedx" in root.tag:
+                    return self.parse_cyclonedx_xml(root)
+            except ET.ParseError:
+                pass
+
+        return {}, {}, {}, [], [], [], []
 
     def _governance_element(self, element):
         elements = []
@@ -52,11 +78,15 @@ class CycloneDXParser:
 
     def _cyclonedx_15(self):
         # utility for features introduced in version 1.5
-        return self.cyclonedx_version in ["1.5", "1.6"]
+        return self.cyclonedx_version in ["1.5", "1.6", "1.7"]
 
     def _cyclonedx_16(self):
         # utility for features introduced in version 1.6
-        return self.cyclonedx_version in ["1.6"]
+        return self.cyclonedx_version in ["1.6", "1.7"]
+
+    def _cyclonedx_17(self):
+        # utility for features introduced in version 1.7
+        return self.cyclonedx_version in ["1.7"]
 
     def _cyclonedx_mlmodel(self, d):
         # Machine learning model data
@@ -155,14 +185,18 @@ class CycloneDXParser:
                     )
             if "graphics" in d["modelCard"]["quantitativeAnalysis"]:
                 graphicset = ModelGraphicset()
-                graphicset.set_description(
-                    d["modelCard"]["quantitativeAnalysis"]["graphics"]["description"]
-                )
-                for graphic in d["modelCard"]["quantitativeAnalysis"]["graphics"][
-                    "collection"
-                ]:
-                    image = graphic["image"]
-                    graphicset.add_image(graphic.get("name"), image.get("content"))
+                if "description" in d["modelCard"]["quantitativeAnalysis"]["graphics"]:
+                    graphicset.set_description(
+                        d["modelCard"]["quantitativeAnalysis"]["graphics"][
+                            "description"
+                        ]
+                    )
+                if "collection" in d["modelCard"]["quantitativeAnalysis"]["graphics"]:
+                    for graphic in d["modelCard"]["quantitativeAnalysis"]["graphics"][
+                        "collection"
+                    ]:
+                        image = graphic["image"]
+                        graphicset.add_image(graphic.get("name"), image.get("content"))
                 self.model_card.set_graphics(graphicset.get_graphicset())
         if "considerations" in d["modelCard"]:
             if "users" in d["modelCard"]["considerations"]:
@@ -204,6 +238,121 @@ class CycloneDXParser:
             for property in d["modelCard"]["properties"]:
                 self.model_card.set_property(property["name"], property["value"])
 
+    def _cyclonedx_crypto(self, d):
+        # Process crypto asset
+        self.crypto.initialise()
+        asset_type = d.get("assetType")
+        keymap = []
+        if asset_type == "algorithm":
+            alg_properties = d.get("algorithmProperties")
+            if alg_properties is not None:
+                for key, value in alg_properties.items():
+                    if key == "primitive":
+                        self.crypto.set_type(asset_type, value)
+                    elif key == "algorithmFamily":
+                        self.crypto.set_algorithm(value)
+                    elif key == "parameterSetIdentifier":
+                        self.crypto.set_keysize(value)
+                    else:
+                        self.crypto.set_value(key, value)
+        elif asset_type == "certificate":
+            certificate_properties = d.get("certificateProperties")
+            if certificate_properties is not None:
+                self.crypto.set_type(asset_type)
+                subject = issuer = None
+                if "subjectName" in certificate_properties:
+                    subject = certificate_properties["subjectName"]
+                    keymap.append("subjectName")
+                if "issuerName" in certificate_properties:
+                    issuer = certificate_properties["issuerName"]
+                    keymap.append("issuertName")
+                if subject is not None or issuer is not None:
+                    self.crypto.set_certificate(subject=subject, issuer=issuer)
+                if "certificateFormat" in certificate_properties:
+                    self.crypto.set_format(certificate_properties["certificateFormat"])
+                    keymap.append("certificateFormat")
+                if "certificateState" in certificate_properties:
+                    self.crypto.set_state(certificate_properties["certificateState"])
+                    keymap.append("certificateState")
+                # Date handling
+                event_mapping = {
+                    "creationDate": "create",
+                    "activationDate": "activate",
+                    "deactivationDate": "deactivate",
+                    "revocationDate": "revoke",
+                    "destructionDate": "destroy",
+                }
+                for date_event in event_mapping.keys():
+                    if date_event in certificate_properties:
+                        self.crypto.set_date(
+                            event_mapping[date_event],
+                            certificate_properties[date_event],
+                        )
+                        keymap.append(date_event)
+                if "relatedCryptographicAssets" in certificate_properties:
+                    for asset in certificate_properties["relatedCryptographicAssets"]:
+                        self.crypto.set_asset(asset["type"], asset["ref"])
+                    keymap.append("relatedCryptographicAssets")
+                for key, value in certificate_properties.items():
+                    if key not in keymap:
+                        self.crypto.set_value(key, value)
+        elif asset_type == "protocol":
+            protocol_properties = d.get("protocolProperties")
+            if protocol_properties is not None:
+                if "type" in protocol_properties:
+                    self.crypto.set_type(asset_type, protocol_properties["type"])
+                    keymap.append("type")
+                if "version" in protocol_properties:
+                    self.crypto.set_version(protocol_properties["version"])
+                    keymap.append("version")
+                if "relatedCryptographicAssets" in protocol_properties:
+                    for asset in protocol_properties["relatedCryptographicAssets"]:
+                        self.crypto.set_asset(asset["type"], asset["ref"])
+                    keymap.append("relatedCryptographicAssets")
+                for key, value in protocol_properties.items():
+                    if key not in keymap:
+                        self.crypto.set_value(key, value)
+        elif asset_type == "related-crypto-material":
+            material_properties = d.get("relatedCryptoMaterialProperties")
+            if material_properties is not None:
+                if "type" in material_properties:
+                    self.crypto.set_type(asset_type, material_properties["type"])
+                    keymap.append("type")
+                if "value" in material_properties:
+                    self.crypto.set_value("value", material_properties["value"])
+                    keymap.append("value")
+                if "size" in material_properties:
+                    self.crypto.set_keysize(material_properties["size"])
+                    keymap.append("size")
+                if "format" in material_properties:
+                    self.crypto.set_format(material_properties["format"])
+                    keymap.append("format")
+                if "state" in material_properties:
+                    self.crypto.set_state(material_properties["state"])
+                    keymap.append("state")
+                # Date handling
+                event_mapping = {
+                    "creationDate": "create",
+                    "activationDate": "activate",
+                    "updateDate": "update",
+                    "rexpirationDate": "expire",
+                }
+                for date_event in event_mapping.keys():
+                    if date_event in material_properties:
+                        self.crypto.set_date(
+                            event_mapping[date_event], material_properties[date_event]
+                        )
+                        keymap.append(date_event)
+                if "relatedCryptographicAssets" in material_properties:
+                    for asset in material_properties["relatedCryptographicAssets"]:
+                        self.crypto.set_asset(asset["type"], asset["ref"])
+                    keymap.append("relatedCryptographicAssets")
+                for key, value in material_properties.items():
+                    if key not in keymap:
+                        self.crypto.set_value(key, value)
+        if "oid" in d:
+            self.crypto.set_oid(d["oid"])
+
     def process_license(self, license_element):
         license_info = []
         for license in license_element:
@@ -216,6 +365,13 @@ class CycloneDXParser:
                     id = license["license"]["id"]
                 if "name" in license["license"]:
                     name = license["license"]["name"]
+                    # check if the name is really an id!
+                    id = self.license_scanner.find_license_id(name)
+                    if len(id) > 0:
+                        license["license"]["id"] = id
+                        license["license"]["name"] = (
+                            self.license_scanner.get_license_name(id)
+                        )
                 if id is None and name is None:
                     print(
                         f"[ERROR] Invalid license specified {license} - missing id or name."
@@ -229,19 +385,22 @@ class CycloneDXParser:
                         f"[ERROR] Invalid license specified {license}  - only one SPDX expression allowed."
                     )
                 else:
-                    type = None
+                    license_type = None
                     license_identity = None
                     if "expression" in license:
                         license_identity = license["expression"]
                     if "acknowledgement" in license:
-                        type = license["acknowledgement"]
+                        license_type = license["acknowledgement"]
                     if license_identity is None:
                         print(
                             f"[ERROR] Invalid license specified {license}  - expression missing."
                         )
                     else:
                         license_info.append(
-                            {"expression": license_identity, "acknowledgement": type}
+                            {
+                                "expression": license_identity,
+                                "acknowledgement": license_type,
+                            }
                         )
         return license_info
 
@@ -261,6 +420,7 @@ class CycloneDXParser:
             "file",
             "machine-learning-model",
             "data",
+            "cryptographic-asset",
         ]:
             package = d["name"]
             self.cyclonedx_package.set_name(package)
@@ -294,6 +454,11 @@ class CycloneDXParser:
             if "author" in d:
                 # Assume that this refers to an individual
                 self.cyclonedx_package.set_originator("Person", d["author"])
+            if "authors" in d:
+                # Assume that this refers to an individual
+                for author in d["authors"]:
+                    if "name" in author:
+                        self.cyclonedx_package.set_originator("Person", author["name"])
             if "description" in d:
                 self.cyclonedx_package.set_description(d["description"])
             if "hashes" in d:
@@ -312,27 +477,42 @@ class CycloneDXParser:
             if license_data is not None and len(license_data) > 0:
                 # Multiple ways of defining licenses
                 for license_info in license_data:
+                    name = None
                     license = license_info.get("expression")
                     if license is None:
                         license = license_info.get("id")
                         if license is None:
                             license = license_info.get("name")
+                            name = license
                     acknowledgement = license_info.get("acknowledgement")
+                    licensetext = license_info.get("text")
                     if license is not None:
                         # CycloneDX 1.6 distinguishes between concluded and declared
                         if self._cyclonedx_16():
                             if acknowledgement is not None:
                                 if acknowledgement == "concluded":
-                                    self.cyclonedx_package.set_licenseconcluded(license)
+                                    self.cyclonedx_package.set_licenseconcluded(
+                                        license, name
+                                    )
                                 else:
-                                    self.cyclonedx_package.set_licensedeclared(license)
+                                    self.cyclonedx_package.set_licensedeclared(
+                                        license, name
+                                    )
                             else:
-                                self.cyclonedx_package.set_licenseconcluded(license)
-                                self.cyclonedx_package.set_licensedeclared(license)
+                                self.cyclonedx_package.set_licenseconcluded(
+                                    license, name
+                                )
+                                self.cyclonedx_package.set_licensedeclared(
+                                    license, name
+                                )
                         else:
                             # Assume License concluded is same as license declared
-                            self.cyclonedx_package.set_licenseconcluded(license)
-                            self.cyclonedx_package.set_licensedeclared(license)
+                            self.cyclonedx_package.set_licenseconcluded(license, name)
+                            self.cyclonedx_package.set_licensedeclared(license, name)
+                        if licensetext is not None:
+                            self.cyclonedx_package.set_value(
+                                "licensetext", licensetext.get("content")
+                            )
                 if license_data is not None and len(license_data) > 1:
                     self.cyclonedx_package.set_licenselist(license_data)
             # acknowledgement = None
@@ -393,7 +573,16 @@ class CycloneDXParser:
                 elif d["cpe"].lower().startswith("cpe:/"):
                     self.cyclonedx_package.set_cpe(d["cpe"], cpetype="cpe22Type")
             if "purl" in d:
-                self.cyclonedx_package.set_purl(d["purl"])
+                # Validate purl
+                purl_validator = SBOMIdentifier(d["purl"])
+                if purl_validator.validate():
+                    self.cyclonedx_package.set_purl(d["purl"])
+                else:
+                    self.cyclonedx_package.set_purl(purl_validator.fix())
+                    # Add comment
+                    self.cyclonedx_package.set_property(
+                        "PURL Comments", f'{d["purl"]} is not a valid PURL'
+                    )
             if "group" in d:
                 self.cyclonedx_package.set_value("group", d["group"])
             if "evidence" in d:
@@ -416,6 +605,10 @@ class CycloneDXParser:
                         self.cyclonedx_package.set_property(
                             property["name"], property["value"]
                         )
+            if "tags" in d:
+                # Potentially multiple entries
+                for tag in d["tags"]:
+                    self.cyclonedx_package.set_tag(tag)
             if "externalReferences" in d:
                 # Potentially multiple entries
                 for reference in d["externalReferences"]:
@@ -435,6 +628,11 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_value(
                     "modelCard", self.model_card.get_modelcard()
                 )
+            if "cryptoProperties" in d:
+                self._cyclonedx_crypto(d["cryptoProperties"])
+                self.cyclonedx_package.set_value(
+                    "crypto", self.crypto.get_cryptography()
+                )
             # Save package metadata
             self.packages[(package, version)] = self.cyclonedx_package.get_package()
             self.id[bom_ref] = package
@@ -443,7 +641,7 @@ class CycloneDXParser:
                 for component in d["components"]:
                     self._cyclondex_component(component)
 
-    def parse_cyclonedx_json(self, sbom_file):
+    def parse_cyclonedx_json(self, data: dict):
         """parses CycloneDX JSON BOM file extracting package name, version and license"""
         files = {}
         relationships = []
@@ -454,7 +652,6 @@ class CycloneDXParser:
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         try:
-            data = json.load(open(sbom_file, "r", encoding="utf-8"))
             # Check valid CycloneDX JSON file (and not SPDX)
             cyclonedx_json_file = data.get("bomFormat", False)
             if cyclonedx_json_file:
@@ -544,6 +741,11 @@ class CycloneDXParser:
                     if "properties" in data["metadata"]:
                         cyclonedx_document.set_value(
                             "property", data["metadata"]["properties"]
+                        )
+                    if "distributionConstraints" in data["metadata"]:
+                        cyclonedx_document.set_value(
+                            "distribition",
+                            data["metadata"]["distributionConstraints"]["tlp"],
                         )
                     if self.debug:
                         print(cyclonedx_document)
@@ -652,6 +854,7 @@ class CycloneDXParser:
                             service_info.set_description(service["description"])
                         if "provider" in service:
                             name = service["provider"].get("name", "")
+                            url = ""
                             if "url" in service["provider"]:
                                 for u in service["provider"]["url"]:
                                     url = u
@@ -841,7 +1044,16 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_cpe(cpe, cpetype="cpe22Type")
         purl = self._xml_component(component, "purl")
         if purl != "":
-            self.cyclonedx_package.set_purl(purl)
+            # Validate purl
+            purl_validator = SBOMIdentifier(purl)
+            if purl_validator.validate():
+                self.cyclonedx_package.set_purl(purl)
+            else:
+                self.cyclonedx_package.set_purl(purl_validator.fix())
+                # Add comment
+                self.cyclonedx_package.set_property(
+                    "PURL Comments", f"{purl} is not a valid PURL"
+                )
         # Potentially multiple entries
         for properties in component.findall(self.schema + "properties"):
             for property in properties.findall(self.schema + "property"):
@@ -914,9 +1126,8 @@ class CycloneDXParser:
         services = []
         return services
 
-    def parse_cyclonedx_xml(self, sbom_file):
-        self.tree = ET.parse(sbom_file)
-        self.root = self.tree.getroot()
+    def parse_cyclonedx_xml(self, xml_root):
+        self.root = xml_root
         # Extract schema
         self.schema = self.root.tag[: self.root.tag.find("}") + 1]
         document = self.parse_document_xml()
