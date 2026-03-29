@@ -415,6 +415,8 @@ class SPDXGenerator:
             self.generateTag("ReleaseDate", package_info["release_date"])
         if "build_date" in package_info:
             self.generateTag("BuiltDate", package_info["build_date"])
+        if "validUntilDate" in package_info:
+            self.generateTag("ValidUntilDate", package_info["validUntilDate"])
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
@@ -574,6 +576,9 @@ class SPDXGenerator:
         if "build_date" in package_info:
             if len(package_info["build_date"]) > 0:
                 component["builtDate"] = package_info["build_date"]
+        if "validUntilDate" in package_info:
+            if len(package_info["validUntilDate"]) > 0:
+                component["validUntilDate"] = package_info["validUntilDate"]
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:

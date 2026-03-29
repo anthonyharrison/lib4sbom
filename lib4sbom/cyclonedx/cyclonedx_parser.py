@@ -601,6 +601,10 @@ class CycloneDXParser:
                         self.cyclonedx_package.set_value(
                             "build_date", property["value"]
                         )
+                    elif property["name"] == "validUntilDate":
+                        self.cyclonedx_package.set_value(
+                            "validUntilDate", property["value"]
+                        )
                     else:
                         self.cyclonedx_package.set_property(
                             property["name"], property["value"]
@@ -1067,6 +1071,10 @@ class CycloneDXParser:
                     value = property.text
                 if params["name"] == "release_date":
                     self.cyclonedx_package.set_value("release_date", value)
+                elif params["name"] == "build_date":
+                    self.cyclonedx_package.set_value("build_date", value)
+                elif params["name"] == "validUntilDate":
+                    self.cyclonedx_package.set_value("validUntilDate", value)
                 else:
                     self.cyclonedx_package.set_property(params["name"], value)
         for references in component.findall(self.schema + "externalReferences"):

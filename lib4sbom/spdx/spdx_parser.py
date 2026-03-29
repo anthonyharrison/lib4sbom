@@ -353,6 +353,9 @@ class SPDXParser:
             elif line_elements[0] == "ReleaseDate":
                 date = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_value("release_date", date)
+            elif line_elements[0] == "ValidUntilDate":
+                date = line_elements[1].strip().rstrip("\n")
+                spdx_package.set_value("validUntilDate", date)
             elif line_elements[0] == "ExternalRef":
                 # Format is TAG CATEGORY TYPE LOCATOR
                 # Need all data after type which may contain ':'
@@ -583,6 +586,8 @@ class SPDXParser:
                             spdx_package.set_value("build_date", d["builtDate"])
                         if "releaseDate" in d:
                             spdx_package.set_value("release_date", d["releaseDate"])
+                        if "validUntilDate" in d:
+                            spdx_package.set_value("validUntilDate", d["validUntilDate"])
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
                                 ref_type = ext_ref["referenceType"]
@@ -757,8 +762,9 @@ class SPDXParser:
                 name = element.get("name")
                 elements[element_id] = name
                 lifecycle_element = element.get("software_sbomType")
-                for phase in lifecycle_element:
-                    lifecycle = phase
+                if lifecycle_element is not None:
+                    for phase in lifecycle_element:
+                        lifecycle = phase
             elif element_type == "SpdxDocument":
                 document_name = element.get("name")
                 doc_id = element_id

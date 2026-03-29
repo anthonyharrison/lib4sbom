@@ -569,12 +569,16 @@ class CycloneDXGenerator:
                 licenses.append(license)
             component["licenses"] = licenses
         elif "licenseconcluded" in package or "licensedeclared" in package:
-            if "licenseconcluded" in package:
+            # Prefer concluded, but fall through to declared if concluded is meaningless
+            if "licenseconcluded" in package and package["licenseconcluded"] not in ("UNKNOWN", "NOASSERTION", "NONE"):
                 license_definition = package["licenseconcluded"]
                 acknowledgement = "concluded"
-            else:
+            elif "licensedeclared" in package:
                 license_definition = package["licensedeclared"]
                 acknowledgement = "declared"
+            else:
+                license_definition = "NOASSERTION"
+                acknowledgement = "concluded"
             license_id = self.license.find_license(license_definition)
             if license_id not in ["UNKNOWN", "NOASSERTION", "NONE"] and (
                 self.license.valid_spdx_license(license_id)
@@ -679,7 +683,10 @@ class CycloneDXGenerator:
                         property_entry = dict()
                         property_entry["name"] = "PURL Comments"
                         property_entry["value"] = f"{ref_value} is not a valid PURL"
-                        component["properties"] = [property_entry]
+                        if "properties" in component:
+                            component["properties"].append(property_entry)
+                        else:
+                            component["properties"] = [property_entry]
                 else:
                     externalReference = dict()
                     externalReference["url"] = ref_value
@@ -694,11 +701,22 @@ class CycloneDXGenerator:
                 property_entry = dict()
                 property_entry["name"] = "release_date"
                 property_entry["value"] = package["release_date"]
-                component["properties"] = [property_entry]
+                if "properties" in component:
+                    component["properties"].append(property_entry)
+                else:
+                    component["properties"] = [property_entry]
         if "build_date" in package:
             property_entry = dict()
             property_entry["name"] = "build_date"
             property_entry["value"] = package["build_date"]
+            if "properties" in component:
+                component["properties"].append(property_entry)
+            else:
+                component["properties"] = [property_entry]
+        if "validUntilDate" in package:
+            property_entry = dict()
+            property_entry["name"] = "validUntilDate"
+            property_entry["value"] = package["validUntilDate"]
             if "properties" in component:
                 component["properties"].append(property_entry)
             else:
