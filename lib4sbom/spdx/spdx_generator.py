@@ -376,10 +376,14 @@ class SPDXGenerator:
             for license in package_info["licenselist"]:
                 if "id" in license:
                     license_expression = license_expression + license["id"] + " AND "
-            # Remove extraneous " AND "
-            license_expression = license_expression[:-4]
-            self.generateTag("PackageLicenseDeclared", license_expression)
-            self.generateTag("PackageLicenseConcluded", license_expression)
+                elif "name" in license:
+                    ref = self.LICENSE_PREAMBLE + license["name"].replace(" ", "-")
+                    license_expression = license_expression + ref + " AND "
+            # Remove trailing " AND "
+            license_expression = license_expression.removesuffix(" AND ")
+            if license_expression:
+                self.generateTag("PackageLicenseDeclared", license_expression)
+                self.generateTag("PackageLicenseConcluded", license_expression)
         if "licensecomments" in package_info:
             self.generateTag(
                 "PackageLicenseComments",
@@ -536,10 +540,14 @@ class SPDXGenerator:
             for license in package_info["licenselist"]:
                 if "id" in license:
                     license_expression = license_expression + license["id"] + " AND "
-            # Remove extraneous " AND "
-            license_expression = license_expression[:-4]
-            component["licenseDeclared"] = license_expression
-            component["licenseConcluded"] = license_expression
+                elif "name" in license:
+                    ref = self.LICENSE_PREAMBLE + license["name"].replace(" ", "-")
+                    license_expression = license_expression + ref + " AND "
+            # Remove trailing " AND "
+            license_expression = license_expression.removesuffix(" AND ")
+            if license_expression:
+                component["licenseDeclared"] = license_expression
+                component["licenseConcluded"] = license_expression
         if "licensecomments" in package_info:
             component["licenseComments"] = package_info["licensecomments"]
         if files_analysed:

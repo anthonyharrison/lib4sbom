@@ -118,8 +118,8 @@ class SPDXParser:
         return None
 
     def _validate_license(self, license_id):
-        # correct licence ids
-        return self.license_scanner.find_license_id(license_id)
+        # correct licence ids, supporting both single ids and expressions (e.g. "MIT OR Apache-2.0")
+        return self.license_scanner.find_license(license_id)
 
     def parse_spdx_tag(self, lines: list[str]):
         """parses SPDX tag value file extracting all SBOM data"""
