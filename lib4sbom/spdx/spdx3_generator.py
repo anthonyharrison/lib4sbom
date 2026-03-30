@@ -198,20 +198,24 @@ class SPDX3Generator:
             supplier = component_details["supplier"].split(":")
             # Extract details of the supplier. Assume format is name (email address)
             pattern = r"^(.*?)(?:\s*\((.*?)\))?\s*$"
-            match = re.search(pattern, supplier[1])
-            if match:
-                name = match.group(1).strip()
-                email = match.group(2)
-                supplier_info = {"name": name}
-                if email is not None:
-                    ext_id = {
-                        "type": "ExternalIdentifier",
-                        "identifier": email.strip(),
-                        "externalIdentifierType": "email",
-                    }
-                    supplier_info["externalIdentifier"] = [ext_id]
-                supplier_id = self.create_type(supplier[0].capitalize(), supplier_info)
-                package_details["suppliedBy"] = supplier_id
+            if len(supplier) > 1:
+                match = re.search(pattern, supplier[1])
+                if match:
+                    name = match.group(1).strip()
+                    email = match.group(2)
+                    supplier_info = {"name": name}
+                    if email is not None:
+                        ext_id = {
+                            "type": "ExternalIdentifier",
+                            "identifier": email.strip(),
+                            "externalIdentifierType": "email",
+                        }
+                        supplier_info["externalIdentifier"] = [ext_id]
+                    supplier_id = self.create_type(supplier[0].capitalize(), supplier_info)
+            else:
+                # NOASSERTION
+                supplier_id = self.create_type("Agent", {"name": supplier[0]})
+            package_details["suppliedBy"] = supplier_id
         if "checksums" in component_details:
             for checksum in component_details["checksums"]:
                 checksum_entry = dict()
