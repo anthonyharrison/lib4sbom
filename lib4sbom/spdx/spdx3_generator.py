@@ -607,8 +607,6 @@ class SPDX3Generator:
                 "comment": comment,
             },
         )
-        # Store reference?
-        # self.licenses.append(extractedlicense)
 
     def generatePackageDetails(
         self, package, id, package_info, parent_id, relationship
