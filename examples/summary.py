@@ -44,12 +44,16 @@ try:
         print("-" * 70)
         thepackage = SBOMPackage()
         for package in packages:
+            thepackage.initialise()
             thepackage.copy_package(package)
             print(
                 f"{package['name']:30} {package.get('version','MISSING'):15} {package['type']:20}"
             )
-            print(f"PURL {thepackage.get_purl()}")
-            print(f"CPE {thepackage.get_cpe()}")
+            if package["type"] == "CRYPTOGRAPHIC-ASSET":
+                print (f'Crypto: {dict(package["crypto"])}')
+            else:
+                print(f"PURL {thepackage.get_purl()}")
+                print(f"CPE {thepackage.get_cpe()}")
     print(f"\nVulnerabilities    {len(vulnerabilities)}")
     if len(vulnerabilities) > 0:
         print("-" * 70)

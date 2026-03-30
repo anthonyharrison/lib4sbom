@@ -1,6 +1,7 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+from enum import Enum
 from typing import Dict, List, NamedTuple
 
 
@@ -12,6 +13,7 @@ class SBOMData(NamedTuple):
     vulnerabilities: Dict
     services: Dict
     licenses: List
+    annotations: List
     type: str
     version: str
 
@@ -47,6 +49,9 @@ class SBOM:
 
     def add_licenses(self, licenses: List):
         self.sbom["licenses"] = licenses
+
+    def add_annotations(self, annotations: List):
+        self.sbom["annotations"] = annotations
 
     def add_data(self, sbom_data: SBOMData) -> None:
         for key, value in sbom_data.items():
@@ -103,6 +108,9 @@ class SBOM:
     def get_licenses(self) -> List:
         return self.sbom.get("licenses", [])
 
+    def get_annoations(self) -> List:
+        return self.sbom.get("annotations", [])
+
     def get_version(self) -> str:
         return self.sbom.get("version", "")
 
@@ -114,3 +122,15 @@ class SBOM:
 
     def get_bom_version(self):
         return self.sbom.get("bom_version", None)
+
+
+class ParserType(Enum):
+    JSON = 0
+    CYCLONEDX_JSON = 1
+    CYCLONEDX_XML = 2
+    SPDX_JSON = 3
+    SPDX_XML = 4
+    SPDX_YML = 5
+    SPDX_RDF = 6
+    SPDX_TAG = 7
+    SPDX_JSONLD = 8

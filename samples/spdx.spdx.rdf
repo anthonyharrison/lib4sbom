@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:spdx="http://spdx.org/rdf/ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#">
+<spdx:Document rdf:about="SPDXRef-DOCUMENT">
+<spdx:SPDXVersion>SPDX-2.2</spdx:SPDXVersion>
+<spdx:dataLicense>CC0-1.0</spdx:dataLicense>
+<spdx:documentName>Example SBOM</spdx:documentName>
+<spdx:creationInfo><spdx:creationInfo rdf:type="spdx:CreationInfo">
+<spdx:created>2023-08-10T00:00:00Z</spdx:created>
+<spdx:creators>
+<spdx:creatorType rdf:type="spdx:CreatorType">Tool</spdx:creatorType>
+<spdx:creator>Example Tool</spdx:creator>
+</spdx:creators>
+<spdx:licenseListVersion>3.23</spdx:licenseListVersion>
+</spdx:creationInfo></spdx:creationInfo>
+<spdx:packages>
+<spdx:Package rdf:about="SPDXRef-Package-1">
+<spdx:name>example-library</spdx:name>
+<spdx:versionInfo>1.0.0</spdx:versionInfo>
+<spdx:licenseConcluded>MIT</spdx:licenseConcluded>
+<spdx:licenseDeclared>MIT</spdx:licenseDeclared>
+<spdx:copyrightText>Copyright (c) 2023 Example Company</spdx:copyrightText>
+</spdx:Package>
+</spdx:packages>
+</spdx:Document>
+</rdf:RDF>

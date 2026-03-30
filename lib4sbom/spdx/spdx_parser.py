@@ -3,16 +3,20 @@
 
 import json
 import re
+from datetime import datetime
 
 import defusedxml.ElementTree as ET
 import yaml
 
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.file import SBOMFile
+from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.license import SBOMLicense
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
 from lib4sbom.exception import SBOMParserException
+from lib4sbom.license import LicenseScanner
+from lib4sbom.sbom import ParserType
 
 
 class SPDXParser:
@@ -22,38 +26,104 @@ class SPDXParser:
         # Services not in SPDX
         self.services = []
         self.user_licences = []
+        self.license_scanner = LicenseScanner()
 
-    def parse(self, sbom_file):
-        """parses SPDX SBOM file"""
-        if sbom_file.endswith(".spdx"):
-            return self.parse_spdx_tag(sbom_file)
-        elif sbom_file.endswith((".spdx.json", ".json")):
-            # Convention for SPDX is to use .spdx.json extension but
-            # check any json file just in case. Attempts to parse a CycloneDX JSON
-            # file will result in no data being returned.
-            return self.parse_spdx_json(sbom_file)
-        elif sbom_file.endswith((".spdx.yaml", "spdx.yml")):
-            return self.parse_spdx_yaml(sbom_file)
-        elif sbom_file.endswith(".spdx.rdf"):
-            return self.parse_spdx_rdf(sbom_file)
-        elif sbom_file.endswith(".spdx.xml"):
-            return self.parse_spdx_xml(sbom_file)
-        else:
-            return (
-                {},
-                {},
-                {},
-                [],
-                self.vulnerabilities,
-                self.services,
-                self.user_licences,
-            )
+    def parse(self, sbom_string: str, parser_type: ParserType = None):
+        """parses SPDX SBOM string"""
 
-    def parse_spdx_tag(self, sbom_file):
+        # SPDX
+        # Check for SPDX JSON
+        if (
+            parser_type == ParserType.SPDX_JSON
+            or parser_type == ParserType.SPDX_JSONLD
+            or parser_type == ParserType.JSON
+            or sbom_string.startswith("{")
+        ):
+            try:
+                sbom_dict = json.loads(sbom_string)
+                # Might be a protobom file
+                if sbom_dict.get("sbom") is not None:
+                    sbom_dict = sbom_dict["sbom"]
+                # Might be an Into attestation
+                if sbom_dict.get("predicateType"):
+                    if "spdx.dev/Document" in sbom_dict.get("predicateType"):
+                        sbom_dict = sbom_dict.get("predicate")
+                if sbom_dict.get("@graph") is not None:
+                    # we have SPDX3
+                    return self._parse_spdx3_data(sbom_dict["@graph"])
+                if sbom_dict["spdxVersion"]:
+                    return self._parse_spdx_data(sbom_dict)
+            except json.JSONDecodeError:
+                # Unable to process file. Probably not a JSON file
+                raise SBOMParserException
+            except KeyError:
+                pass
+
+        # Check for SPDX RDF
+        if parser_type == ParserType.SPDX_RDF or (
+            sbom_string.startswith("<") and "<spdx:packages>" in sbom_string
+        ):
+            lines = sbom_string.splitlines()
+            return self.parse_spdx_rdf(lines)
+
+        # Check for SPDX XML
+        if parser_type == ParserType.SPDX_XML or sbom_string.startswith("<"):
+            try:
+                root = ET.fromstring(sbom_string)
+                schema = root.tag[: root.tag.find("}") + 1]
+                packages = root.findall(schema + "packages")
+                if packages:
+                    return self.parse_spdx_xml(schema, packages)
+            except ET.ParseError:
+                pass
+
+        # Check for SPDX YAML
+        if parser_type == ParserType.SPDX_YML or parser_type is None:
+            try:
+                yml_data = yaml.safe_load(sbom_string)
+                if "SPDXID" in yml_data:
+                    return self._parse_spdx_data(yml_data)
+            except yaml.YAMLError:
+                pass
+
+        # Check for SPDX tag-value
+        if parser_type == ParserType.SPDX_TAG or "PackageName:" in sbom_string:
+            lines = sbom_string.splitlines()
+            return self.parse_spdx_tag(lines)
+
+        return (
+            {},
+            {},
+            {},
+            [],
+            self.vulnerabilities,
+            self.services,
+            self.user_licences,
+        )
+
+    def get_lifecycle(self, comment):
+        # Use to extract lifecycle from comment. Assumes follows OpenChain telco format
+        # SBOM Type: Design|Source|Build|Analyzed|Deployed|Runtime <extra>
+        sbomtype_to_lifecycle = {
+            "Design": "design",
+            "Source": "pre-build",
+            "Build": "build",
+            "Analyzed": "post-build",
+            "Deployed": "operations",
+            "Runtime": "discovery",
+        }
+        if comment.startswith("SBOM Type: "):
+            sbomtype = comment.split(" ")[2]
+            return sbomtype_to_lifecycle[sbomtype]
+        return None
+
+    def _validate_license(self, license_id):
+        # correct licence ids, supporting both single ids and expressions (e.g. "MIT OR Apache-2.0")
+        return self.license_scanner.find_license(license_id)
+
+    def parse_spdx_tag(self, lines: list[str]):
         """parses SPDX tag value file extracting all SBOM data"""
         DEFAULT_VERSION = ""
-        with open(sbom_file, "r", encoding="utf-8") as f:
-            lines = f.readlines()
         spdx_document = SBOMDocument()
         packages = {}
         spdx_package = SBOMPackage()
@@ -115,7 +185,15 @@ class SPDXParser:
                     .strip()
                     .rstrip("\n")
                 )
-                spdx_document.set_creator(creator_type, creator)
+                if creator_type == "Organization":
+                    spdx_document.set_value("metadata_supplier", creator)
+                else:
+                    spdx_document.set_creator(creator_type, creator)
+            elif line_elements[0] == "CreatorComment":
+                comment = line[len("CreatorComment:") :].strip().rstrip("\n")
+                lifecycle = self.get_lifecycle(comment)
+                if lifecycle is not None:
+                    spdx_document.set_value("lifcycle", lifecycle)
             if line_elements[0] == "FileName":
                 # Is this a new file?
                 if file is not None and file not in files:
@@ -148,7 +226,9 @@ class SPDXParser:
                 spdx_file.set_checksum(checksum_type, checksum)
             elif line_elements[0] == "LicenseConcluded":
                 license_concluded = line_elements[1].strip().rstrip("\n")
-                spdx_file.set_licenseconcluded(license_concluded)
+                spdx_file.set_licenseconcluded(
+                    self._validate_license(license_concluded)
+                )
             elif line_elements[0] == "LicenseInfoInFile":
                 license_info = line_elements[1].strip().rstrip("\n")
                 spdx_file.set_licenseinfoinfile(license_info)
@@ -238,10 +318,14 @@ class SPDXParser:
                 spdx_package.set_sourceinfo(sourceinfo)
             elif line_elements[0] == "PackageLicenseConcluded":
                 license_concluded = line_elements[1].strip().rstrip("\n")
-                spdx_package.set_licenseconcluded(license_concluded)
+                spdx_package.set_licenseconcluded(
+                    self._validate_license(license_concluded)
+                )
             elif line_elements[0] == "PackageLicenseDeclared":
                 license_declared = line_elements[1].strip().rstrip("\n")
-                spdx_package.set_licensedeclared(license_declared)
+                spdx_package.set_licensedeclared(
+                    self._validate_license(license_declared)
+                )
             elif line_elements[0] == "PackageLicenseComments":
                 license_comments = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_licensecomments(license_comments)
@@ -269,6 +353,9 @@ class SPDXParser:
             elif line_elements[0] == "ReleaseDate":
                 date = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_value("release_date", date)
+            elif line_elements[0] == "ValidUntilDate":
+                date = line_elements[1].strip().rstrip("\n")
+                spdx_package.set_value("validUntilDate", date)
             elif line_elements[0] == "ExternalRef":
                 # Format is TAG CATEGORY TYPE LOCATOR
                 # Need all data after type which may contain ':'
@@ -277,6 +364,12 @@ class SPDXParser:
                 ref_category = ext_elements.split()[0]
                 ref_type = ext_elements.split()[1]
                 ref_locator = ext_elements.split()[2]
+                if ref_type == "purl":
+                    # Validate purl
+                    purl_validator = SBOMIdentifier(ref_locator)
+                    if not purl_validator.validate():
+                        # correct PURL value
+                        ref_locator = purl_validator.fix()
                 spdx_package.set_externalreference(ref_category, ref_type, ref_locator)
             elif line_elements[0] == "Relationship":
                 # Format is TAG SOURCE TYPE TARGET
@@ -328,25 +421,6 @@ class SPDXParser:
             self.user_licences,
         )
 
-    def parse_spdx_json(self, sbom_file):
-        """parses SPDX JSON SBOM file extracting SBOM data"""
-        try:
-            data = json.load(open(sbom_file, "r", encoding="utf-8"))
-            return self._parse_spdx_data(data)
-        except json.JSONDecodeError:
-            # Unable to process file. Probably not a JSON file
-            raise SBOMParserException
-        # Return Null data
-        return (
-            SBOMDocument(),
-            {},
-            {},
-            [],
-            self.vulnerabilities,
-            self.services,
-            self.user_licences,
-        )
-
     def _parse_spdx_data(self, data):
         packages = {}
         spdx_package = SBOMPackage()
@@ -375,7 +449,14 @@ class SPDXParser:
             # Potentially multiple entries
             for creator in data["creationInfo"]["creators"]:
                 creator_entry = creator.split(":")
-                spdx_document.set_creator(creator_entry[0], creator_entry[1])
+                if creator_entry[0] == "Organization":
+                    spdx_document.set_value("metadata_supplier", creator_entry[1])
+                else:
+                    spdx_document.set_creator(creator_entry[0], creator_entry[1])
+            if "comment" in data["creationInfo"]:
+                lifecycle = self.get_lifecycle(data["creationInfo"]["comment"])
+                if lifecycle is not None:
+                    spdx_document.set_value("lifecycle", lifecycle)
             elements[data["SPDXID"]] = data["name"]
             if "hasExtractedLicensingInfos" in data:
                 for e in data["hasExtractedLicensingInfos"]:
@@ -409,7 +490,9 @@ class SPDXParser:
                             for filetype in d["fileTypes"]:
                                 spdx_file.set_filetype(filetype)
                         if "licenseConcluded" in d:
-                            spdx_file.set_licenseconcluded(d["licenseConcluded"])
+                            spdx_file.set_licenseconcluded(
+                                self._validate_license(d["licenseConcluded"])
+                            )
                         if "copyrightText" in d:
                             spdx_file.set_copyrighttext(d["copyrightText"])
                         if "comment" in d:
@@ -476,9 +559,13 @@ class SPDXParser:
                         if "sourceInfo" in d:
                             spdx_package.set_sourceinfo(d["sourceInfo"])
                         if "licenseConcluded" in d:
-                            spdx_package.set_licenseconcluded(d["licenseConcluded"])
+                            spdx_package.set_licenseconcluded(
+                                self._validate_license(d["licenseConcluded"])
+                            )
                         if "licenseDeclared" in d:
-                            spdx_package.set_licensedeclared(d["licenseDeclared"])
+                            spdx_package.set_licensedeclared(
+                                self._validate_license(d["licenseDeclared"])
+                            )
                         if "licenseComments" in d:
                             spdx_package.set_licensecomments(d["licenseComments"])
                         if "copyrightText" in d:
@@ -499,12 +586,22 @@ class SPDXParser:
                             spdx_package.set_value("build_date", d["builtDate"])
                         if "releaseDate" in d:
                             spdx_package.set_value("release_date", d["releaseDate"])
+                        if "validUntilDate" in d:
+                            spdx_package.set_value("validUntilDate", d["validUntilDate"])
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
+                                ref_type = ext_ref["referenceType"]
+                                ref_locator = ext_ref["referenceLocator"]
+                                if ref_type == "purl":
+                                    # Validate purl
+                                    purl_validator = SBOMIdentifier(ref_locator)
+                                    if not purl_validator.validate():
+                                        # correct PURL value
+                                        ref_locator = purl_validator.fix()
                                 spdx_package.set_externalreference(
                                     ext_ref["referenceCategory"],
-                                    ext_ref["referenceType"],
-                                    ext_ref["referenceLocator"],
+                                    ref_type,
+                                    ref_locator,
                                 )
                         package_tuple = (package, version, id)
                         if package_tuple in packages:
@@ -533,11 +630,6 @@ class SPDXParser:
             self.user_licences,
         )
 
-    def parse_spdx_yaml(self, sbom_file):
-        """parses SPDX YAML SBOM file extracting SBOM data"""
-        data = yaml.safe_load(open(sbom_file, "r", encoding="utf-8"))
-        return self._parse_spdx_data(data)
-
     def _transform_relationship(self, relationship_list, element_mapping):
         # Translate element ids in each relationship to element name
         spdx_relationship = SBOMRelationship()
@@ -554,12 +646,17 @@ class SPDXParser:
                 # Retain ids for look up
                 spdx_relationship.set_relationship_id(rel["source"], rel["target"])
                 relationships.append(spdx_relationship.get_relationship())
+            else:
+                # Elements not found
+                # print(rel)
+                # print(
+                #     rel["source"] in element_mapping, rel["target"] in element_mapping
+                # )
+                pass
         return relationships
 
-    def parse_spdx_rdf(self, sbom_file):
+    def parse_spdx_rdf(self, lines: list[str]):
         # parses SPDX RDF BOM file extracting package name and version ONLY
-        with open(sbom_file, "r", encoding="utf-8") as f:
-            lines = f.readlines()
         packages = {}
         package = ""
         for line in lines:
@@ -589,17 +686,12 @@ class SPDXParser:
             self.user_licences,
         )
 
-    def parse_spdx_xml(self, sbom_file):
+    def parse_spdx_xml(self, schema: str, packages_list: list):
         # parses SPDX XML BOM file extracting package name and version ONLY
         # XML is experimental in SPDX 2.x
         packages = {}
-        tree = ET.parse(sbom_file)
-        # Find root element
-        root = tree.getroot()
-        # Extract schema
-        schema = root.tag[: root.tag.find("}") + 1]
         # Extract package information
-        for component in root.findall(schema + "packages"):
+        for component in packages_list:
             package_match = component.find(schema + "name")
             if package_match is None:
                 continue
@@ -618,6 +710,266 @@ class SPDXParser:
             {},
             packages,
             [],
+            self.vulnerabilities,
+            self.services,
+            self.user_licences,
+        )
+
+    def _parse_spdx3_data(self, data):
+        packages = {}
+        spdx_package = SBOMPackage()
+        files = {}
+        spdx_file = SBOMFile()
+        relationships = []
+        spdx_relationship = SBOMRelationship()
+        spdx_licenses = SBOMLicense()
+        spdx_licenses.initialise()
+        # Maintain mapping of document/file/package ids to names
+        elements = {}
+        processed_elements = {}
+        spdx_document = SBOMDocument()
+        doc_id = None
+        agent = {}
+        datalicence = None
+        licence_expression = {}
+        licence_list_version = None
+        lifecycle = None
+        specversion = "3.0.1"
+        # Default creation time
+        created = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        for element in data:
+            # Get type and identifier. Mulitple ways of specifying type and id!
+            element_type = element.get("type")
+            if element_type is None:
+                element_type = element.get("@type")
+            element_id = element.get("spdxId")
+            if element_id is None:
+                element_id = element.get("@id")
+            if element_id not in processed_elements:
+                processed_elements[element_id] = []
+            if element_type in ["software_Package", "Package"]:
+                processed_elements[element_id].append(element)
+            elif element_type in ["software_File", "File"]:
+                processed_elements[element_id].append(element)
+            elif element_type == "Relationship":
+                from_id = element.get("from")
+                if from_id is not None:
+                    if from_id not in processed_elements:
+                        processed_elements[from_id] = []
+                    processed_elements[from_id].append(element)
+            elif element_type == "software_Sbom":
+                name = element.get("name")
+                elements[element_id] = name
+                lifecycle_element = element.get("software_sbomType")
+                if lifecycle_element is not None:
+                    for phase in lifecycle_element:
+                        lifecycle = phase
+            elif element_type == "SpdxDocument":
+                document_name = element.get("name")
+                doc_id = element_id
+            elif element_type == "CreationInfo":
+                specversion = element.get("specVersion")
+                created = element.get("created")
+            elif element_type in ["Person", "Organization", "Tool"]:
+                name = element.get("name")
+                if "externalIdentifier" in element:
+                    identifier = element["externalIdentifier"][0]["identifier"]
+                    name = f"{name} ({identifier})"
+                agent[element_id] = (name, element_type)
+            elif element_type == "AnyLicenseInfo":
+                datalicence = element.get("name")
+            elif element_type == "simplelicensing_LicenseExpression":
+                licence_expression[element_id] = element.get(
+                    "simplelicensing_licenseExpression"
+                )
+                if "simplelicensing_licenseListVersion" in element:
+                    licence_list_version = element.get(
+                        "simplelicensing_licenseListVersion"
+                    )
+
+        # Look for metadata
+        # Should alays have softwareSbom element, but just in case...
+        if doc_id is not None:
+            spdx_document.set_version(specversion)
+            spdx_document.set_id(doc_id)
+            if datalicence is not None:
+                spdx_document.set_datalicense(datalicence)
+            if licence_list_version is not None:
+                spdx_document.set_licenselist(licence_list_version)
+            spdx_document.set_type("spdx")
+            spdx_document.set_name(document_name)
+            if lifecycle is not None:
+                spdx_document.set_value("lifecycle", lifecycle)
+            # Process Creation Info
+            spdx_document.set_created(created)
+            for creator_id, creator_info in agent.items():
+                if creator_info[1] == "Tool":
+                    spdx_document.set_creator(creator_info[1], creator_info[0])
+
+        # Now process components
+        for key, value in processed_elements.items():
+            if len(value) > 0:
+                spdx_file.initialise()
+                spdx_package.initialise()
+                declared_licence = concluded_licence = None
+                for element in value:
+                    element_type = element.get("type")
+                    if element_type is None:
+                        element_type = element.get("@type")
+                    if element_type == "Relationship":
+                        relation_type = element.get("relationshipType")
+                        if relation_type in [
+                            "hasDeclaredLicense",
+                            "hasConcludedLicense",
+                        ]:
+                            relation_to = element.get("to")[0]
+                            if relation_type == "hasDeclaredLicense":
+                                declared_licence = relation_to
+                            elif relation_type == "hasConcludedLicense":
+                                concluded_licence = relation_to
+                        else:
+                            # Dependency relatiosnhip
+                            spdx_relationship.initialise()
+                            relation_type = (
+                                "depends_on"
+                                if relation_type == "dependsOn"
+                                else relation_type
+                            )
+                            spdx_relationship.set_relationship(
+                                key,
+                                relation_type.upper(),
+                                element.get("to")[0],
+                            )
+                            relationships.append(spdx_relationship.get_relationship())
+                    elif element_type in ["software_File", "File"]:
+                        name = element.get("name")
+                        id = element.get("spdxId")
+                        spdx_file.set_id(id)
+                        elements[id] = name
+                        spdx_file.set_name(name)
+                        # Save file metadata
+                        files[name] = spdx_file.get_file()
+                    elif element_type in ["software_Package", "Package"]:
+                        name = element.get("name")
+                        id = element.get("spdxId")
+                        spdx_package.set_id(id)
+                        elements[id] = name
+                        spdx_package.set_name(name)
+                        version = element.get("software_packageVersion") or element.get(
+                            "packageVersion"
+                        )
+                        if version is not None:
+                            spdx_package.set_version(version)
+                        download = element.get(
+                            "software_downloadLocation"
+                        ) or element.get("downloadLocation")
+                        if download is not None:
+                            spdx_package.set_downloadlocation(download)
+                        homepage = element.get("software_homePage") or element.get(
+                            "homePage"
+                        )
+                        if homepage is not None:
+                            spdx_package.set_homepage(homepage)
+                        description = element.get("description")
+                        if description is not None:
+                            spdx_package.set_description(description)
+                        purpose = element.get("software_primaryPurpose") or element.get(
+                            "primaryPurpose"
+                        )
+                        if purpose is not None:
+                            spdx_package.set_type(purpose)
+                        else:
+                            # default
+                            spdx_package.set_type("library")
+                        copyright = element.get(
+                            "software_copyrightText"
+                        ) or element.get("copyrightText")
+                        if copyright is not None:
+                            spdx_package.set_copyrighttext(copyright)
+                        supplier = element.get("suppliedBy")
+                        if supplier is not None:
+                            # Some SPDX3 documents have suppliedBy as a list
+                            if type(supplier) is list:
+                                supplier = supplier[0]
+                            supplier_info = agent[supplier]
+                            spdx_package.set_supplier(
+                                supplier_info[1], supplier_info[0]
+                            )
+                        if "verifiedUsing" in element:
+                            for checksum in element["verifiedUsing"]:
+                                spdx_package.set_checksum(
+                                    checksum["algorithm"].upper(), checksum["hashValue"]
+                                )
+                        if "externalIdentifier" in element:
+                            for ext_ref in element["externalIdentifier"]:
+                                # Could be a list of refs or an entry
+                                if type(ext_ref) is dict:
+                                    ref_type = ext_ref.get("externalIdentifierType")
+
+                                    if ref_type is not None:
+                                        ref_locator = ext_ref["identifier"]
+                                        if ref_type == "packageUrl":
+                                            # Validate purl
+                                            purl_validator = SBOMIdentifier(ref_locator)
+                                            if not purl_validator.validate():
+                                                # correct PURL value
+                                                ref_locator = purl_validator.fix()
+                                            ref_type = "purl"
+                                            category = "PACKAGE-MANAGER"
+                                        elif ref_type.startswith("cpe"):
+                                            ref_type = f"{ref_type}Type"
+                                            category = "SECURITY"
+                                        else:
+                                            category = "OTHER"
+                                        spdx_package.set_externalreference(
+                                            category,
+                                            ref_type,
+                                            ref_locator,
+                                        )
+                        if "software_packageUrl" in element or "packageUrl" in element:
+                            spdx_package.set_externalreference(
+                                "PACKAGE-MANAGER",
+                                "purl",
+                                element.get("software_packageUrl")
+                                or element.get("packageUrl"),
+                            )
+                        # TODO add more attributes
+                if declared_licence is not None:
+                    if "NoAssertionLicense" in declared_licence:
+                        spdx_package.set_licensedeclared("NOASSERTION")
+                    elif "NoneLicense" in declared_licence:
+                        spdx_package.set_licensedeclared("NOASSERTION")
+                    else:
+                        if spdx_package.get_name() is not None:
+                            spdx_package.set_licensedeclared(
+                                self._validate_license(
+                                    licence_expression[declared_licence]
+                                )
+                            )
+                if concluded_licence is not None:
+                    if "NoAssertionLicense" in concluded_licence:
+                        spdx_package.set_licenseconcluded("NOASSERTION")
+                    elif "NoneLicense" in concluded_licence:
+                        spdx_package.set_licensedeclared("NOASSERTION")
+                    else:
+                        if spdx_package.get_name() is not None:
+                            spdx_package.set_licenseconcluded(
+                                self._validate_license(
+                                    licence_expression[concluded_licence]
+                                )
+                            )
+                if spdx_package.get_name() is not None:
+                    package_tuple = (name, version, id)
+                    if package_tuple in packages:
+                        print(f"Duplicate package detected {name} {version}")
+                    else:
+                        packages[package_tuple] = spdx_package.get_package()
+        return (
+            spdx_document,
+            files,
+            packages,
+            self._transform_relationship(relationships, elements),
             self.vulnerabilities,
             self.services,
             self.user_licences,
