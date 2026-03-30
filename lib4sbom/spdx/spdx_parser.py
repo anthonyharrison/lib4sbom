@@ -27,6 +27,7 @@ class SPDXParser:
         self.services = []
         self.user_licences = []
         self.license_scanner = LicenseScanner()
+        self.debug = False
 
     def parse(self, sbom_string: str, parser_type: ParserType = None):
         """parses SPDX SBOM string"""
@@ -254,7 +255,8 @@ class SPDXParser:
                     # Save package metadata
                     package_tuple = (package, version, spdx_id)
                     if package_tuple in packages:
-                        print(f"Duplicate package detected {package} {version}")
+                        if self.debug:
+                            print(f"Duplicate package detected {package} {version}")
                     else:
                         packages[package_tuple] = spdx_package.get_package()
                     version = DEFAULT_VERSION
@@ -408,7 +410,8 @@ class SPDXParser:
             # Save package metadata
             package_tuple = (package, version, spdx_id)
             if package_tuple in packages:
-                print(f"Duplicate package detected {package} {version}")
+                if self.debug:
+                    print(f"Duplicate package detected {package} {version}")
             else:
                 packages[package_tuple] = spdx_package.get_package()
         if spdx_licenses.get_id() is not None:
@@ -611,7 +614,8 @@ class SPDXParser:
                                 )
                         package_tuple = (package, version, id)
                         if package_tuple in packages:
-                            print(f"Duplicate package detected {package} {version}")
+                            if self.debug:
+                                print(f"Duplicate package detected {package} {version}")
                         else:
                             packages[package_tuple] = spdx_package.get_package()
                     except KeyError as e:
@@ -967,7 +971,8 @@ class SPDXParser:
                 if spdx_package.get_name() is not None:
                     package_tuple = (name, version, id)
                     if package_tuple in packages:
-                        print(f"Duplicate package detected {name} {version}")
+                        if self.debug:
+                            print(f"Duplicate package detected {name} {version}")
                     else:
                         packages[package_tuple] = spdx_package.get_package()
         return (

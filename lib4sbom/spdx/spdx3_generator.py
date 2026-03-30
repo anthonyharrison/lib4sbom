@@ -212,7 +212,9 @@ class SPDX3Generator:
                             "externalIdentifierType": "email",
                         }
                         supplier_info["externalIdentifier"] = [ext_id]
-                    supplier_id = self.create_type(supplier[0].capitalize(), supplier_info)
+                    supplier_id = self.create_type(
+                        supplier[0].capitalize(), supplier_info
+                    )
             else:
                 # NOASSERTION
                 supplier_id = self.create_type("Agent", {"name": supplier[0]})
@@ -599,7 +601,7 @@ class SPDX3Generator:
         self.create_file(component)
 
     def generateJSONLicenseDetails(self, id, name, license_text, comment):
-        licence_ref = self.create_type(
+        self.create_type(
             "expandedlicensing_CustomLicense",
             {
                 "simplelicensing_licenseText": license_text,
