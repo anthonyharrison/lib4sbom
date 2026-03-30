@@ -276,6 +276,7 @@ class SBOMGenerator:
         if "licenses" in sbom_data and len(sbom_data["licenses"]) > 0:
             # Load user defined licences
             self.bom.addLicenseDetails(sbom_data["licenses"])
+            self.bom.generateLicenseDetails()
         if "files" in sbom_data:
             # Process list of files
             if len(sbom_data["files"]) is not None:
@@ -325,8 +326,6 @@ class SBOMGenerator:
                     relationship,
                 )
                 id = id + 1
-        # If user defined licenses defined, generate details
-        self.bom.generateLicenseDetails()
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
                 if (

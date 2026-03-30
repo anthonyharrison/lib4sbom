@@ -1,0 +1,1495 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:5dcfc197-a734-40d0-ba31-aff98ec4918d",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2025-10-24T19:16:56Z",
+    "tools": {
+      "components": [
+        {
+          "name": "lib4sbom",
+          "version": "0.10.1",
+          "type": "application"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "supplier": {
+        "name": " Chainguard, Inc"
+      },
+      "bom-ref": "CDXRef-DOCUMENT",
+      "name": "sbom-sha256:fa27783ca9a35d4c920fedbc28102086b05af7ad99ee0ed05ea11030294a6723"
+    },
+    "distributionConstraints": {
+      "tlp": "CLEAR"
+    }
+  },
+  "components": [
+    {
+      "type": "container",
+      "bom-ref": "SPDXRef-Package-sha256-036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf",
+      "name": "sha256:036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf",
+      "version": "sha256:036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf:sha256:036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf",
+      "description": "apko container image",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf"
+        }
+      ],
+      "purl": "pkg:oci/image@sha256:036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-fa27783ca9a35d4c920fedbc28102086b05af7ad99ee0ed05ea11030294a6723",
+      "name": "sha256:fa27783ca9a35d4c920fedbc28102086b05af7ad99ee0ed05ea11030294a6723",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:fa27783ca9a35d4c920fedbc28102086b05af7ad99ee0ed05ea11030294a6723:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:fa27783ca9a35d4c920fedbc28102086b05af7ad99ee0ed05ea11030294a6723?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-ca40c89207b5d2f775a2e01f1c450c6b97b01921b83448fb3a5632d26867c772",
+      "name": "sha256:ca40c89207b5d2f775a2e01f1c450c6b97b01921b83448fb3a5632d26867c772",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:ca40c89207b5d2f775a2e01f1c450c6b97b01921b83448fb3a5632d26867c772:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:ca40c89207b5d2f775a2e01f1c450c6b97b01921b83448fb3a5632d26867c772?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-bf363d243bd4e1f8f835312f455de35ab9e2176600a44a7bfc54697db44d2b42",
+      "name": "sha256:bf363d243bd4e1f8f835312f455de35ab9e2176600a44a7bfc54697db44d2b42",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:bf363d243bd4e1f8f835312f455de35ab9e2176600a44a7bfc54697db44d2b42:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:bf363d243bd4e1f8f835312f455de35ab9e2176600a44a7bfc54697db44d2b42?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-a611e81ea967326c43734059ac44e80caa9c0e192c0e1df5f3db53be726881ca",
+      "name": "sha256:a611e81ea967326c43734059ac44e80caa9c0e192c0e1df5f3db53be726881ca",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:a611e81ea967326c43734059ac44e80caa9c0e192c0e1df5f3db53be726881ca:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:a611e81ea967326c43734059ac44e80caa9c0e192c0e1df5f3db53be726881ca?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-f2b79ae14933f452b869feef2758c060f44a6b8a48ec938b176781d26a972649",
+      "name": "sha256:f2b79ae14933f452b869feef2758c060f44a6b8a48ec938b176781d26a972649",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:f2b79ae14933f452b869feef2758c060f44a6b8a48ec938b176781d26a972649:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:f2b79ae14933f452b869feef2758c060f44a6b8a48ec938b176781d26a972649?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-c4026b83f2a1d9e17d58587f1f3e250148e790b0b1ebe8300b5459bfe5cc4770",
+      "name": "sha256:c4026b83f2a1d9e17d58587f1f3e250148e790b0b1ebe8300b5459bfe5cc4770",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:c4026b83f2a1d9e17d58587f1f3e250148e790b0b1ebe8300b5459bfe5cc4770:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:c4026b83f2a1d9e17d58587f1f3e250148e790b0b1ebe8300b5459bfe5cc4770?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-91b45192f37ca27cec7bf052b0a8b388b6d13cd93f4f1115db2f9862d298287c",
+      "name": "sha256:91b45192f37ca27cec7bf052b0a8b388b6d13cd93f4f1115db2f9862d298287c",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:91b45192f37ca27cec7bf052b0a8b388b6d13cd93f4f1115db2f9862d298287c:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:91b45192f37ca27cec7bf052b0a8b388b6d13cd93f4f1115db2f9862d298287c?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-606b248d4414bce6018b06fab1f139833d2e33b7d5422b537c29b4a832ff4d71",
+      "name": "sha256:606b248d4414bce6018b06fab1f139833d2e33b7d5422b537c29b4a832ff4d71",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:606b248d4414bce6018b06fab1f139833d2e33b7d5422b537c29b4a832ff4d71:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:606b248d4414bce6018b06fab1f139833d2e33b7d5422b537c29b4a832ff4d71?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-0cae0046c5ad55757be208a1950faffe69f1f46d1ce6cc24da1787b841755920",
+      "name": "sha256:0cae0046c5ad55757be208a1950faffe69f1f46d1ce6cc24da1787b841755920",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:0cae0046c5ad55757be208a1950faffe69f1f46d1ce6cc24da1787b841755920:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:0cae0046c5ad55757be208a1950faffe69f1f46d1ce6cc24da1787b841755920?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-ffc938985e7c1e3607eb87ae356e1f29147f9c5e7dddd7fd3d3a9f401df0f943",
+      "name": "sha256:ffc938985e7c1e3607eb87ae356e1f29147f9c5e7dddd7fd3d3a9f401df0f943",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:ffc938985e7c1e3607eb87ae356e1f29147f9c5e7dddd7fd3d3a9f401df0f943:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:ffc938985e7c1e3607eb87ae356e1f29147f9c5e7dddd7fd3d3a9f401df0f943?arch=amd64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sha256-ef3c72749a0bb72cbc640bbde3b559f015e5fe4acdb0cd5164f1f473feb9a1ab",
+      "name": "sha256:ef3c72749a0bb72cbc640bbde3b559f015e5fe4acdb0cd5164f1f473feb9a1ab",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sha256:ef3c72749a0bb72cbc640bbde3b559f015e5fe4acdb0cd5164f1f473feb9a1ab:20230201",
+      "description": "apko operating system layer",
+      "purl": "pkg:oci/image@sha256:ef3c72749a0bb72cbc640bbde3b559f015e5fe4acdb0cd5164f1f473feb9a1ab?arch=amd64"
+    },
+    {
+      "type": "operating-system",
+      "bom-ref": "SPDXRef-OperatingSystem-wolfi",
+      "name": "wolfi",
+      "version": "20230201",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/o:Wolfi:wolfi:20230201",
+      "description": "Operating System"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-wolfi-baselayout-20230201-r24",
+      "name": "wolfi-baselayout",
+      "version": "20230201-r24",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:wolfi-baselayout:20230201-r24",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/wolfi-baselayout@20230201-r24?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-wolfi-baselayout.yaml-5e4608aee947a07d2d0aced99d17a278298dce6b",
+      "name": "wolfi-baselayout.yaml",
+      "version": "5e4608aee947a07d2d0aced99d17a278298dce6b",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:wolfi-baselayout.yaml:5e4608aee947a07d2d0aced99d17a278298dce6b",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@5e4608aee947a07d2d0aced99d17a278298dce6b#wolfi-baselayout.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-ca-certificates-bundle-20250911-r0",
+      "name": "ca-certificates-bundle",
+      "version": "20250911-r0",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:ca-certificates-bundle:20250911-r0",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/ca-certificates-bundle@20250911-r0?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-ca-certificates.yaml-af1b3810b208dfdf90e043f9313adefe1e2b1c64",
+      "name": "ca-certificates.yaml",
+      "version": "af1b3810b208dfdf90e043f9313adefe1e2b1c64",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:ca-certificates.yaml:af1b3810b208dfdf90e043f9313adefe1e2b1c64",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@af1b3810b208dfdf90e043f9313adefe1e2b1c64#ca-certificates.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-gitlab.alpinelinux.org-alpine-ca-certificates-20250911-cdee21a4fdc8536b2398d5dfcd961c3d0962dfd5-0",
+      "name": "ca-certificates",
+      "version": "20250911",
+      "supplier": {
+        "name": "Alpine"
+      },
+      "cpe": "cpe:/a:Alpine:ca-certificates:20250911",
+      "authors": [
+        {
+          "name": "Alpine"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://gitlab.alpinelinux.org/alpine/ca-certificates/-/archive/cdee21a4fdc8536b2398d5dfcd961c3d0962dfd5/cdee21a4fdc8536b2398d5dfcd961c3d0962dfd5.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/ca-certificates@20250911"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-glibc-locale-posix-2.42-r3",
+      "name": "glibc-locale-posix",
+      "version": "2.42-r3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:glibc-locale-posix:2.42-r3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/glibc-locale-posix@2.42-r3?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-glibc.yaml-59803b3985082825582920848a15e0f0999d93d8",
+      "name": "glibc.yaml",
+      "version": "59803b3985082825582920848a15e0f0999d93d8",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:glibc.yaml:59803b3985082825582920848a15e0f0999d93d8",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@59803b3985082825582920848a15e0f0999d93d8#glibc.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-gitlab.com-gnutools-glibc.git-glibc-2.42-d2097651cc57834dbfcaa102ddfacae0d86cfb66-0",
+      "name": "glibc",
+      "version": "glibc-2.42",
+      "supplier": {
+        "name": "Gnutools"
+      },
+      "cpe": "cpe:/a:Gnutools:glibc:glibc-2.42",
+      "authors": [
+        {
+          "name": "Gnutools"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://gitlab.com/gnutools/glibc/-/archive/d2097651cc57834dbfcaa102ddfacae0d86cfb66/d2097651cc57834dbfcaa102ddfacae0d86cfb66.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:gitlab/gnutools/glibc@glibc-2.42",
+      "properties": [
+        {
+          "name": "PURL Comments",
+          "value": "pkg:gitlab/gnutools/glibc@glibc-2.42 is not a valid PURL"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libgcc-15.2.0-r3",
+      "name": "libgcc",
+      "version": "15.2.0-r3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libgcc:15.2.0-r3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libgcc@15.2.0-r3?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-gcc.yaml-4271baae62717d13adf6e2bd89f7768cae93c056",
+      "name": "gcc.yaml",
+      "version": "4271baae62717d13adf6e2bd89f7768cae93c056",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:gcc.yaml:4271baae62717d13adf6e2bd89f7768cae93c056",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@4271baae62717d13adf6e2bd89f7768cae93c056#gcc.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-gcc-15.2.0-0",
+      "name": "gcc",
+      "version": "15.2.0",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:gcc:15.2.0",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "89047a2e07bd9da265b507b516ed3635adb17491c7f4f67cf090f0bd5b3fc7f2ee6e4cc4008beef7ca884b6b71dffe2bb652b21f01a702e17b468cca2d10b2de"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://ftpmirror.gnu.org/gnu/gcc/gcc-15.2.0/gcc-15.2.0.tar.xz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/gcc@15.2.0?checksum=sha512%3A89047a2e07bd9da265b507b516ed3635adb17491c7f4f67cf090f0bd5b3fc7f2ee6e4cc4008beef7ca884b6b71dffe2bb652b21f01a702e17b468cca2d10b2de&download_url=https%3A%2F%2Fftpmirror.gnu.org%2Fgnu%2Fgcc%2Fgcc-15.2.0%2Fgcc-15.2.0.tar.xz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-glibc-2.42-r3",
+      "name": "glibc",
+      "version": "2.42-r3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:glibc:2.42-r3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/glibc@2.42-r3?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-ld-linux-2.42-r3",
+      "name": "ld-linux",
+      "version": "2.42-r3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:ld-linux:2.42-r3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/ld-linux@2.42-r3?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-gdbm-1.26-r1",
+      "name": "gdbm",
+      "version": "1.26-r1",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:gdbm:1.26-r1",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/gdbm@1.26-r1?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-gdbm.yaml-834490e333bbfebd997c42d713e1f728eab3958f",
+      "name": "gdbm.yaml",
+      "version": "834490e333bbfebd997c42d713e1f728eab3958f",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:gdbm.yaml:834490e333bbfebd997c42d713e1f728eab3958f",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@834490e333bbfebd997c42d713e1f728eab3958f#gdbm.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-gdbm-1.26-0",
+      "name": "gdbm",
+      "version": "1.26",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:gdbm:1.26",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6a24504a14de4a744103dcb936be976df6fbe88ccff26065e54c1c47946f4a5e"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://ftpmirror.gnu.org/gnu/gdbm/gdbm-1.26.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/gdbm@1.26?checksum=sha256%3A6a24504a14de4a744103dcb936be976df6fbe88ccff26065e54c1c47946f4a5e&download_url=https%3A%2F%2Fftpmirror.gnu.org%2Fgnu%2Fgdbm%2Fgdbm-1.26.tar.gz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libbz2-1-1.0.8-r21",
+      "name": "libbz2-1",
+      "version": "1.0.8-r21",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libbz2-1:1.0.8-r21",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libbz2-1@1.0.8-r21?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-bzip2.yaml-2619f318eef93ed7f288a87b446626ed9eff6488",
+      "name": "bzip2.yaml",
+      "version": "2619f318eef93ed7f288a87b446626ed9eff6488",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:bzip2.yaml:2619f318eef93ed7f288a87b446626ed9eff6488",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@2619f318eef93ed7f288a87b446626ed9eff6488#bzip2.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sourceware.org-git-bzip2.git-bzip2-1.0.8-6a8690fc8d26c815e798c588f796eabe9d684cf0-0",
+      "name": "git/bzip2",
+      "version": "bzip2-1.0.8",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:git/bzip2:bzip2-1.0.8",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://tarballs.cgr.dev/g/bd9e4cde2b52db644da8ff7b19a2e89df1ff408230201c86e08456c98ef2fc12-6a8690fc8d26c815e798c588f796eabe9d684cf0.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/git/bzip2@bzip2-1.0.8"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libcrypto3-3.6.0-r1",
+      "name": "libcrypto3",
+      "version": "3.6.0-r1",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libcrypto3:3.6.0-r1",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libcrypto3@3.6.0-r1?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-openssl.yaml-ba2edfc86ca6178b97ac5beffb051c7d66572e45",
+      "name": "openssl.yaml",
+      "version": "ba2edfc86ca6178b97ac5beffb051c7d66572e45",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:openssl.yaml:ba2edfc86ca6178b97ac5beffb051c7d66572e45",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@ba2edfc86ca6178b97ac5beffb051c7d66572e45#openssl.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-github.com-openssl-openssl-openssl-3.6.0-7b371d80d959ec9ab4139d09d78e83c090de9779-0",
+      "name": "openssl",
+      "version": "openssl-3.6.0",
+      "supplier": {
+        "name": "Openssl"
+      },
+      "cpe": "cpe:/a:Openssl:openssl:openssl-3.6.0",
+      "authors": [
+        {
+          "name": "Openssl"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/openssl/openssl/archive/7b371d80d959ec9ab4139d09d78e83c090de9779.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:github/openssl/openssl@openssl-3.6.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libexpat1-2.7.3-r0",
+      "name": "libexpat1",
+      "version": "2.7.3-r0",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libexpat1:2.7.3-r0",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libexpat1@2.7.3-r0?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-expat.yaml-30e89f62f474698bdf5b78fcf7820d7f4d643b68",
+      "name": "expat.yaml",
+      "version": "30e89f62f474698bdf5b78fcf7820d7f4d643b68",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:expat.yaml:30e89f62f474698bdf5b78fcf7820d7f4d643b68",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@30e89f62f474698bdf5b78fcf7820d7f4d643b68#expat.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-expat-2.7.3-0",
+      "name": "expat",
+      "version": "2.7.3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:expat:2.7.3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "59c31441fec9a66205307749eccfee551055f2d792f329f18d97099e919a3b2f"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://downloads.sourceforge.net/project/expat/expat/2.7.3/expat-2.7.3.tar.bz2",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/expat@2.7.3?checksum=sha256%3A59c31441fec9a66205307749eccfee551055f2d792f329f18d97099e919a3b2f&download_url=https%3A%2F%2Fdownloads.sourceforge.net%2Fproject%2Fexpat%2Fexpat%2F2.7.3%2Fexpat-2.7.3.tar.bz2"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libffi-3.5.2-r1",
+      "name": "libffi",
+      "version": "3.5.2-r1",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libffi:3.5.2-r1",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libffi@3.5.2-r1?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libffi.yaml-04deb9807c398ff68064238e09e92f22d7c33cdf",
+      "name": "libffi.yaml",
+      "version": "04deb9807c398ff68064238e09e92f22d7c33cdf",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libffi.yaml:04deb9807c398ff68064238e09e92f22d7c33cdf",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@04deb9807c398ff68064238e09e92f22d7c33cdf#libffi.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-github.com-libffi-libffi.git-v3.5.2-e2eda0cf72a0598b44278cc91860ea402273fa29-0",
+      "name": "libffi",
+      "version": "v3.5.2",
+      "supplier": {
+        "name": "Libffi"
+      },
+      "cpe": "cpe:/a:Libffi:libffi:v3.5.2",
+      "authors": [
+        {
+          "name": "Libffi"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/libffi/libffi/archive/e2eda0cf72a0598b44278cc91860ea402273fa29.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:github/libffi/libffi@v3.5.2"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libssl3-3.6.0-r1",
+      "name": "libssl3",
+      "version": "3.6.0-r1",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libssl3:3.6.0-r1",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libssl3@3.6.0-r1?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libstdcC43C43-15.2.0-r3",
+      "name": "libstdc++",
+      "version": "15.2.0-r3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libstdc++:15.2.0-r3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libstdc%2B%2B@15.2.0-r3?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-libuuid-2.41.2-r0",
+      "name": "libuuid",
+      "version": "2.41.2-r0",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:libuuid:2.41.2-r0",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/libuuid@2.41.2-r0?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-util-linux.yaml-f34ec141c6ffe7eefa3af3957f3e87fd86692eb4",
+      "name": "util-linux.yaml",
+      "version": "f34ec141c6ffe7eefa3af3957f3e87fd86692eb4",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:util-linux.yaml:f34ec141c6ffe7eefa3af3957f3e87fd86692eb4",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@f34ec141c6ffe7eefa3af3957f3e87fd86692eb4#util-linux.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-util-linux-2.41.2-0",
+      "name": "util-linux",
+      "version": "2.41.2",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:util-linux:2.41.2",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6062a1d89b571a61932e6fc0211f36060c4183568b81ee866cf363bce9f6583e"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.2.tar.xz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/util-linux@2.41.2?checksum=sha256%3A6062a1d89b571a61932e6fc0211f36060c4183568b81ee866cf363bce9f6583e&download_url=https%3A%2F%2Fwww.kernel.org%2Fpub%2Flinux%2Futils%2Futil-linux%2Fv2.41%2Futil-linux-2.41.2.tar.xz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-mpdecimal-4.0.1-r3",
+      "name": "mpdecimal",
+      "version": "4.0.1-r3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:mpdecimal:4.0.1-r3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/mpdecimal@4.0.1-r3?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-mpdecimal.yaml-816f399eca16c98994a5f607d6a8de6df29939b9",
+      "name": "mpdecimal.yaml",
+      "version": "816f399eca16c98994a5f607d6a8de6df29939b9",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:mpdecimal.yaml:816f399eca16c98994a5f607d6a8de6df29939b9",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@816f399eca16c98994a5f607d6a8de6df29939b9#mpdecimal.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-mpdecimal-4.0.1-0",
+      "name": "mpdecimal",
+      "version": "4.0.1",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:mpdecimal:4.0.1",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "96d33abb4bb0070c7be0fed4246cd38416188325f820468214471938545b1ac8"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-4.0.1.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/mpdecimal@4.0.1?checksum=sha256%3A96d33abb4bb0070c7be0fed4246cd38416188325f820468214471938545b1ac8&download_url=https%3A%2F%2Fwww.bytereef.org%2Fsoftware%2Fmpdecimal%2Freleases%2Fmpdecimal-4.0.1.tar.gz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-ncurses-terminfo-base-6.5C95p20250621-r2",
+      "name": "ncurses-terminfo-base",
+      "version": "6.5_p20250621-r2",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:ncurses-terminfo-base:6.5_p20250621-r2",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/ncurses-terminfo-base@6.5_p20250621-r2?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-ncurses.yaml-bd606bb7aefe4a49cbb7bd6a19dfe858ee60092a",
+      "name": "ncurses.yaml",
+      "version": "bd606bb7aefe4a49cbb7bd6a19dfe858ee60092a",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:ncurses.yaml:bd606bb7aefe4a49cbb7bd6a19dfe858ee60092a",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@bd606bb7aefe4a49cbb7bd6a19dfe858ee60092a#ncurses.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-ncurses-6.5C95p20250621-0",
+      "name": "ncurses",
+      "version": "6.5_p20250621",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:ncurses:6.5_p20250621",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-512",
+          "content": "1b665749b822133e7166c21e44e0cf0d94766a7ed4f96a6138de43c46c8ce85ed0c5d5230c050103de3830e7d2fc35c283262d30990b9de30851d1f999525b85"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250621.tgz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/ncurses@6.5_p20250621?checksum=sha512%3A1b665749b822133e7166c21e44e0cf0d94766a7ed4f96a6138de43c46c8ce85ed0c5d5230c050103de3830e7d2fc35c283262d30990b9de30851d1f999525b85&download_url=https%3A%2F%2Finvisible-mirror.net%2Farchives%2Fncurses%2Fcurrent%2Fncurses-6.5-20250621.tgz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-ncurses-6.5C95p20250621-r2",
+      "name": "ncurses",
+      "version": "6.5_p20250621-r2",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:ncurses:6.5_p20250621-r2",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/ncurses@6.5_p20250621-r2?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-py3-pip-wheel-25.2-r2",
+      "name": "py3-pip-wheel",
+      "version": "25.2-r2",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:py3-pip-wheel:25.2-r2",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/py3-pip-wheel@25.2-r2?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-py3-pip.yaml-1d72f0aa35141fecded53880405073c1fb364330",
+      "name": "py3-pip.yaml",
+      "version": "1d72f0aa35141fecded53880405073c1fb364330",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:py3-pip.yaml:1d72f0aa35141fecded53880405073c1fb364330",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@1d72f0aa35141fecded53880405073c1fb364330#py3-pip.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-github.com-pypa-pip-25.2-2e05cae3da2cfafa6dce58167a25b7dba4bc2a33-0",
+      "name": "pip",
+      "version": "25.2",
+      "supplier": {
+        "name": "Pypa"
+      },
+      "cpe": "cpe:/a:Pypa:pip:25.2",
+      "authors": [
+        {
+          "name": "Pypa"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/pypa/pip/archive/2e05cae3da2cfafa6dce58167a25b7dba4bc2a33.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:github/pypa/pip@25.2"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-xz-5.8.1-r6",
+      "name": "xz",
+      "version": "5.8.1-r6",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:xz:5.8.1-r6",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/xz@5.8.1-r6?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-xz.yaml-05d68791bcc7348ba3342096fdf086837b130c01",
+      "name": "xz.yaml",
+      "version": "05d68791bcc7348ba3342096fdf086837b130c01",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:xz.yaml:05d68791bcc7348ba3342096fdf086837b130c01",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@05d68791bcc7348ba3342096fdf086837b130c01#xz.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-github.com-tukaani-project-xz-v5.8.1-a522a226545730551f7e7c2685fab27cf567746c-0",
+      "name": "xz",
+      "version": "v5.8.1",
+      "supplier": {
+        "name": "Tukaani-Project"
+      },
+      "cpe": "cpe:/a:Tukaani-Project:xz:v5.8.1",
+      "authors": [
+        {
+          "name": "Tukaani-Project"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/tukaani-project/xz/archive/a522a226545730551f7e7c2685fab27cf567746c.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:github/tukaani-project/xz@v5.8.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-readline-8.3-r1",
+      "name": "readline",
+      "version": "8.3-r1",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:readline:8.3-r1",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/readline@8.3-r1?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-readline.yaml-b0ab5e2e7fad981f5ca302a7b7f999f307e1ba85",
+      "name": "readline.yaml",
+      "version": "b0ab5e2e7fad981f5ca302a7b7f999f307e1ba85",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:readline.yaml:b0ab5e2e7fad981f5ca302a7b7f999f307e1ba85",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@b0ab5e2e7fad981f5ca302a7b7f999f307e1ba85#readline.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-readline-8.3-0",
+      "name": "readline",
+      "version": "8.3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:readline:8.3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://ftpmirror.gnu.org/gnu/readline/readline-8.3.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/readline@8.3?checksum=sha256%3Afe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc&download_url=https%3A%2F%2Fftpmirror.gnu.org%2Fgnu%2Freadline%2Freadline-8.3.tar.gz"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sqlite-libs-3.50.4-r2",
+      "name": "sqlite-libs",
+      "version": "3.50.4-r2",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sqlite-libs:3.50.4-r2",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/sqlite-libs@3.50.4-r2?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sqlite.yaml-473261ccb34ae58af9fed7924ce72ab8313996b9",
+      "name": "sqlite.yaml",
+      "version": "473261ccb34ae58af9fed7924ce72ab8313996b9",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sqlite.yaml:473261ccb34ae58af9fed7924ce72ab8313996b9",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@473261ccb34ae58af9fed7924ce72ab8313996b9#sqlite.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-sqlite-3.50.4-0",
+      "name": "sqlite",
+      "version": "3.50.4",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:sqlite:3.50.4",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b7b4dc060f36053902fb65b344bbbed592e64b2291a26ac06fe77eec097850e9"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://www.sqlite.org/2025/sqlite-src-3500400.zip",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:generic/sqlite@3.50.4?checksum=sha256%3Ab7b4dc060f36053902fb65b344bbbed592e64b2291a26ac06fe77eec097850e9&download_url=https%3A%2F%2Fwww.sqlite.org%2F2025%2Fsqlite-src-3500400.zip"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-zlib-1.3.1-r51",
+      "name": "zlib",
+      "version": "1.3.1-r51",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:zlib:1.3.1-r51",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/zlib@1.3.1-r51?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-zlib.yaml-aa6b1a2aa6f8a444fc26b4415a66584030fa79d3",
+      "name": "zlib.yaml",
+      "version": "aa6b1a2aa6f8a444fc26b4415a66584030fa79d3",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:zlib.yaml:aa6b1a2aa6f8a444fc26b4415a66584030fa79d3",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@aa6b1a2aa6f8a444fc26b4415a66584030fa79d3#zlib.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-github.com-madler-zlib.git-v1.3.1-51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf-0",
+      "name": "zlib",
+      "version": "v1.3.1",
+      "supplier": {
+        "name": "Madler"
+      },
+      "cpe": "cpe:/a:Madler:zlib:v1.3.1",
+      "authors": [
+        {
+          "name": "Madler"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/madler/zlib/archive/51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:github/madler/zlib@v1.3.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-python-3.13-base-3.13.9-r0",
+      "name": "python-3.13-base",
+      "version": "3.13.9-r0",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:python-3.13-base:3.13.9-r0",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/python-3.13-base@3.13.9-r0?arch=x86_64"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-python-3.13.yaml-e646ba7fe7135af607ece1396373b410547cb535",
+      "name": "python-3.13.yaml",
+      "version": "e646ba7fe7135af607ece1396373b410547cb535",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:python-3.13.yaml:e646ba7fe7135af607ece1396373b410547cb535",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:github/wolfi-dev/os@e646ba7fe7135af607ece1396373b410547cb535#python-3.13.yaml"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-github.com-python-cpython.git-v3.13.9-8183fa5e3f78ca6ab862de7fb8b14f3d929421e0-0",
+      "name": "cpython",
+      "version": "v3.13.9",
+      "supplier": {
+        "name": "Python"
+      },
+      "cpe": "cpe:/a:Python:cpython:v3.13.9",
+      "authors": [
+        {
+          "name": "Python"
+        }
+      ],
+      "externalReferences": [
+        {
+          "url": "https://github.com/python/cpython/archive/8183fa5e3f78ca6ab862de7fb8b14f3d929421e0.tar.gz",
+          "type": "distribution",
+          "comment": "Download location for component"
+        }
+      ],
+      "purl": "pkg:github/python/cpython@v3.13.9"
+    },
+    {
+      "type": "library",
+      "bom-ref": "SPDXRef-Package-python-3.13-3.13.9-r0",
+      "name": "python-3.13",
+      "version": "3.13.9-r0",
+      "supplier": {
+        "name": "Wolfi"
+      },
+      "cpe": "cpe:/a:Wolfi:python-3.13:3.13.9-r0",
+      "authors": [
+        {
+          "name": "Wolfi"
+        }
+      ],
+      "purl": "pkg:apk/wolfi/python-3.13@3.13.9-r0?arch=x86_64"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "SPDXRef-Package-sha256-036c47b2aa6fe4f616e97d3271392c035fc75d82e0d792535dbd67d18c1432cf",
+      "dependsOn": [
+        "SPDXRef-Package-sha256-fa27783ca9a35d4c920fedbc28102086b05af7ad99ee0ed05ea11030294a6723",
+        "SPDXRef-Package-sha256-ca40c89207b5d2f775a2e01f1c450c6b97b01921b83448fb3a5632d26867c772",
+        "SPDXRef-Package-sha256-bf363d243bd4e1f8f835312f455de35ab9e2176600a44a7bfc54697db44d2b42",
+        "SPDXRef-Package-sha256-a611e81ea967326c43734059ac44e80caa9c0e192c0e1df5f3db53be726881ca",
+        "SPDXRef-Package-sha256-f2b79ae14933f452b869feef2758c060f44a6b8a48ec938b176781d26a972649",
+        "SPDXRef-Package-sha256-c4026b83f2a1d9e17d58587f1f3e250148e790b0b1ebe8300b5459bfe5cc4770",
+        "SPDXRef-Package-sha256-91b45192f37ca27cec7bf052b0a8b388b6d13cd93f4f1115db2f9862d298287c",
+        "SPDXRef-Package-sha256-606b248d4414bce6018b06fab1f139833d2e33b7d5422b537c29b4a832ff4d71",
+        "SPDXRef-Package-sha256-0cae0046c5ad55757be208a1950faffe69f1f46d1ce6cc24da1787b841755920",
+        "SPDXRef-Package-sha256-ffc938985e7c1e3607eb87ae356e1f29147f9c5e7dddd7fd3d3a9f401df0f943",
+        "SPDXRef-Package-sha256-ef3c72749a0bb72cbc640bbde3b559f015e5fe4acdb0cd5164f1f473feb9a1ab"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-wolfi-baselayout-20230201-r24",
+      "dependsOn": [
+        "SPDXRef-Package-wolfi-baselayout.yaml-5e4608aee947a07d2d0aced99d17a278298dce6b"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-ca-certificates-bundle-20250911-r0",
+      "dependsOn": [
+        "SPDXRef-Package-ca-certificates.yaml-af1b3810b208dfdf90e043f9313adefe1e2b1c64",
+        "SPDXRef-Package-gitlab.alpinelinux.org-alpine-ca-certificates-20250911-cdee21a4fdc8536b2398d5dfcd961c3d0962dfd5-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-glibc-locale-posix-2.42-r3",
+      "dependsOn": [
+        "SPDXRef-Package-glibc.yaml-59803b3985082825582920848a15e0f0999d93d8",
+        "SPDXRef-Package-gitlab.com-gnutools-glibc.git-glibc-2.42-d2097651cc57834dbfcaa102ddfacae0d86cfb66-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libgcc-15.2.0-r3",
+      "dependsOn": [
+        "SPDXRef-Package-gcc.yaml-4271baae62717d13adf6e2bd89f7768cae93c056",
+        "SPDXRef-Package-gcc-15.2.0-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-glibc-2.42-r3",
+      "dependsOn": [
+        "SPDXRef-Package-glibc.yaml-59803b3985082825582920848a15e0f0999d93d8",
+        "SPDXRef-Package-gitlab.com-gnutools-glibc.git-glibc-2.42-d2097651cc57834dbfcaa102ddfacae0d86cfb66-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-ld-linux-2.42-r3",
+      "dependsOn": [
+        "SPDXRef-Package-glibc.yaml-59803b3985082825582920848a15e0f0999d93d8",
+        "SPDXRef-Package-gitlab.com-gnutools-glibc.git-glibc-2.42-d2097651cc57834dbfcaa102ddfacae0d86cfb66-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-gdbm-1.26-r1",
+      "dependsOn": [
+        "SPDXRef-Package-gdbm.yaml-834490e333bbfebd997c42d713e1f728eab3958f",
+        "SPDXRef-Package-gdbm-1.26-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libbz2-1-1.0.8-r21",
+      "dependsOn": [
+        "SPDXRef-Package-bzip2.yaml-2619f318eef93ed7f288a87b446626ed9eff6488",
+        "SPDXRef-Package-sourceware.org-git-bzip2.git-bzip2-1.0.8-6a8690fc8d26c815e798c588f796eabe9d684cf0-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libcrypto3-3.6.0-r1",
+      "dependsOn": [
+        "SPDXRef-Package-openssl.yaml-ba2edfc86ca6178b97ac5beffb051c7d66572e45",
+        "SPDXRef-Package-github.com-openssl-openssl-openssl-3.6.0-7b371d80d959ec9ab4139d09d78e83c090de9779-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libexpat1-2.7.3-r0",
+      "dependsOn": [
+        "SPDXRef-Package-expat.yaml-30e89f62f474698bdf5b78fcf7820d7f4d643b68",
+        "SPDXRef-Package-expat-2.7.3-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libffi-3.5.2-r1",
+      "dependsOn": [
+        "SPDXRef-Package-libffi.yaml-04deb9807c398ff68064238e09e92f22d7c33cdf",
+        "SPDXRef-Package-github.com-libffi-libffi.git-v3.5.2-e2eda0cf72a0598b44278cc91860ea402273fa29-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libssl3-3.6.0-r1",
+      "dependsOn": [
+        "SPDXRef-Package-openssl.yaml-ba2edfc86ca6178b97ac5beffb051c7d66572e45",
+        "SPDXRef-Package-github.com-openssl-openssl-openssl-3.6.0-7b371d80d959ec9ab4139d09d78e83c090de9779-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libstdcC43C43-15.2.0-r3",
+      "dependsOn": [
+        "SPDXRef-Package-gcc.yaml-4271baae62717d13adf6e2bd89f7768cae93c056",
+        "SPDXRef-Package-gcc-15.2.0-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-libuuid-2.41.2-r0",
+      "dependsOn": [
+        "SPDXRef-Package-util-linux.yaml-f34ec141c6ffe7eefa3af3957f3e87fd86692eb4",
+        "SPDXRef-Package-util-linux-2.41.2-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-mpdecimal-4.0.1-r3",
+      "dependsOn": [
+        "SPDXRef-Package-mpdecimal.yaml-816f399eca16c98994a5f607d6a8de6df29939b9",
+        "SPDXRef-Package-mpdecimal-4.0.1-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-ncurses-terminfo-base-6.5C95p20250621-r2",
+      "dependsOn": [
+        "SPDXRef-Package-ncurses.yaml-bd606bb7aefe4a49cbb7bd6a19dfe858ee60092a",
+        "SPDXRef-Package-ncurses-6.5C95p20250621-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-ncurses-6.5C95p20250621-r2",
+      "dependsOn": [
+        "SPDXRef-Package-ncurses.yaml-bd606bb7aefe4a49cbb7bd6a19dfe858ee60092a",
+        "SPDXRef-Package-ncurses-6.5C95p20250621-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-py3-pip-wheel-25.2-r2",
+      "dependsOn": [
+        "SPDXRef-Package-py3-pip.yaml-1d72f0aa35141fecded53880405073c1fb364330",
+        "SPDXRef-Package-github.com-pypa-pip-25.2-2e05cae3da2cfafa6dce58167a25b7dba4bc2a33-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-xz-5.8.1-r6",
+      "dependsOn": [
+        "SPDXRef-Package-xz.yaml-05d68791bcc7348ba3342096fdf086837b130c01",
+        "SPDXRef-Package-github.com-tukaani-project-xz-v5.8.1-a522a226545730551f7e7c2685fab27cf567746c-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-readline-8.3-r1",
+      "dependsOn": [
+        "SPDXRef-Package-readline.yaml-b0ab5e2e7fad981f5ca302a7b7f999f307e1ba85",
+        "SPDXRef-Package-readline-8.3-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-sqlite-libs-3.50.4-r2",
+      "dependsOn": [
+        "SPDXRef-Package-sqlite.yaml-473261ccb34ae58af9fed7924ce72ab8313996b9",
+        "SPDXRef-Package-sqlite-3.50.4-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-zlib-1.3.1-r51",
+      "dependsOn": [
+        "SPDXRef-Package-zlib.yaml-aa6b1a2aa6f8a444fc26b4415a66584030fa79d3",
+        "SPDXRef-Package-github.com-madler-zlib.git-v1.3.1-51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-python-3.13-base-3.13.9-r0",
+      "dependsOn": [
+        "SPDXRef-Package-python-3.13.yaml-e646ba7fe7135af607ece1396373b410547cb535",
+        "SPDXRef-Package-github.com-python-cpython.git-v3.13.9-8183fa5e3f78ca6ab862de7fb8b14f3d929421e0-0"
+      ]
+    },
+    {
+      "ref": "SPDXRef-Package-python-3.13-3.13.9-r0",
+      "dependsOn": [
+        "SPDXRef-Package-python-3.13.yaml-e646ba7fe7135af607ece1396373b410547cb535",
+        "SPDXRef-Package-github.com-python-cpython.git-v3.13.9-8183fa5e3f78ca6ab862de7fb8b14f3d929421e0-0"
+      ]
+    }
+  ]
+}
