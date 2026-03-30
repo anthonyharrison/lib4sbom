@@ -282,7 +282,12 @@ class SPDXParser:
             elif line_elements[0] == "PackageSupplier":
                 if len(line_elements) == 3:
                     supplier_type = line_elements[1]
-                    supplier = line_elements[2].strip().rstrip("\n")
+                    # Capture all data after supplier type
+                    supplier = (
+                        line[line.find(supplier_type) + len(supplier_type) + 1 :]
+                        .strip()
+                        .rstrip("\n")
+                    )
                 else:
                     # No type specified
                     supplier_type = "UNKNOWN"
@@ -516,11 +521,17 @@ class SPDXParser:
                         if version is not None:
                             spdx_package.set_version(version)
                         if "supplier" in d:
+                            # Format is <supplier type>: <data> or NOASSERTION
                             supplier = d["supplier"].split(":")
-                            # Type not always specified
-                            if len(supplier) == 2:
+                            # Check if type specified
+                            if len(supplier) > 1:
                                 supplier_type = supplier[0]
-                                supplier_name = supplier[1].strip().rstrip("\n")
+                                # Capture all data after supplier type
+                                supplier_name = (
+                                    d["supplier"][len(supplier_type) + 1 :]
+                                    .strip()
+                                    .rstrip("\n")
+                                )
                             else:
                                 # No type specified
                                 supplier_type = "UNKNOWN"
