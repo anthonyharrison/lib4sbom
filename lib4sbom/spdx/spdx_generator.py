@@ -453,8 +453,9 @@ class SPDXGenerator:
         elif self.debug:
             print(f"[WARNING] **** version missing for {package}")
         if "type" in package_info:
+            # Handle SPDX mismatch of - and _ in OPERATING-SYSTEM
             component["primaryPackagePurpose"] = (
-                package_info["type"].upper().replace("-", "_")
+                package_info["type"].upper().replace("_", "-")
             )
         else:
             component["primaryPackagePurpose"] = "LIBRARY"
