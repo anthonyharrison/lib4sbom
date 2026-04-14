@@ -141,6 +141,13 @@ class TestLicenseScanner:
         result = tm.get_exception_text("LLVM-exception")
         assert len(result) > 0
 
+    def test_get_exception_url(self):
+        tm = test_module()
+        result = tm.get_exception_url("Apache-2.0")
+        assert result is None
+        result = tm.get_exception_url("LLVM-exception")
+        assert result.startswith("http")
+
     @pytest.mark.parametrize(
         "license, expected_result",
         (

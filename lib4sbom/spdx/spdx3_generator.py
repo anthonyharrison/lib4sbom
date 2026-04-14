@@ -262,6 +262,13 @@ class SPDX3Generator:
                 if not self.license.license_expression(component_details[key]):
                     licence_id = self.license.find_license_id(component_details[key])
                     licence_url = self.license.get_license_url(licence_id)
+                    if self.license.license_exception(component_details[key]):
+                        # "type": "expandedlicensing_WithAdditionOperator",
+                        # "expandedlicensing_subjectAddition": "http://spdx.org/licenses/LLVM-exception",
+                        # "expandedlicensing_subjectExtendableLicense": "http://spdx.org/licenses/Apache-2.0",
+                        licence_url = self.license.get_license_url(licence_id)
+                        exception_id = self.license.get_exception(component_details[key])
+                        exception_url = self.licence.get_exception_url(exception_id)
                 if licence_url is not None:
                     # create a license object and reference it
                     licence_ref = self.create_type(

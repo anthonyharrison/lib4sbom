@@ -267,6 +267,14 @@ class LicenseScanner:
             return self.get_license_text(exception_id)
         return ""
 
+    def get_exception_url(self, exception_id):
+        # Assume that exception_id is a valid id
+        for exception in self.exceptions.get("exceptions", []):
+            # Comparisons ignore case of provided exception text
+            if exception["licenseExceptionId"] == exception_id:
+                return exception["seeAlso"][0]
+        return None
+
     def get_license_type(self, license):
         # Default is UNKNOWN
         license_id = self.find_license_id(license)
