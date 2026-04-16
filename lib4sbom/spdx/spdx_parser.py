@@ -796,6 +796,16 @@ class SPDXParser:
                     licence_list_version = element.get(
                         "simplelicensing_licenseListVersion"
                     )
+            elif element_type == "expandedlicensing_ListedLicense":
+                licence_expression[element_id] = element.get(
+                    "simplelicensing_licenseText"
+                )
+            elif element_type == "expandedlicensing_ListedLicenseException":
+                licence_expression[element_id] = element.get(
+                    "expandedlicensing_additionText"
+                )
+            elif element_type == "expandedlicensing_WithAdditionOperator":
+                licence_expression[element_id] = f'{licence_expression[element.get("expandedlicensing_subjectExtendableLicense")]} WITH {licence_expression[element.get("expandedlicensing_subjectAddition")]}'
 
         # Look for metadata
         # Should alays have softwareSbom element, but just in case...

@@ -138,7 +138,7 @@ class SPDX3Generator:
             "name": project_name,
             "dataLicense": data_licence_id,
             "rootElement": [bom_id],
-            "profileConformance": ["core", "software", "security", "simpleLicensing"],
+            "profileConformance": ["core", "software", "security", "simpleLicensing", "expandedLicensing"],
         }
         self.create_type("SpdxDocument", document_properties)
 
@@ -258,26 +258,37 @@ class SPDX3Generator:
                 license_details = {}
                 license_details["relationshipType"] = license_attributes[key]
                 # Detect if a valid SPDX license. Licence expressions are ignored
-                licence_url = True
+                licence_url = None
                 if not self.license.license_expression(component_details[key]):
-                    licence_id = self.license.find_license_id(component_details[key])
-                    licence_url = self.license.get_license_url(licence_id)
                     if self.license.license_exception(component_details[key]):
-                        # "type": "expandedlicensing_WithAdditionOperator",
-                        # "expandedlicensing_subjectAddition": "http://spdx.org/licenses/LLVM-exception",
-                        # "expandedlicensing_subjectExtendableLicense": "http://spdx.org/licenses/Apache-2.0",
-                        licence_url = self.license.get_license_url(licence_id)
+                        licence_type = "expandedlicensing_ListedLicense"
+                        licence_type_data = {
+                            "simplelicensing_licenseText":self.license.get_license_from_exception(component_details[key]),
+                        }
+                        licence_url_ref = self.create_type(licence_type, licence_type_data)
                         exception_id = self.license.get_exception(component_details[key])
-                        exception_url = self.licence.get_exception_url(exception_id)
-                if licence_url is not None:
-                    # create a license object and reference it
-                    licence_ref = self.create_type(
-                        "simplelicensing_LicenseExpression",
-                        {
+                        exception_url = self.license.get_exception_url(exception_id)
+                        licence_type = "expandedlicensing_ListedLicenseException"
+                        licence_type_data = {
+                            "expandedlicensing_additionText": self.license.get_exception(component_details[key])
+                        }
+                        licence_exception_url_ref = self.create_type(licence_type, licence_type_data)
+                        licence_type="expandedlicensing_WithAdditionOperator"
+                        licence_type_data = {
+                            "expandedlicensing_subjectExtendableLicense": licence_url_ref,
+                            "expandedlicensing_subjectAddition": licence_exception_url_ref,
+                        }
+                        licence_url = True
+                    else:
+                        licence_id = self.license.find_license_id(component_details[key])
+                        licence_url = self.license.get_license_url(licence_id)
+                        licence_type = "simplelicensing_LicenseExpression"
+                        licence_type_data = {
                             "simplelicensing_licenseExpression": component_details[key],
                             "simplelicensing_licenseListVersion": self.license_list_id,
-                        },
-                    )
+                        }
+                if licence_url is not None:
+                    licence_ref = self.create_type(licence_type, licence_type_data)
                     license_details["to"] = [licence_ref]
                 else:
                     license_details["to"] = [

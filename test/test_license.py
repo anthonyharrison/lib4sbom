@@ -70,7 +70,7 @@ class TestLicenseScanner:
         ),
     )
 
-    def test_license_expresiion(self, expression, expected_result):
+    def test_license_expresion(self, expression, expected_result):
         tm = test_module()
         result = tm.license_expression(expression)
         assert result == expected_result
@@ -115,6 +115,8 @@ class TestLicenseScanner:
         assert result is None
         result = tm.get_license_url("MIT")
         assert result.startswith("http")
+        result = tm.get_license_url("Apache-2.0 WITH LLVM-exception")
+        assert result.startswith("http")
 
     def test_osi_approvedt(self):
         tm = test_module()
@@ -124,6 +126,16 @@ class TestLicenseScanner:
         assert result is False
         result = tm.osi_approved("MIT")
         assert result == True
+
+    def test_get_license_from_exception(self):
+        tm = test_module()
+        result = tm.get_license_from_exception("NotALicence")
+        assert result == None
+        result = tm.get_license_from_exception("Apache-2.0")
+        assert result is None
+        result = tm.get_license_from_exception("Apache-2.0 WITH LLVM-exception")
+        assert result == "Apache-2.0"
+
 
     def test_get_exception(self):
         tm = test_module()
@@ -170,9 +182,10 @@ class TestLicenseScanner:
         (
             ("", False),
             ("AGPL-3.0", True),
-            ("MIT",True),
+            ("MIT", True),
             ("UnKNOWN", False),
             ("Apache 2.0", False),
+            ("Apache-2.0 WITH LLVM-exception", False)
         ),
     )
     def test_valid_SPDX_id (self, spdxid, expected_result):

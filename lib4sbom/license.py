@@ -130,6 +130,9 @@ class LicenseScanner:
 
     def get_license_url(self, license_id):
         # Assume that license_id is a valid SPDX id
+        if self.license_exception(license_id):
+            # Extract license
+            license_id = license_id.split(" ")[0]
         if license_id != self.DEFAULT_LICENSE:
             for lic in self.get_license_list():
                 # License URL is in the seeAlso field.
@@ -239,6 +242,14 @@ class LicenseScanner:
                 return exception["licenseExceptionId"]
             elif exception["name"].lower() == exception_id.lower():
                 return exception["licenseExceptionId"]
+        return None
+
+    def get_license_from_exception(self, license):
+        if self.license_exception(license):
+            updated_license = self._update_exception(license)
+            license_id = self._validate_license(updated_license.split(" WITH ")[0])
+            if license_id != self.DEFAULT_LICENSE:
+                return license_id
         return None
 
     def exception_processing(self, license):
