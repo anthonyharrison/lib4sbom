@@ -805,8 +805,13 @@ class SPDXParser:
                     "expandedlicensing_additionText"
                 )
             elif element_type == "expandedlicensing_WithAdditionOperator":
-                licence_expression[element_id] = f'{licence_expression[element.get("expandedlicensing_subjectExtendableLicense")]} WITH {licence_expression[element.get("expandedlicensing_subjectAddition")]}'
-
+                licence_expression[element_id] = (
+                    f'{licence_expression[element.get("expandedlicensing_subjectExtendableLicense")]} WITH {licence_expression[element.get("expandedlicensing_subjectAddition")]}'
+                )
+            elif element_type == "expandedlicensing_OrLaterOperator":
+                licence_expression[element_id] = (
+                    f'{licence_expression[element.get("expandedlicensing_subjectLicense")]}+'
+                )
         # Look for metadata
         # Should alays have softwareSbom element, but just in case...
         if doc_id is not None:

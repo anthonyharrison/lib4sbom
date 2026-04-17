@@ -138,7 +138,13 @@ class SPDX3Generator:
             "name": project_name,
             "dataLicense": data_licence_id,
             "rootElement": [bom_id],
-            "profileConformance": ["core", "software", "security", "simpleLicensing", "expandedLicensing"],
+            "profileConformance": [
+                "core",
+                "software",
+                "security",
+                "simpleLicensing",
+                "expandedLicensing",
+            ],
         }
         self.create_type("SpdxDocument", document_properties)
 
@@ -200,7 +206,14 @@ class SPDX3Generator:
             # Extract details of the supplier. Assume format is name (email address)
             pattern = r"^(.*?)(?:\s*\((.*?)\))?\s*$"
             if len(supplier) > 1:
-                match = re.search(pattern, supplier[1])
+                supplier_type = supplier[0].capitalize()
+                # Capture all data after supplier type
+                supplier_name = (
+                    component_details["supplier"][len(supplier_type) + 1 :]
+                    .strip()
+                    .rstrip("\n")
+                )
+                match = re.search(pattern, supplier_name)
                 if match:
                     name = match.group(1).strip()
                     email = match.group(2)
@@ -212,9 +225,7 @@ class SPDX3Generator:
                             "externalIdentifierType": "email",
                         }
                         supplier_info["externalIdentifier"] = [ext_id]
-                    supplier_id = self.create_type(
-                        supplier[0].capitalize(), supplier_info
-                    )
+                    supplier_id = self.create_type(supplier_type, supplier_info)
             else:
                 # NOASSERTION
                 supplier_id = self.create_type("Agent", {"name": supplier[0]})
@@ -263,24 +274,49 @@ class SPDX3Generator:
                     if self.license.license_exception(component_details[key]):
                         licence_type = "expandedlicensing_ListedLicense"
                         licence_type_data = {
-                            "simplelicensing_licenseText":self.license.get_license_from_exception(component_details[key]),
+                            "simplelicensing_licenseText": self.license.get_license_from_exception(
+                                component_details[key]
+                            ),
                         }
-                        licence_url_ref = self.create_type(licence_type, licence_type_data)
-                        exception_id = self.license.get_exception(component_details[key])
-                        exception_url = self.license.get_exception_url(exception_id)
+                        licence_url_ref = self.create_type(
+                            licence_type, licence_type_data
+                        )
+                        exception_id = self.license.get_exception(
+                            component_details[key]
+                        )
                         licence_type = "expandedlicensing_ListedLicenseException"
                         licence_type_data = {
-                            "expandedlicensing_additionText": self.license.get_exception(component_details[key])
+                            "expandedlicensing_additionText": exception_id
                         }
-                        licence_exception_url_ref = self.create_type(licence_type, licence_type_data)
-                        licence_type="expandedlicensing_WithAdditionOperator"
+                        licence_exception_url_ref = self.create_type(
+                            licence_type, licence_type_data
+                        )
+                        licence_type = "expandedlicensing_WithAdditionOperator"
                         licence_type_data = {
                             "expandedlicensing_subjectExtendableLicense": licence_url_ref,
                             "expandedlicensing_subjectAddition": licence_exception_url_ref,
                         }
                         licence_url = True
+                    elif self.license.orlater(component_details[key]):
+                        licence_type = "expandedlicensing_ListedLicense"
+                        # Need to remove the '+' from the license identifier
+                        licence_type_data = {
+                            "simplelicensing_licenseText": self.license.find_license_id(
+                                component_details[key]
+                            )[:-1],
+                        }
+                        licence_url_ref = self.create_type(
+                            licence_type, licence_type_data
+                        )
+                        licence_type = "expandedlicensing_OrLaterOperator"
+                        licence_type_data = {
+                            "expandedlicensing_subjectLicense": licence_url_ref,
+                        }
+                        licence_url = True
                     else:
-                        licence_id = self.license.find_license_id(component_details[key])
+                        licence_id = self.license.find_license_id(
+                            component_details[key]
+                        )
                         licence_url = self.license.get_license_url(licence_id)
                         licence_type = "simplelicensing_LicenseExpression"
                         licence_type_data = {

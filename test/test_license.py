@@ -49,8 +49,9 @@ class TestLicenseScanner:
             ("LicenseRef-MyLic", "LicenseRef-MyLic"),
             ("GPL2+", "GPL-2.0-or-later"),
             ("wxWindows","wxWindows"),  # Deprecated license
-            #("Apache-1.0+", "Apache-1.0+"),
-
+            ("Apache-1.0+", "Apache-1.0+"),
+            ("NotALicence+", "NOASSERTION"),
+            ("Apache-1.0+ WITH LLVM-exception", "Apache-1.0+ WITH LLVM-exception"),
         ),
     )
     def test_license(self, license, expected_result):
@@ -67,6 +68,7 @@ class TestLicenseScanner:
             ("MIT AND Apache-2.0", True),
             ("MIT", False),
             ("Apache-2.0 with LLVM Exception", False),
+            ("MIT AND Apache-1.0+", True),
         ),
     )
 
@@ -83,12 +85,25 @@ class TestLicenseScanner:
             ("MIT AND Apache-2.0", False),
             ("MIT", False),
             ("Apache-2.0 with LLVM-exception", True),
+            ("Apache-1.0+ WITH LLVM-exception", True),
         ),
     )
 
     def test_license_exception(self, exception, expected_result):
         tm = test_module()
         result = tm.license_exception(exception)
+        assert result == expected_result
+
+    @pytest.mark.parametrize(
+        "license, expected_result",
+        (
+            ("MIT", False),
+            ("Apache-1.0+", True),
+        ),
+    )
+    def test_orlater(self, license, expected_result):
+        tm = test_module()
+        result = tm.orlater(license)
         assert result == expected_result
 
     # Get routines
@@ -99,12 +114,16 @@ class TestLicenseScanner:
         assert len(result) == 0
         result = tm.get_license_text("MIT")
         assert len(result) > 0
+        result = tm.get_license_text("Apache-1.0+")
+        assert len(result) > 0
 
     def test_get_license_name(self):
         tm = test_module()
         result = tm.get_license_name("NotALicence")
         assert result == ""
         result = tm.get_license_name("MIT")
+        assert result == "MIT License"
+        result = tm.get_license_name("MIT+")
         assert result == "MIT License"
 
     def test_get_license_url(self):
@@ -117,14 +136,20 @@ class TestLicenseScanner:
         assert result.startswith("http")
         result = tm.get_license_url("Apache-2.0 WITH LLVM-exception")
         assert result.startswith("http")
+        result = tm.get_license_url("Apache-1.0+")
+        assert result.startswith("http")
 
-    def test_osi_approvedt(self):
+    def test_osi_approved(self):
         tm = test_module()
         result = tm.osi_approved("NotALicence")
         assert result == False
         result = tm.osi_approved("UNKNOWN")
         assert result is False
         result = tm.osi_approved("MIT")
+        assert result == True
+        result = tm.osi_approved("Apache-1.0")
+        assert result == False
+        result = tm.osi_approved("MIT+")
         assert result == True
 
     def test_get_license_from_exception(self):
@@ -135,6 +160,8 @@ class TestLicenseScanner:
         assert result is None
         result = tm.get_license_from_exception("Apache-2.0 WITH LLVM-exception")
         assert result == "Apache-2.0"
+        result = tm.get_license_from_exception("Apache-1.0+")
+        assert result is None
 
 
     def test_get_exception(self):
@@ -145,6 +172,8 @@ class TestLicenseScanner:
         assert result is None
         result = tm.get_exception("Apache-2.0 WITH LLVM-exception")
         assert result == "LLVM-exception"
+        result = tm.get_exception("Apache-1.0+")
+        assert result is None
 
     def test_get_exception_text(self):
         tm = test_module()
@@ -152,10 +181,14 @@ class TestLicenseScanner:
         assert len(result) == 0
         result = tm.get_exception_text("LLVM-exception")
         assert len(result) > 0
+        result = tm.get_exception_text("Apache-1.0+")
+        assert len(result) == 0
 
     def test_get_exception_url(self):
         tm = test_module()
         result = tm.get_exception_url("Apache-2.0")
+        assert result is None
+        result = tm.get_exception_url("Apache-1.0+")
         assert result is None
         result = tm.get_exception_url("LLVM-exception")
         assert result.startswith("http")
@@ -170,6 +203,7 @@ class TestLicenseScanner:
             (["MIT","Apache-2.0"], "permissive"),
             (["MIT","GPL-3.0+"], "copyleft"),
             (["Apache-2.0 WITH LLVM-exception"], "permissive"),
+            (["Apache-1.0+"], "permissive"),
         ),
     )
     def test_get_license_category(self, license, expected_result):
@@ -185,7 +219,8 @@ class TestLicenseScanner:
             ("MIT", True),
             ("UnKNOWN", False),
             ("Apache 2.0", False),
-            ("Apache-2.0 WITH LLVM-exception", False)
+            ("Apache-2.0 WITH LLVM-exception", False),
+            ("Apache-1.0+", False),
         ),
     )
     def test_valid_SPDX_id (self, spdxid, expected_result):
@@ -200,6 +235,7 @@ class TestLicenseScanner:
             ("MIT or Apache-2.0", ["MIT", "Apache-2.0"]),
             ("MIT And Apache-2.0", ["MIT", "Apache-2.0"]),
             ("MIT AND Apache-2.0", ["MIT", "Apache-2.0"]),
+            ("MIT AND Apache-1.0+", ["MIT", "Apache-1.0+"]),
             ("MIT", ["MIT"]),
             ("MIT AND NotALicence", ["MIT", "NOASSERTION"]),
             ("Apache-2.0 with LLVM Exception", ["Apache-2.0 WITH LLVM-exception"]),
