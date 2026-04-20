@@ -715,7 +715,7 @@ class CycloneDXGenerator:
                 component["properties"] = [property_entry]
         if "validUntilDate" in package:
             property_entry = dict()
-            property_entry["name"] = "validUntilDate"
+            property_entry["name"] = "c2a:end_of_life"
             property_entry["value"] = package["validUntilDate"]
             if "properties" in component:
                 component["properties"].append(property_entry)

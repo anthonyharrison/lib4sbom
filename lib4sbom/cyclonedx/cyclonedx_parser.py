@@ -603,7 +603,7 @@ class CycloneDXParser:
                         self.cyclonedx_package.set_value(
                             "build_date", property["value"]
                         )
-                    elif property["name"] == "validUntilDate":
+                    elif property["name"] == "c2a:end_of_life":
                         self.cyclonedx_package.set_value(
                             "validUntilDate", property["value"]
                         )
@@ -1074,7 +1074,7 @@ class CycloneDXParser:
                     self.cyclonedx_package.set_value("release_date", value)
                 elif params["name"] == "build_date":
                     self.cyclonedx_package.set_value("build_date", value)
-                elif params["name"] == "validUntilDate":
+                elif params["name"] == "c2a:end_of_life":
                     self.cyclonedx_package.set_value("validUntilDate", value)
                 else:
                     self.cyclonedx_package.set_property(params["name"], value)
