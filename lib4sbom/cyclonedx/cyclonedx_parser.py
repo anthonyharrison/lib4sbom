@@ -639,8 +639,13 @@ class CycloneDXParser:
                 self.cyclonedx_package.set_value(
                     "crypto", self.crypto.get_cryptography()
                 )
-            # Save package metadata
-            self.packages[(package, version)] = self.cyclonedx_package.get_package()
+            # Save package metadata. Use bom-ref as the key when present so
+            # that components sharing (name, version) but differing in group
+            # (e.g. npm scoped packages @types/cookie vs cookie) don't
+            # overwrite each other. Falls back to (name, version) when a
+            # bom-ref isn't provided.
+            key = bom_ref if bom_ref else (package, version)
+            self.packages[key] = self.cyclonedx_package.get_package()
             self.id[bom_ref] = package
             # Handle component assemblies
             if "components" in d:
@@ -1089,8 +1094,11 @@ class CycloneDXParser:
                 elif ref_type == "distribution":
                     self.cyclonedx_package.set_downloadlocation(ref_url)
 
-        # Save package metadata
-        self.packages[(package, version)] = self.cyclonedx_package.get_package()
+        # Save package metadata. Use bom-ref as the key when present so that
+        # components sharing (name, version) but differing in group don't
+        # overwrite each other. Falls back to (name, version) otherwise.
+        key = bom_ref if bom_ref else (package, version)
+        self.packages[key] = self.cyclonedx_package.get_package()
         self.id[bom_ref] = package
         # Handle component assembly
         for components in component.findall(self.schema + "components"):

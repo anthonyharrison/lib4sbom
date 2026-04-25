@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import re
 import uuid
 from datetime import datetime
 
@@ -133,18 +134,24 @@ class SPDXGenerator:
                 return f"SBOM Type: {lifecycle.capitalize()} - {default_text}"
         return default_text
 
+    def _safe_project_name(self, project_name):
+        # Document namespace is an IRI; strip characters that aren't allowed
+        # so paths like "C:\Users\..." don't poison it.
+        return re.sub(r"[^A-Za-z0-9.\-_]+", "-", project_name).strip("-.") or "project"
+
     def generateTagDocumentHeader(self, project_name, uuid=None, lifecycle=None):
         # Geerate SPDX Document Header
         self.generateTag("SPDXVersion", self.spdx_version)
         self.generateTag("DataLicense", self.DATA_LICENSE)
         self.generateTag("SPDXID", self.SPDX_PROJECT_ID)
-        # Project name mustn't have spaces in. Covert spaces to '-'
-        self.generateTag("DocumentName", project_name.replace(" ", "-"))
+        # SPDX 2.3 spec: DocumentName is a "single line of text" with no
+        # character restrictions — spaces are allowed.
+        self.generateTag("DocumentName", project_name)
         if uuid is None or uuid.startswith("urn:uuid:"):
             self.generateTag(
                 "DocumentNamespace",
                 self.SPDX_NAMESPACE
-                + project_name.replace(" ", "-")
+                + self._safe_project_name(project_name)
                 + "-"
                 + self._uuid(uuid),
             )
@@ -188,13 +195,14 @@ class SPDXGenerator:
         creation_info["created"] = self.generateTime()
         creation_info["licenseListVersion"] = self.license.get_license_version()
         self.doc["creationInfo"] = creation_info
-        # Project name mustn't have spaces in. Covert spaces to '-'
-        self.doc["name"] = project_name.replace(" ", "-")
+        # SPDX 2.3 spec: DocumentName is a "single line of text" with no
+        # character restrictions — spaces are allowed.
+        self.doc["name"] = project_name
         self.doc["dataLicense"] = self.DATA_LICENSE
         if uuid is None or uuid.startswith("urn:uuid:"):
             self.doc["documentNamespace"] = (
                 self.SPDX_NAMESPACE
-                + project_name.replace(" ", "-")
+                + self._safe_project_name(project_name)
                 + "-"
                 + self._uuid(uuid)
             )
@@ -605,7 +613,13 @@ class SPDXGenerator:
                             ref_value = purl_validator.fix()
                     reference_data = dict()
                     reference_data["referenceCategory"] = reference[0].replace("_", "-")
-                    reference_data["referenceType"] = reference[1]
+                    ref_type = reference[1]
+                    # SPDX requires referenceType to be a full IRI when the
+                    # category is OTHER. CycloneDX types like "issue-tracker"
+                    # arrive as bare tokens; wrap them so RDF serializers accept.
+                    if reference_data["referenceCategory"] == "OTHER" and ref_type and "://" not in ref_type:
+                        ref_type = "http://spdx.org/spdxdocs/external-references#" + ref_type
+                    reference_data["referenceType"] = ref_type
                     reference_data["referenceLocator"] = ref_value
                     if "externalRefs" in component:
                         component["externalRefs"].append(reference_data)

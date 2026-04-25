@@ -534,7 +534,13 @@ class SPDX3Generator:
                             ref_value = purl_validator.fix()
                     reference_data = dict()
                     reference_data["referenceCategory"] = reference[0].replace("_", "-")
-                    reference_data["referenceType"] = reference[1]
+                    ref_type = reference[1]
+                    # SPDX requires referenceType to be a full IRI when the
+                    # category is OTHER. CycloneDX types like "issue-tracker"
+                    # arrive as bare tokens; wrap them so RDF serializers accept.
+                    if reference_data["referenceCategory"] == "OTHER" and ref_type and "://" not in ref_type:
+                        ref_type = "http://spdx.org/spdxdocs/external-references#" + ref_type
+                    reference_data["referenceType"] = ref_type
                     reference_data["referenceLocator"] = ref_value
                     if "externalRefs" in component:
                         component["externalRefs"].append(reference_data)
