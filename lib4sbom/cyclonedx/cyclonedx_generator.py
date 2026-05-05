@@ -865,7 +865,7 @@ class CycloneDXGenerator:
                     version_info["version"] = component_version
                     version_info["status"] = "affected"
                 if len(version_info) > 0:
-                    affected["versions"] = version_info
+                    affected["versions"] = [version_info]
                 affects.append(affected)
                 vulnerability["affects"] = affects
             # Add properties for any user defined items
