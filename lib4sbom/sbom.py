@@ -60,6 +60,10 @@ class SBOM:
     def set_type(self, sbom_type):
         self.sbom["type"] = sbom_type
 
+    def set_format(self, sbom_format):
+        if sbom_format.lower() in ["json", "xml", "tag", "jsonld", "yml", "rdf"]:
+            self.sbom["format"] = sbom_format.lower()
+
     def set_version(self, version):
         self.sbom["version"] = version
 
@@ -116,6 +120,9 @@ class SBOM:
 
     def get_type(self) -> str:
         return self.sbom.get("type", "")
+
+    def get_format(self) -> str:
+        return self.sbom.get("format", "")
 
     def get_uuid(self):
         return self.sbom.get("uuid", None)

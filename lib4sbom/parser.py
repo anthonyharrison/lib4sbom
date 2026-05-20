@@ -170,6 +170,7 @@ class SBOMParser:
             if len(self.licenses) > 0:
                 self.sbom.add_licenses(self.licenses)
             self.sbom.set_type(self.sbom_type)
+            self.sbom.set_format(self.set_format(parser_type))
         except KeyError:
             if self.debug:
                 print("Key Error")
@@ -181,6 +182,21 @@ class SBOMParser:
 
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type
+
+    def set_format(self, parser_type: ParserType) -> str:
+        if parser_type == ParserType.CYCLONEDX_JSON or parser_type == ParserType.SPDX_JSON or parser_type == ParserType.JSON:
+            return "json"
+        elif parser_type ==  ParserType.CYCLONEDX_XML or parser_type == ParserType.SPDX_XML:
+            return "xml"
+        elif parser_type == ParserType.SPDX_TAG:
+            return "tag"
+        elif parser_type == ParserType.SPDX_JSONLD:
+            return "jsonld"
+        elif parser_type == ParserType.SPDX_YML:
+            return "yml"
+        elif parser_type == ParserType.SPDX_RDF:
+            return "rdf"
+        return "unknown"
 
     def get_sbom(self) -> SBOMData:
         """Return the constituent components of SBOM
@@ -197,6 +213,14 @@ class SBOMParser:
         SBOMtype : string
         """
         return self.sbom.get_type()
+
+    def get_format(self) -> str:
+        """Return the format of SBOM
+        Returns
+        -------
+        SBOMformat : string
+        """
+        return self.sbom.get_format()
 
     def get_files(self) -> List[Dict]:
         """Returns the file elements from within a parsed SBOM
