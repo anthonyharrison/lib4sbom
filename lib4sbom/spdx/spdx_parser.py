@@ -28,6 +28,16 @@ class SPDXParser:
         self.user_licences = []
         self.license_scanner = LicenseScanner()
         self.debug = False
+        self.parsed = {
+            "document" : {},
+            "files" : {},
+            "packages" : {},
+            "relationships" : [],
+            "vulnerabilities" : [],
+            "services": [],
+            "licences" : [],
+            "definitions": [],
+        }
 
     def parse(self, sbom_string: str, parser_type: ParserType = None):
         """parses SPDX SBOM string"""
@@ -92,15 +102,16 @@ class SPDXParser:
             lines = sbom_string.splitlines()
             return self.parse_spdx_tag(lines)
 
-        return (
-            {},
-            {},
-            {},
-            [],
-            self.vulnerabilities,
-            self.services,
-            self.user_licences,
-        )
+        # return (
+        #     {},
+        #     {},
+        #     {},
+        #     [],
+        #     self.vulnerabilities,
+        #     self.services,
+        #     self.user_licences,
+        # )
+        return self.parsed
 
     def get_lifecycle(self, comment):
         # Use to extract lifecycle from comment. Assumes follows OpenChain telco format
@@ -416,15 +427,23 @@ class SPDXParser:
                 packages[package_tuple] = spdx_package.get_package()
         if spdx_licenses.get_id() is not None:
             self.user_licences.append(spdx_licenses.get_license())
-        return (
-            spdx_document,
-            files,
-            packages,
-            self._transform_relationship(relationships, elements),
-            self.vulnerabilities,
-            self.services,
-            self.user_licences,
-        )
+        self.parsed["document"] = spdx_document
+        self.parsed["files"] = files
+        self.parsed["packages"] = packages
+        self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["vulnerabilities"] = self.vulnerabilities
+        self.parsed["services"] = self.services
+        self.parsed["licences"] = self.user_licences
+        return self.parsed
+        # return (
+        #     spdx_document,
+        #     files,
+        #     packages,
+        #     self._transform_relationship(relationships, elements),
+        #     self.vulnerabilities,
+        #     self.services,
+        #     self.user_licences,
+        # )
 
     def _parse_spdx_data(self, data):
         packages = {}
@@ -630,15 +649,23 @@ class SPDXParser:
                         d["relatedSpdxElement"],
                     )
                     relationships.append(spdx_relationship.get_relationship())
-        return (
-            spdx_document,
-            files,
-            packages,
-            self._transform_relationship(relationships, elements),
-            self.vulnerabilities,
-            self.services,
-            self.user_licences,
-        )
+        self.parsed["document"] = spdx_document
+        self.parsed["files"] = files
+        self.parsed["packages"] = packages
+        self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["vulnerabilities"] = self.vulnerabilities
+        self.parsed["services"] = self.services
+        self.parsed["licences"] = self.user_licences
+        return self.parsed
+        # return (
+        #     spdx_document,
+        #     files,
+        #     packages,
+        #     self._transform_relationship(relationships, elements),
+        #     self.vulnerabilities,
+        #     self.services,
+        #     self.user_licences,
+        # )
 
     def _transform_relationship(self, relationship_list, element_mapping):
         # Translate element ids in each relationship to element name
@@ -686,15 +713,23 @@ class SPDXParser:
                     continue
                 version = version_match.group(1)
                 packages[(package, version)] = {"name": package, "version": version}
-        return (
-            {},
-            {},
-            packages,
-            [],
-            self.vulnerabilities,
-            self.services,
-            self.user_licences,
-        )
+        # self.parsed["document"] = spdx_document
+        # self.parsed["files"] = files
+        self.parsed["packages"] = packages
+        # self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["vulnerabilities"] = self.vulnerabilities
+        self.parsed["services"] = self.services
+        self.parsed["licences"] = self.user_licences
+        return self.parsed
+        # return (
+        #     {},
+        #     {},
+        #     packages,
+        #     [],
+        #     self.vulnerabilities,
+        #     self.services,
+        #     self.user_licences,
+        # )
 
     def parse_spdx_xml(self, schema: str, packages_list: list):
         # parses SPDX XML BOM file extracting package name and version ONLY
@@ -715,15 +750,23 @@ class SPDXParser:
             if version is None:
                 continue
             packages[(package, version)] = {"name": package, "version": version}
-        return (
-            {},
-            {},
-            packages,
-            [],
-            self.vulnerabilities,
-            self.services,
-            self.user_licences,
-        )
+        # self.parsed["document"] = spdx_document
+        # self.parsed["files"] = files
+        self.parsed["packages"] = packages
+        # self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["vulnerabilities"] = self.vulnerabilities
+        self.parsed["services"] = self.services
+        self.parsed["licences"] = self.user_licences
+        return self.parsed
+        # return (
+        #     {},
+        #     {},
+        #     packages,
+        #     [],
+        #     self.vulnerabilities,
+        #     self.services,
+        #     self.user_licences,
+        # )
 
     def _parse_spdx3_data(self, data):
         packages = {}
@@ -990,12 +1033,20 @@ class SPDXParser:
                             print(f"Duplicate package detected {name} {version}")
                     else:
                         packages[package_tuple] = spdx_package.get_package()
-        return (
-            spdx_document,
-            files,
-            packages,
-            self._transform_relationship(relationships, elements),
-            self.vulnerabilities,
-            self.services,
-            self.user_licences,
-        )
+        self.parsed["document"] = spdx_document
+        self.parsed["files"] = files
+        self.parsed["packages"] = packages
+        self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["vulnerabilities"] = self.vulnerabilities
+        self.parsed["services"] = self.services
+        self.parsed["licences"] = self.user_licences
+        return self.parsed
+        # return (
+        #     spdx_document,
+        #     files,
+        #     packages,
+        #     self._transform_relationship(relationships, elements),
+        #     self.vulnerabilities,
+        #     self.services,
+        #     self.user_licences,
+        # )

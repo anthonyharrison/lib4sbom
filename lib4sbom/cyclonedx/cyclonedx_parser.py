@@ -8,6 +8,7 @@ import uuid
 import defusedxml.ElementTree as ET
 
 from lib4sbom.data.cryptography import SBOMCryptography
+from lib4sbom.data.definition import SBOMDefinition
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
@@ -32,6 +33,16 @@ class CycloneDXParser:
         self.crypto = SBOMCryptography()
         self.cyclonedx_version = None
         self.license_scanner = LicenseScanner()
+        self.parsed = {
+            "document" : {},
+            "files" : {},
+            "packages" : {},
+            "relationships" : [],
+            "vulnerabilities" : [],
+            "services": [],
+            "licences" : [],
+            "definitions": [],
+        }
 
     def parse(self, sbom_string: str, parser_type: ParserType = None):
         """parses CycloneDX BOM string extracting package name, version and license"""
@@ -60,7 +71,8 @@ class CycloneDXParser:
             except ET.ParseError:
                 pass
 
-        return {}, {}, {}, [], [], [], []
+        return self.parsed
+        # return {}, {}, {}, [], [], [], []
 
     def _governance_element(self, element):
         elements = []
@@ -649,6 +661,7 @@ class CycloneDXParser:
         relationship_type = " DESCRIBES "
         vulnerabilities = []
         services = []
+        definitions = []
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         try:
@@ -915,20 +928,70 @@ class CycloneDXParser:
                         service_id = service_id + 1
                     if self.debug:
                         print(services)
+                if "definitions" in data:
+                    if self.debug:
+                        print("Processing Definitions")
+                    if "standards" in data["definitions"]:
+                        definition_info = SBOMDefinition()
+                        definition_id = 1
+                        for definition in data["definitions"]["standards"]:
+                            definition_info.initialise()
+                            definition_info.set_id(
+                                definition.get("bom-ref", f"CycloneDX-Definition-{definition_id}")
+                            )
+                            definition_info.set_name(definition.get("name"))
+                            definition_info.set_version(definition.get("version"))
+                            definition_info.set_description(definition.get("description"))
+                            definition_info.set_owner(definition.get("owner"))
+                            if "requirements" in definition:
+                                for requirement in definition["requirements"]:
+                                    requirement_id = requirement.get("identifier")
+                                    requirement_title = requirement.get("title")
+                                    requirement_text = requirement.get("text")
+                                    parent = requirement.get("parent")
+                                    definition_info.set_requirement(requirement_id, requirement_title, requirement_text, parent)
+                            if "levels" in definition:
+                                for level in definition["levels"]:
+                                    level_id = level.get("identifier")
+                                    level_title = level.get("title")
+                                    level_description = level.get("description")
+                                    level_requirements = level.get("requirements")
+                                    definition_info.set_level(level_id, level_title, level_description, level_requirements)
+                            if "externalReferences" in definition:
+                                for reference in definition["externalReferences"]:
+                                    url = reference.get("url")
+                                    external_type = reference.get("type")
+                                    comment = reference.get("comment", "")
+                                    definition_info.set_externalreference(
+                                        external_type, url, comment=comment
+                                    )
+                            definitions.append(definition_info.get_definition())
+                            definition_id = definition_id + 1
+                        if self.debug:
+                            print(definitions)                               
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
             if self.debug:
                 print("[ERROR] Unable to process file.")
             raise SBOMParserException
-        return (
-            cyclonedx_document,
-            files,
-            self.packages,
-            relationships,
-            vulnerabilities,
-            services,
-            self.licences,
-        )
+        self.parsed["document"] = cyclonedx_document
+        self.parsed["files"] = files
+        self.parsed["packages"] = self.packages
+        self.parsed["relationships"] = relationships
+        self.parsed["vulnerabilities"] = vulnerabilities
+        self.parsed["services"] = services
+        self.parsed["licences"] = self.licences
+        self.parsed["definitions"] = definitions
+        return self.parsed
+        # return (
+        #     cyclonedx_document,
+        #     files,
+        #     self.packages,
+        #     relationships,
+        #     vulnerabilities,
+        #     services,
+        #     self.licences,
+        # )
 
     def _parse_component(self, component_element):
         """Parses a CycloneDX component element and returns a dictionary of its contents."""
@@ -1135,12 +1198,20 @@ class CycloneDXParser:
         dependencies = self.parse_dependencies_xml()
         vulnerabilities = self.parse_vulnerabilities_xml()
         services = self.parse_services_xml()
-        return (
-            document,
-            {},
-            self.packages,
-            dependencies,
-            vulnerabilities,
-            services,
-            self.licences,
-        )
+        self.parsed["document"] = document
+        # self.parsed["files"] = {}}
+        self.parsed["packages"] = self.packages
+        self.parsed["relationships"] = dependencies
+        self.parsed["vulnerabilities"] = vulnerabilities
+        self.parsed["services"] = services
+        self.parsed["licences"] = self.licences
+        return self.parsed
+        # return (
+        #     document,
+        #     {},
+        #     self.packages,
+        #     dependencies,
+        #     vulnerabilities,
+        #     services,
+        #     self.licences,
+        # )

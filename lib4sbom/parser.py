@@ -35,6 +35,7 @@ class SBOMParser:
         self.vulnerabilities = None
         self.services = None
         self.licenses = None
+        self.definitions = None
         self.sbom = SBOM(self.sbom_type)
 
     def parse_file(self, filename: str) -> None:
@@ -122,15 +123,24 @@ class SBOMParser:
                 # Work out the SBOM type for file
                 # Assume SPDX...
                 self.sbom_type = "spdx"
-                (
-                    self.document,
-                    self.files,
-                    self.packages,
-                    self.relationships,
-                    self.vulnerabilities,
-                    self.services,
-                    self.licenses,
-                ) = self.parser.parse(sbom_string, parser_type)
+                # (
+                #     self.document,
+                #     self.files,
+                #     self.packages,
+                #     self.relationships,
+                #     self.vulnerabilities,
+                #     self.services,
+                #     self.licenses,
+                # ) = self.parser.parse(sbom_string, parser_type)
+                parsed = self.parser.parse(sbom_string, parser_type)
+                self.document = parsed["document"]
+                self.files = parsed["files"]
+                self.packages = parsed["packages"]
+                self.relationships = parsed["relationships"]
+                self.vulnerabilities = parsed["vulnerabilities"]
+                self.services = parsed["services"]
+                self.licenses = parsed["licences"]
+                self.definitions = parsed["definitions"]
                 # but if no packages or files found, assume it must be CycloneDX
                 if (
                     len(self.packages) == 0
@@ -139,25 +149,43 @@ class SBOMParser:
                 ):
                     self.sbom_type = "cyclonedx"
                     self.parser = CycloneDXParser()
-                    (
-                        self.document,
-                        self.files,
-                        self.packages,
-                        self.relationships,
-                        self.vulnerabilities,
-                        self.services,
-                        self.licenses,
-                    ) = self.parser.parse(sbom_string, parser_type)
+                    # (
+                    #     self.document,
+                    #     self.files,
+                    #     self.packages,
+                    #     self.relationships,
+                    #     self.vulnerabilities,
+                    #     self.services,
+                    #     self.licenses,
+                    # ) = self.parser.parse(sbom_string, parser_type)
+                    parsed = self.parser.parse(sbom_string, parser_type)
+                    self.document = parsed["document"]
+                    self.files = parsed["files"]
+                    self.packages = parsed["packages"]
+                    self.relationships = parsed["relationships"]
+                    self.vulnerabilities = parsed["vulnerabilities"]
+                    self.services = parsed["services"]
+                    self.licenses = parsed["licences"]
+                    self.definitions = parsed["definitions"]
             else:
-                (
-                    self.document,
-                    self.files,
-                    self.packages,
-                    self.relationships,
-                    self.vulnerabilities,
-                    self.services,
-                    self.licenses,
-                ) = self.parser.parse(sbom_string, parser_type)
+                # (
+                #     self.document,
+                #     self.files,
+                #     self.packages,
+                #     self.relationships,
+                #     self.vulnerabilities,
+                #     self.services,
+                #     self.licenses,
+                # ) = self.parser.parse(sbom_string, parser_type)
+                parsed = self.parser.parse(sbom_string, parser_type)
+                self.document = parsed["document"]
+                self.files = parsed["files"]
+                self.packages = parsed["packages"]
+                self.relationships = parsed["relationships"]
+                self.vulnerabilities = parsed["vulnerabilities"]
+                self.services = parsed["services"]
+                self.licenses = parsed["licences"]
+                self.definitions = parsed["definitions"]
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
             self.sbom.add_relationships(self.relationships)
@@ -169,6 +197,8 @@ class SBOMParser:
                 self.sbom.add_services(self.services)
             if len(self.licenses) > 0:
                 self.sbom.add_licenses(self.licenses)
+            if len(self.definitions) > 0:
+                self.sbom.add_definitions(self.definitions)
             self.sbom.set_type(self.sbom_type)
             self.sbom.set_format(self.set_format(parser_type))
         except KeyError:
@@ -284,3 +314,12 @@ class SBOMParser:
 
         """
         return self.sbom.get_licenses()
+
+    def get_definitions(self) -> List[Dict]:
+        """Returns the definition elements from within a parsed SBOM
+        Returns
+        -------
+        definitions : list of SBOMDefintion objects
+
+        """
+        return self.sbom.get_definitions()
