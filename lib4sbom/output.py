@@ -26,7 +26,7 @@ class _OutputManager:
             self.file_handle = None
 
     def close(self):
-        if self.out_type == "file":
+        if self.file_handle is not None:
             self.file_handle.close()
 
     def file_out(self, message):
