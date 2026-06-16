@@ -1,6 +1,5 @@
 import json
 import os
-
 import requests
 
 license_dir, filename = os.path.split(__file__)
@@ -8,8 +7,8 @@ license_dir, filename = os.path.split(__file__)
 license_path = os.path.join(
     license_dir, "../lib4sbom/license_data", "spdx_licenses.json"
 )
-licfile = open(license_path, "r", encoding="utf-8")
-licenses = json.load(licfile)
+with open(license_path, mode="r", encoding="utf-8") as licfile:
+    licenses = json.load(licfile)
 
 # Process each licence
 for lic in licenses["licenses"]:

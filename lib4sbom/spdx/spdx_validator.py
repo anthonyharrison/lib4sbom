@@ -9,7 +9,6 @@ import yaml
 
 
 class SPDXValidator:
-
     SPDX_VERSIONS = ["2.3", "2.2"]
 
     def __init__(self, spdx_version=None, debug=False):
@@ -59,9 +58,8 @@ class SPDXValidator:
             if self.debug:
                 print(f"[JSON] Checking to validate against SPDX {spdx_version}.")
             try:
-                jsonschema.validate(
-                    instance=sbom_data, schema=json.load(open(schema_file))
-                )
+                with open(schema_file, mode="r", encoding="utf-8") as f:
+                    jsonschema.validate(instance=sbom_data, schema=json.load(f))
                 # if no validation errors
                 return {"SPDX": spdx_version}
             except jsonschema.exceptions.SchemaError:
@@ -79,7 +77,8 @@ class SPDXValidator:
         return {"SPDX": False}
 
     def validate_spdx_json(self, sbom_file):
-        sbom_data = json.load(open(sbom_file))
+        with open(sbom_file, mode="r", encoding="utf-8") as f:
+            sbom_data = json.load(f)
         # Might be in a protobuf
         if sbom_data.get("sbom") is not None:
             sbom_data = sbom_data["sbom"]
@@ -90,7 +89,8 @@ class SPDXValidator:
         return self._validate_jsonyaml_data(sbom_data)
 
     def validate_spdx_yaml(self, sbom_file):
-        sbom_data = yaml.safe_load(open(sbom_file, "r", encoding="utf-8"))
+        with open(sbom_file, mode="r", encoding="utf-8") as f:
+            sbom_data = yaml.safe_load(f)
         return self._validate_jsonyaml_data(sbom_data)
 
     def validate_spdx_rdf(self, sbom_file):
