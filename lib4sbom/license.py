@@ -3,6 +3,7 @@
 
 
 import json
+from pathlib import Path
 import os
 
 
@@ -16,15 +17,15 @@ class LicenseScanner:
         self.licenses = {}
         license_path = os.path.join(license_dir, "license_data", "spdx_licenses.json")
         if self._check_file(license_path):
-            licfile = open(license_path, "r", encoding="utf-8")
-            self.licenses = json.load(licfile)
+            with open(license_path, "r", encoding="utf-8") as licfile:
+                self.licenses = json.load(licfile)
         self.exceptions = {}
         exception_path = os.path.join(
             license_dir, "license_data", "spdx_exceptions.json"
         )
         if self._check_file(exception_path):
-            exception_file = open(exception_path, "r", encoding="utf-8")
-            self.exceptions = json.load(exception_file)
+            with open(exception_path, "r", encoding="utf-8") as exception_file:
+                self.exceptions = json.load(exception_file)
         # Set up list of license synonyms
         synonym_file = os.path.join(license_dir, "license_data", "license_synonyms.txt")
         self.license_synonym = {}
@@ -110,9 +111,9 @@ class LicenseScanner:
         for lic in self.get_license_list():
             # Comparisons ignore case of provided license text
             if lic["licenseId"].lower() == license_id.lower():
-                return f'{lic["licenseId"]}{extra}'
+                return f"{lic['licenseId']}{extra}"
             elif lic["name"].lower() == license_id.lower():
-                return f'{lic["licenseId"]}{extra}'
+                return f"{lic['licenseId']}{extra}"
         return self.DEFAULT_LICENSE
 
     def get_license_text(self, license_id):
@@ -121,9 +122,7 @@ class LicenseScanner:
         filename = f"{self.license_text_path}/{license_id.lower()}.html"
         # check filename exists
         if self._check_file(filename):
-            license_text_file = open(filename, "r", encoding="utf-8")
-            license_text = license_text_file.read()
-            license_text_file.close()
+            license_text = Path(filename).read_text(encoding="utf-8")
         return license_text
 
     def get_license_name(self, license_id):

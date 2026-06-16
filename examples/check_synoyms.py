@@ -1,9 +1,11 @@
 import json
+
 # Check SPDX license file and check synoyms
 license_file = "lib4sbom/license_data/spdx_licenses.json"
 synonym_file = "lib4sbom/license_data/license_synonyms.txt"
 # Load license file
-licenses_data = json.load(open(license_file, "r", encoding="utf-8"))
+with open(license_file, mode="r", encoding="utf-8") as license_file:
+    licenses_data = json.load(license_file)
 data_list = {}
 with open(synonym_file, "r", encoding="utf-8") as f:
     lines = f.readlines()
@@ -19,9 +21,8 @@ with open(synonym_file, "r", encoding="utf-8") as f:
             data_list[license_name] = license
             for license_record in licenses_data["licenses"]:
                 if license_record.get("name").upper() == license_name:
-                    print (f"[{license}] - {license_name} not required - NAME")
+                    print(f"[{license}] - {license_name} not required - NAME")
                     break
                 elif license_record.get("licenseId").upper() == license_name:
-                    print (f"[{license}] - {license_name} not required - ID")
+                    print(f"[{license}] - {license_name} not required - ID")
                     break
-

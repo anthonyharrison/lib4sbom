@@ -12,7 +12,6 @@ import xmlschema
 
 
 class CycloneDXValidator:
-
     CYCLONEDX_VERSIONS = ["1.7", "1.6", "1.5", "1.4", "1.3"]
     SUPPORT_SCHEMA = [
         "spdx.schema.json",
@@ -80,7 +79,8 @@ class CycloneDXValidator:
             with urllib.request.urlopen(uri) as response:
                 return response.read()
 
-        sbom_data = json.load(open(sbom_file))
+        with open(sbom_file, mode="r", encoding="utf-8") as f:
+            sbom_data = json.load(f)
         for cyclonedx_version in self.cyclonedx_version:
             schema_file = f"{self.schemas_path}/bom-{cyclonedx_version}.schema.json"
             if self.debug:
