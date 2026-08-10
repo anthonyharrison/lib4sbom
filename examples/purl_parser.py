@@ -22,7 +22,7 @@ for package in packages:
     ext_ref = package.get("externalreference")
     if ext_ref != None:
         for ref in ext_ref:
-            if ref[1] == "purl":
+            if ref[1] == "purl" and len(ref[2]) > 0:
                 # Process purl identifier
                 purl_validator = SBOMIdentifier(ref[2])
                 is_valid = purl_validator.validate()
