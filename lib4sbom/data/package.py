@@ -322,7 +322,7 @@ class SBOMPackage:
         if "externalreference" in self.package:
             for e in self.package["externalreference"]:
                 category, element, value = e
-                if element == "purl":
+                if element == "purl" and len(value) > 0:
                     return value
         return None
 

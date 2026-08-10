@@ -590,6 +590,8 @@ class SPDX3Generator:
                     "OTHER",
                 ]:
                     ref_value = reference[2]
+                    if len(ref_value) == 0:
+                        continue
                     if reference[1] == "purl":
                         # Validate purl
                         purl_validator = SBOMIdentifier(ref_value)

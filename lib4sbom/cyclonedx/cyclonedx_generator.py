@@ -671,6 +671,8 @@ class CycloneDXGenerator:
                 ref_category = reference[0]
                 ref_type = reference[1]
                 ref_value = reference[2]
+                if len(ref_value) == 0:
+                    continue
                 if ref_category == "SECURITY" and ref_type in [
                     "cpe22Type",
                     "cpe23Type",
