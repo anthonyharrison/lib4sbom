@@ -11,6 +11,7 @@ from lib4sbom.data.cryptography import SBOMCryptography
 from lib4sbom.data.definition import SBOMDefinition
 from lib4sbom.data.document import SBOMDocument
 from lib4sbom.data.identifier import SBOMIdentifier
+from lib4sbom.data.license import SBOMLicense
 from lib4sbom.data.modelcard import ModelDataset, ModelGraphicset, SBOMModelCard
 from lib4sbom.data.package import SBOMPackage
 from lib4sbom.data.relationship import SBOMRelationship
@@ -43,6 +44,8 @@ class CycloneDXParser:
             "licences" : [],
             "definitions": [],
         }
+        self.spdx_licenses = SBOMLicense()
+        self.spdx_licenses.initialise()
 
     def parse(self, sbom_string: str, parser_type: ParserType = None):
         """parses CycloneDX BOM string extracting package name, version and license"""
@@ -525,6 +528,15 @@ class CycloneDXParser:
                             self.cyclonedx_package.set_value(
                                 "licensetext", licensetext.get("content")
                             )
+                            # Save user defined licence
+                            self.spdx_licenses.initialise()
+                            if name is not None:
+                                self.spdx_licenses.set_name(name)
+                            if license is not None:
+                                self.spdx_licenses.set_id(license)
+                            if licensetext is not None:
+                                self.spdx_licenses.set_value("text", licensetext.get("content"))
+                            self.licences.append(self.spdx_licenses.get_license())
                 if license_data is not None and len(license_data) > 1:
                     self.cyclonedx_package.set_licenselist(license_data)
             # acknowledgement = None
