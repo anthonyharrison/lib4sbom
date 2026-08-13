@@ -381,12 +381,12 @@ class CycloneDXParser:
                 if "name" in license["license"]:
                     name = license["license"]["name"]
                     # check if the name is really an id!
-                    id = self.license_scanner.find_license_id(name)
-                    if len(id) > 0:
-                        license["license"]["id"] = id
-                        license["license"]["name"] = (
-                            self.license_scanner.get_license_name(id)
-                        )
+                    # id = self.license_scanner.find_license_id(name)
+                    # if len(id) > 0:
+                    #     license["license"]["id"] = id
+                    #     # license["license"]["name"] = (
+                    #     #     self.license_scanner.get_license_name(id)
+                    #     # )
                 if id is None and name is None:
                     print(
                         f"[ERROR] Invalid license specified {license} - missing id or name."
@@ -499,6 +499,8 @@ class CycloneDXParser:
                         if license is None:
                             license = license_info.get("name")
                             name = license
+                        else:
+                            name = license_info.get("name")
                     acknowledgement = license_info.get("acknowledgement")
                     licensetext = license_info.get("text")
                     if license is not None:
@@ -532,10 +534,10 @@ class CycloneDXParser:
                             self.spdx_licenses.initialise()
                             if name is not None:
                                 self.spdx_licenses.set_name(name)
-                            if license is not None:
-                                self.spdx_licenses.set_id(license)
-                            if licensetext is not None:
-                                self.spdx_licenses.set_value("text", licensetext.get("content"))
+                            # Don't set Id
+                            # if license is not None:
+                            #     self.spdx_licenses.set_id(license)
+                            self.spdx_licenses.set_value("text", licensetext.get("content"))
                             self.licences.append(self.spdx_licenses.get_license())
                 if license_data is not None and len(license_data) > 1:
                     self.cyclonedx_package.set_licenselist(license_data)

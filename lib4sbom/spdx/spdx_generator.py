@@ -62,6 +62,11 @@ class SPDXGenerator:
     def show(self, message):
         self.doc.append(message)
 
+    def _create_user_defined_licence_id(self, licence):
+        if not licence.startswith(self.LICENSE_PREAMBLE):
+            return f"{self.LICENSE_PREAMBLE}{licence.replace(' ','-')}"
+        return licence
+
     def getBOM(self):
         if self.format != "tag":
             # Add subcomponents to SBOM
@@ -263,7 +268,23 @@ class SPDXGenerator:
             return "NOASSERTION"
         else:
             # No validation
+            if self.license.license_expression(license):
+                # Convert expression to use SPDX license id for user defined license as ncessary
+                for lic in self.license_info:
+                    if lic.get('name') is None or lic.get('id') is None:
+                        continue
+                    license = license.replace(lic['name'], lic['id'])
             return license
+
+    def get_user_licence_ident(self, licence):
+        for lic in self.license_info:
+            if lic.get('name') is None or lic.get('id') is None:
+                continue
+            # Have we found licence name?
+            if lic['name'] == licence:
+                return lic['id']
+        # Shouldn't get here!
+        return licence
 
     def _text(file, text_item):
         if text_item not in ["NONE", "NOASSERTION"]:
@@ -339,15 +360,7 @@ class SPDXGenerator:
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                self.generateTag("PackageLicenseDeclared", self.license_ref())
-                self.license_info.append(
-                    {
-                        "id": self.license_ref(),
-                        "name": package_info["licensename"],
-                        "text": package_info.get("licensetext", ""),
-                    }
-                )
-                self.license_id = self.license_id + 1
+                self.generateTag("PackageLicenseDeclared", self.get_user_licence_ident(package_info["licensename"]))
             else:
                 self.generateTag(
                     "PackageLicenseDeclared",
@@ -356,15 +369,7 @@ class SPDXGenerator:
         if "licenseconcluded" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                self.generateTag("PackageLicenseConcluded", self.license_ref())
-                self.license_info.append(
-                    {
-                        "id": self.license_ref(),
-                        "name": package_info["licensename"],
-                        "text": package_info.get("licensetext", ""),
-                    }
-                )
-                self.license_id = self.license_id + 1
+                self.generateTag("PackageLicenseConcluded", self.get_user_licence_ident(package_info["licensename"]))
             else:
                 self.generateTag(
                     "PackageLicenseConcluded",
@@ -502,15 +507,7 @@ class SPDXGenerator:
         if "licenseconcluded" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                component["licenseConcluded"] = self.license_ref()
-                self.license_info.append(
-                    {
-                        "id": self.license_ref(),
-                        "name": package_info["licensename"],
-                        "text": package_info.get("licensetext", ""),
-                    }
-                )
-                self.license_id = self.license_id + 1
+                component["licenseConcluded"] = self.get_user_licence_ident(package_info["licensename"])
             else:
                 component["licenseConcluded"] = self.license_ident(
                     package_info["licenseconcluded"]
@@ -518,15 +515,7 @@ class SPDXGenerator:
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                component["licenseDeclared"] = self.license_ref()
-                self.license_info.append(
-                    {
-                        "id": self.license_ref(),
-                        "name": package_info["licensename"],
-                        "text": package_info.get("licensetext", ""),
-                    }
-                )
-                self.license_id = self.license_id + 1
+                component["licenseDeclared"] = self.get_user_licence_ident(package_info["licensename"])
             else:
                 component["licenseDeclared"] = self.license_ident(
                     package_info["licensedeclared"]
@@ -694,7 +683,7 @@ class SPDXGenerator:
     def generateJSONLicenseDetails(self, id, name, license_text, comment):
         extractedlicense = {}
         if len(id) > 0:
-            extractedlicense["licenseId"] = id
+            extractedlicense["licenseId"] = self._create_user_defined_licence_id(id) 
         if len(name) > 0:
             extractedlicense["name"] = name
         if len(license_text) > 0:
@@ -725,12 +714,13 @@ class SPDXGenerator:
         for license in user_licenses:
             self.license_info.append(
                 {
-                    "id": license["id"],
+                    "id": self.license_ref(),
                     "name": license.get("name", ""),
                     "text": license.get("text", ""),
                     "comment": license.get("comment", ""),
                 }
             )
+            self.license_id = self.license_id + 1
 
     def generateLicenseDetails(self):
         for license_info in self.license_info:
