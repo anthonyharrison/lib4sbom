@@ -8,17 +8,17 @@ class SBOMDefinition:
 
     def _validate(self, attribute, value):
         if len(value) > 0:
-            self.definition[attribute] = value 
+            self.definition[attribute] = value
 
     def initialise(self):
         self.definition = {}
 
     def set_id(self, id):
-        self._validate("id", id)       
+        self._validate("id", id)
 
     def set_name(self, name):
         self._validate("name", name)
-    
+
     def set_version(self, version):
         self._validate("version", version)
 
@@ -28,8 +28,15 @@ class SBOMDefinition:
     def set_owner(self, owner):
         self._validate("owner", owner)
 
-    def set_requirement(self, requirement_id, requirement_title, requirement_text, parent=None):
-        requirement_entry = [requirement_id, requirement_title, requirement_text, parent]
+    def set_requirement(
+        self, requirement_id, requirement_title, requirement_text, parent=None
+    ):
+        requirement_entry = [
+            requirement_id,
+            requirement_title,
+            requirement_text,
+            parent,
+        ]
         if "requirement" in self.definition:
             self.definition["requirement"].append(requirement_entry)
         else:
@@ -40,7 +47,7 @@ class SBOMDefinition:
         if "level" in self.definition:
             self.definition["level"].append(level_entry)
         else:
-            self.definition["level"] = [level_entry]   
+            self.definition["level"] = [level_entry]
 
     def set_externalreference(self, ref_type, locator, comment=""):
         # Valid categories (CycloneDX)
@@ -102,7 +109,7 @@ class SBOMDefinition:
         else:
             self.definition["externalreference"] = [reference_entry]
 
-    def get(attribute, default_value=""):
+    def get(self, attribute, default_value=""):
         return self.definition.get(attribute, default_value)
 
     def get_definition(self):
