@@ -214,9 +214,16 @@ class SBOMParser:
         self.sbom_type = sbom_type
 
     def set_format(self, parser_type: ParserType) -> str:
-        if parser_type == ParserType.CYCLONEDX_JSON or parser_type == ParserType.SPDX_JSON or parser_type == ParserType.JSON:
+        if (
+            parser_type == ParserType.CYCLONEDX_JSON
+            or parser_type == ParserType.SPDX_JSON
+            or parser_type == ParserType.JSON
+        ):
             return "json"
-        elif parser_type ==  ParserType.CYCLONEDX_XML or parser_type == ParserType.SPDX_XML:
+        elif (
+            parser_type == ParserType.CYCLONEDX_XML
+            or parser_type == ParserType.SPDX_XML
+        ):
             return "xml"
         elif parser_type == ParserType.SPDX_TAG:
             return "tag"

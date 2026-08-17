@@ -3,8 +3,8 @@
 
 
 import json
-from pathlib import Path
 import os
+from pathlib import Path
 
 
 class LicenseScanner:
