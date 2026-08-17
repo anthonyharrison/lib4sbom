@@ -29,13 +29,13 @@ class SPDXParser:
         self.license_scanner = LicenseScanner()
         self.debug = False
         self.parsed = {
-            "document" : {},
-            "files" : {},
-            "packages" : {},
-            "relationships" : [],
-            "vulnerabilities" : [],
+            "document": {},
+            "files": {},
+            "packages": {},
+            "relationships": [],
+            "vulnerabilities": [],
             "services": [],
-            "licences" : [],
+            "licences": [],
             "definitions": [],
         }
 
@@ -371,6 +371,9 @@ class SPDXParser:
             elif line_elements[0] == "ReleaseDate":
                 date = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_value("release_date", date)
+            elif line_elements[0] == "ValidUntilDate":
+                date = line_elements[1].strip().rstrip("\n")
+                spdx_package.set_value("valid_until_date", date)
             elif line_elements[0] == "ExternalRef":
                 # Format is TAG CATEGORY TYPE LOCATOR
                 # Need all data after type which may contain ':'
@@ -430,7 +433,9 @@ class SPDXParser:
         self.parsed["document"] = spdx_document
         self.parsed["files"] = files
         self.parsed["packages"] = packages
-        self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["relationships"] = self._transform_relationship(
+            relationships, elements
+        )
         self.parsed["vulnerabilities"] = self.vulnerabilities
         self.parsed["services"] = self.services
         self.parsed["licences"] = self.user_licences
@@ -616,6 +621,10 @@ class SPDXParser:
                             spdx_package.set_value("build_date", d["builtDate"])
                         if "releaseDate" in d:
                             spdx_package.set_value("release_date", d["releaseDate"])
+                        if "validUntilDate" in d:
+                            spdx_package.set_value(
+                                "valid_until_date", d["validUntilDate"]
+                            )
                         if "externalRefs" in d:
                             for ext_ref in d["externalRefs"]:
                                 ref_type = ext_ref["referenceType"]
@@ -652,7 +661,9 @@ class SPDXParser:
         self.parsed["document"] = spdx_document
         self.parsed["files"] = files
         self.parsed["packages"] = packages
-        self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["relationships"] = self._transform_relationship(
+            relationships, elements
+        )
         self.parsed["vulnerabilities"] = self.vulnerabilities
         self.parsed["services"] = self.services
         self.parsed["licences"] = self.user_licences
@@ -1036,7 +1047,9 @@ class SPDXParser:
         self.parsed["document"] = spdx_document
         self.parsed["files"] = files
         self.parsed["packages"] = packages
-        self.parsed["relationships"] = self._transform_relationship(relationships, elements)
+        self.parsed["relationships"] = self._transform_relationship(
+            relationships, elements
+        )
         self.parsed["vulnerabilities"] = self.vulnerabilities
         self.parsed["services"] = self.services
         self.parsed["licences"] = self.user_licences

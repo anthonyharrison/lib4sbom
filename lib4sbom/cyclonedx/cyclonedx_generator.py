@@ -723,6 +723,15 @@ class CycloneDXGenerator:
                 component["properties"].append(property_entry)
             else:
                 component["properties"] = [property_entry]
+        if "valid_until_date" in package:
+            if package["valid_until_date"] is not None:
+                property_entry = dict()
+                property_entry["name"] = "valid_until_date"
+                property_entry["value"] = package["valid_until_date"]
+                if "properties" in component:
+                    component["properties"].append(property_entry)
+                else:
+                    component["properties"] = [property_entry]
         if "property" in package:
             for property in package["property"]:
                 property_entry = dict()

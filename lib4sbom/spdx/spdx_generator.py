@@ -271,18 +271,18 @@ class SPDXGenerator:
             if self.license.license_expression(license):
                 # Convert expression to use SPDX license id for user defined license as ncessary
                 for lic in self.license_info:
-                    if lic.get('name') is None or lic.get('id') is None:
+                    if lic.get("name") is None or lic.get("id") is None:
                         continue
-                    license = license.replace(lic['name'], lic['id'])
+                    license = license.replace(lic["name"], lic["id"])
             return license
 
     def get_user_licence_ident(self, licence):
         for lic in self.license_info:
-            if lic.get('name') is None or lic.get('id') is None:
+            if lic.get("name") is None or lic.get("id") is None:
                 continue
             # Have we found licence name?
-            if lic['name'] == licence:
-                return lic['id']
+            if lic["name"] == licence:
+                return lic["id"]
         # Shouldn't get here!
         return licence
 
@@ -360,7 +360,10 @@ class SPDXGenerator:
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                self.generateTag("PackageLicenseDeclared", self.get_user_licence_ident(package_info["licensename"]))
+                self.generateTag(
+                    "PackageLicenseDeclared",
+                    self.get_user_licence_ident(package_info["licensename"]),
+                )
             else:
                 self.generateTag(
                     "PackageLicenseDeclared",
@@ -369,7 +372,10 @@ class SPDXGenerator:
         if "licenseconcluded" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                self.generateTag("PackageLicenseConcluded", self.get_user_licence_ident(package_info["licensename"]))
+                self.generateTag(
+                    "PackageLicenseConcluded",
+                    self.get_user_licence_ident(package_info["licensename"]),
+                )
             else:
                 self.generateTag(
                     "PackageLicenseConcluded",
@@ -420,6 +426,8 @@ class SPDXGenerator:
             self.generateTag("ReleaseDate", package_info["release_date"])
         if "build_date" in package_info:
             self.generateTag("BuiltDate", package_info["build_date"])
+        if "valid_until_date" in package_info:
+            self.generateTag("ValidUntilDate", package_info["valid_until_date"])
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
@@ -507,7 +515,9 @@ class SPDXGenerator:
         if "licenseconcluded" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                component["licenseConcluded"] = self.get_user_licence_ident(package_info["licensename"])
+                component["licenseConcluded"] = self.get_user_licence_ident(
+                    package_info["licensename"]
+                )
             else:
                 component["licenseConcluded"] = self.license_ident(
                     package_info["licenseconcluded"]
@@ -515,7 +525,9 @@ class SPDXGenerator:
         if "licensedeclared" in package_info:
             if "licensename" in package_info:
                 # User defined license
-                component["licenseDeclared"] = self.get_user_licence_ident(package_info["licensename"])
+                component["licenseDeclared"] = self.get_user_licence_ident(
+                    package_info["licensename"]
+                )
             else:
                 component["licenseDeclared"] = self.license_ident(
                     package_info["licensedeclared"]
@@ -566,6 +578,12 @@ class SPDXGenerator:
         if "build_date" in package_info:
             if len(package_info["build_date"]) > 0:
                 component["builtDate"] = package_info["build_date"]
+        if "valid_until_date" in package_info:
+            if (
+                package_info["valid_until_date"] is not None
+                and len(package_info["valid_until_date"]) > 0
+            ):
+                component["validUntilDate"] = package_info["valid_until_date"]
         if "externalreference" in package_info:
             # Potentially multiple entries
             for reference in package_info["externalreference"]:
@@ -683,7 +701,7 @@ class SPDXGenerator:
     def generateJSONLicenseDetails(self, id, name, license_text, comment):
         extractedlicense = {}
         if len(id) > 0:
-            extractedlicense["licenseId"] = self._create_user_defined_licence_id(id) 
+            extractedlicense["licenseId"] = self._create_user_defined_licence_id(id)
         if len(name) > 0:
             extractedlicense["name"] = name
         if len(license_text) > 0:

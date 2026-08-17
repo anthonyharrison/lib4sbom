@@ -35,13 +35,13 @@ class CycloneDXParser:
         self.cyclonedx_version = None
         self.license_scanner = LicenseScanner()
         self.parsed = {
-            "document" : {},
-            "files" : {},
-            "packages" : {},
-            "relationships" : [],
-            "vulnerabilities" : [],
+            "document": {},
+            "files": {},
+            "packages": {},
+            "relationships": [],
+            "vulnerabilities": [],
             "services": [],
-            "licences" : [],
+            "licences": [],
             "definitions": [],
         }
         self.spdx_licenses = SBOMLicense()
@@ -537,7 +537,9 @@ class CycloneDXParser:
                             # Don't set Id
                             # if license is not None:
                             #     self.spdx_licenses.set_id(license)
-                            self.spdx_licenses.set_value("text", licensetext.get("content"))
+                            self.spdx_licenses.set_value(
+                                "text", licensetext.get("content")
+                            )
                             self.licences.append(self.spdx_licenses.get_license())
                 if license_data is not None and len(license_data) > 1:
                     self.cyclonedx_package.set_licenselist(license_data)
@@ -626,6 +628,10 @@ class CycloneDXParser:
                     elif property["name"] == "build_date":
                         self.cyclonedx_package.set_value(
                             "build_date", property["value"]
+                        )
+                    elif property["name"] == "valid_until_date":
+                        self.cyclonedx_package.set_value(
+                            "valid_until_date", property["value"]
                         )
                     else:
                         self.cyclonedx_package.set_property(
@@ -951,11 +957,15 @@ class CycloneDXParser:
                         for definition in data["definitions"]["standards"]:
                             definition_info.initialise()
                             definition_info.set_id(
-                                definition.get("bom-ref", f"CycloneDX-Definition-{definition_id}")
+                                definition.get(
+                                    "bom-ref", f"CycloneDX-Definition-{definition_id}"
+                                )
                             )
                             definition_info.set_name(definition.get("name"))
                             definition_info.set_version(definition.get("version"))
-                            definition_info.set_description(definition.get("description"))
+                            definition_info.set_description(
+                                definition.get("description")
+                            )
                             definition_info.set_owner(definition.get("owner"))
                             if "requirements" in definition:
                                 for requirement in definition["requirements"]:
@@ -963,14 +973,24 @@ class CycloneDXParser:
                                     requirement_title = requirement.get("title")
                                     requirement_text = requirement.get("text")
                                     parent = requirement.get("parent")
-                                    definition_info.set_requirement(requirement_id, requirement_title, requirement_text, parent)
+                                    definition_info.set_requirement(
+                                        requirement_id,
+                                        requirement_title,
+                                        requirement_text,
+                                        parent,
+                                    )
                             if "levels" in definition:
                                 for level in definition["levels"]:
                                     level_id = level.get("identifier")
                                     level_title = level.get("title")
                                     level_description = level.get("description")
                                     level_requirements = level.get("requirements")
-                                    definition_info.set_level(level_id, level_title, level_description, level_requirements)
+                                    definition_info.set_level(
+                                        level_id,
+                                        level_title,
+                                        level_description,
+                                        level_requirements,
+                                    )
                             if "externalReferences" in definition:
                                 for reference in definition["externalReferences"]:
                                     url = reference.get("url")
@@ -982,7 +1002,7 @@ class CycloneDXParser:
                             definitions.append(definition_info.get_definition())
                             definition_id = definition_id + 1
                         if self.debug:
-                            print(definitions)                               
+                            print(definitions)
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
             if self.debug:
@@ -1144,6 +1164,10 @@ class CycloneDXParser:
                     value = property.text
                 if params["name"] == "release_date":
                     self.cyclonedx_package.set_value("release_date", value)
+                elif params["name"] == "build_date":
+                    self.cyclonedx_package.set_value("build_date", value)
+                elif params["name"] == "valid_until_date":
+                    self.cyclonedx_package.set_value("valid_until_date", value)
                 else:
                     self.cyclonedx_package.set_property(params["name"], value)
         for references in component.findall(self.schema + "externalReferences"):
