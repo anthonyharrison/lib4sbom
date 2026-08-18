@@ -37,6 +37,7 @@ class SPDXParser:
             "services": [],
             "licences": [],
             "definitions": [],
+            "signature": {},
         }
 
     def parse(self, sbom_string: str, parser_type: ParserType = None):

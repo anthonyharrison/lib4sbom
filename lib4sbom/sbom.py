@@ -15,6 +15,7 @@ class SBOMData(NamedTuple):
     licenses: List
     annotations: List
     definitions: List
+    signature: Dict
     type: str
     format: str
     version: str
@@ -57,6 +58,9 @@ class SBOM:
 
     def add_definitions(self, definitions: List):
         self.sbom["definitions"] = definitions
+
+    def add_signature(self, signature: Dict):
+        self.sbom["signature"] = signature
 
     def add_data(self, sbom_data: SBOMData) -> None:
         for key, value in sbom_data.items():
@@ -122,6 +126,9 @@ class SBOM:
 
     def get_definitions(self) -> List:
         return self.sbom.get("definitions", [])
+
+    def get_signature(self) -> Dict:
+        return self.sbom.get("signature", {})
 
     def get_version(self) -> str:
         return self.sbom.get("version", "")

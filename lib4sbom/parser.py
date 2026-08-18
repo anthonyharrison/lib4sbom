@@ -36,6 +36,7 @@ class SBOMParser:
         self.services = None
         self.licenses = None
         self.definitions = None
+        self.signature = None
         self.sbom = SBOM(self.sbom_type)
 
     def parse_file(self, filename: str) -> None:
@@ -141,6 +142,7 @@ class SBOMParser:
                 self.services = parsed["services"]
                 self.licenses = parsed["licences"]
                 self.definitions = parsed["definitions"]
+                self.signature = parsed["signature"]
                 # but if no packages or files found, assume it must be CycloneDX
                 if (
                     len(self.packages) == 0
@@ -167,6 +169,7 @@ class SBOMParser:
                     self.services = parsed["services"]
                     self.licenses = parsed["licences"]
                     self.definitions = parsed["definitions"]
+                    self.signature = parsed["signature"]
             else:
                 # (
                 #     self.document,
@@ -186,6 +189,7 @@ class SBOMParser:
                 self.services = parsed["services"]
                 self.licenses = parsed["licences"]
                 self.definitions = parsed["definitions"]
+                self.signature = parsed["signature"]
             self.sbom.add_files(self.files)
             self.sbom.add_packages(self.packages)
             self.sbom.add_relationships(self.relationships)
@@ -199,6 +203,8 @@ class SBOMParser:
                 self.sbom.add_licenses(self.licenses)
             if len(self.definitions) > 0:
                 self.sbom.add_definitions(self.definitions)
+            if len(self.signature) > 0:
+                self.sbom.add_signature(self.signature)
             self.sbom.set_type(self.sbom_type)
             self.sbom.set_format(self.set_format(parser_type))
         except KeyError:
@@ -330,3 +336,12 @@ class SBOMParser:
 
         """
         return self.sbom.get_definitions()
+
+    def get_signature(self) -> Dict:
+        """Returns the signature element from within a parsed SBOM
+        Returns
+        -------
+        signature : JSF signature object
+
+        """
+        return self.sbom.get_signature()

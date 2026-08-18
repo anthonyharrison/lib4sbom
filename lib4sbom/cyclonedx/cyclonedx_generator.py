@@ -1,10 +1,20 @@
 # Copyright (C) 2023 Anthony Harrison
 # SPDX-License-Identifier: Apache-2.0
 
+import base64
+import json
 import os
 import re
 import uuid
 from datetime import datetime
+
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
+# from cryptography.hazmat.primitives.serialization import (
+#     Encoding,
+#     PublicFormat,
+#     load_pem_private_key,
+# )
 
 from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.vulnerability import Vulnerability
@@ -83,6 +93,8 @@ class CycloneDXGenerator:
                     self.doc["vulnerabilities"] = self.vulnerability
                 if len(self.annotation) > 0:
                     self.doc["annotations"] = self.annotation
+                if os.getenv("LIB4SBOM_SIGNATURE") is not None:
+                    self.generate_signature()
             self.sbom_complete = True
         return self.doc
 
@@ -1122,3 +1134,53 @@ class CycloneDXGenerator:
             crypto_properties["oid"] = package["oid"]
 
         return crypto_properties
+
+    def generate_signature(self):
+        # Assume Elliptic Curve P-256
+        private_key = os.getenv("LIB4SBOM_SIGNATURE")
+        if private_key is None:
+            return
+
+        # Remove existing 'signature' key before computing payload hash
+        if "signature" in self.doc:
+            del self.doc["signature"]
+
+        # Canonicalise the JSON (deterministic sorting and compact formatting)
+        canonical_bytes = json.dumps(
+            self.doc, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+
+        # Calculate ECDSA Signature (SHA-256)
+        signature_bytes = private_key.sign(canonical_bytes, ec.ECDSA(hashes.SHA256()))
+        signature_b64 = base64.b64encode(signature_bytes).decode("utf-8")
+
+        # Extract public key parameters for JSF JWK object
+        public_numbers = private_key.public_key().public_numbers()
+
+        # Convert public x and y coordinates to URL-safe base64 strings
+        x_b64 = (
+            base64.urlsafe_b64encode(
+                public_numbers.x.to_bytes(
+                    (public_numbers.x.bit_length() + 7) // 8, byteorder="big"
+                )
+            )
+            .decode("utf-8")
+            .rstrip("=")
+        )
+
+        y_b64 = (
+            base64.urlsafe_b64encode(
+                public_numbers.y.to_bytes(
+                    (public_numbers.y.bit_length() + 7) // 8, byteorder="big"
+                )
+            )
+            .decode("utf-8")
+            .rstrip("=")
+        )
+
+        # Construct JSON Signature Format envelope
+        self.doc["signature"] = {
+            "algorithm": "ES256",
+            "value": signature_b64,
+            "publicKey": {"kty": "EC", "crv": "P-256", "x": x_b64, "y": y_b64},
+        }

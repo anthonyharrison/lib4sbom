@@ -43,6 +43,7 @@ class CycloneDXParser:
             "services": [],
             "licences": [],
             "definitions": [],
+            "signature": {},
         }
         self.spdx_licenses = SBOMLicense()
         self.spdx_licenses.initialise()
@@ -682,6 +683,7 @@ class CycloneDXParser:
         vulnerabilities = []
         services = []
         definitions = []
+        signature = {}
         cyclonedx_relationship = SBOMRelationship()
         cyclonedx_document = SBOMDocument()
         try:
@@ -1003,6 +1005,12 @@ class CycloneDXParser:
                             definition_id = definition_id + 1
                         if self.debug:
                             print(definitions)
+                if "signature" in data:
+                    if self.debug:
+                        print("Processing Signature")
+                    signature = data["signature"]
+                    if self.debug:
+                        print(signature)
         except json.JSONDecodeError:
             # Unable to process file. Probably not a JSON file
             if self.debug:
@@ -1016,6 +1024,7 @@ class CycloneDXParser:
         self.parsed["services"] = services
         self.parsed["licences"] = self.licences
         self.parsed["definitions"] = definitions
+        self.parsed["signature"] = signature
         return self.parsed
         # return (
         #     cyclonedx_document,
