@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from typing import Dict, List
 
+import yaml
+
 from lib4sbom.cyclonedx.cyclonedx_parser import CycloneDXParser
 from lib4sbom.exception import SBOMParserException
 from lib4sbom.sbom import SBOM, ParserType, SBOMData
@@ -40,6 +42,9 @@ class SBOMParser:
 
     def parse_file(self, filename: str) -> None:
         """Parses a SBOM file
+
+        In the absence of a recognised filename extension, the SBOM
+        format and type are identified from the file's content
 
         Parameters
         ----------
@@ -84,7 +89,26 @@ class SBOMParser:
             # file will result in no data being returned.
             parser_type = ParserType.JSON
         else:
-            raise SBOMParserException
+            # Filename extension is not recognised, so identify the SBOM
+            # format and type from the file contents
+            with open(filename, "r", encoding="utf-8") as f:
+                sbom_string = f.read()
+            self._parse_sbom(sbom_string)
+            if (
+                len(self.get_document()) == 0
+                and len(self.get_files()) == 0
+                and len(self.get_packages()) == 0
+                and len(self.get_relationships()) == 0
+                and len(self.get_vulnerabilities()) == 0
+                and len(self.get_services()) == 0
+                and len(self.get_licenses()) == 0
+                and len(self.get_definitions()) == 0
+            ):
+                # No SBOM data identified from the file contents
+                if self.debug:
+                    print(f"No SBOM data identified in file {filename}")
+                raise SBOMParserException
+            return
 
         with open(filename, "r", encoding="utf-8") as f:
             sbom_string = f.read()
@@ -200,7 +224,12 @@ class SBOMParser:
             if len(self.definitions) > 0:
                 self.sbom.add_definitions(self.definitions)
             self.sbom.set_type(self.sbom_type)
-            self.sbom.set_format(self.set_format(parser_type))
+            if parser_type is None:
+                # SBOM format not identified from the filename,
+                # so detect it from the SBOM contents
+                self.sbom.set_format(self._detect_format(sbom_string))
+            else:
+                self.sbom.set_format(self.set_format(parser_type))
         except KeyError:
             if self.debug:
                 print("Key Error")
@@ -212,6 +241,34 @@ class SBOMParser:
 
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type
+
+    def _detect_format(self, sbom_string: str) -> str:
+        """Identify the SBOM format from the SBOM contents
+
+        Parameters
+        ----------
+        sbom_string : string
+            SBOM content
+
+        Returns
+        -------
+        SBOMformat : string
+        """
+        if sbom_string.startswith("{"):
+            return "json"
+        elif sbom_string.startswith("<"):
+            if "<spdx:packages>" in sbom_string:
+                return "rdf"
+            return "xml"
+        try:
+            yml_data = yaml.safe_load(sbom_string)
+            if isinstance(yml_data, dict) and "SPDXID" in yml_data:
+                return "yml"
+        except yaml.YAMLError:
+            pass
+        if "PackageName:" in sbom_string:
+            return "tag"
+        return "unknown"
 
     def set_format(self, parser_type: ParserType) -> str:
         if (
