@@ -21,6 +21,7 @@ AGPL-3.0
 GNU Affero General Public License v3
 GNU AGPL3
 GNU AGPL 3
+GNU AGPL
 [AGPL-3.0-or-later]
 AGPL3+
 AGPL-3+
@@ -66,7 +67,7 @@ BSD License
 BSD3
 BSD-3
 3-Clause BSD
-BSD-3-cluase
+BSD-3-clause
 BSD 3-Clause License
 [BSD-4-Clause]
 BSD4
@@ -75,10 +76,13 @@ BSD-4
 Boost
 Boost Software License 1.0 (BSL-1.0)
 Boost Software License
+[BUSL-1.1]
+Business Source License
 [CC0-1.0]
 CC0
 CC0 1.0
 CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+Public Domain
 [CDDL-1.0]
 Common Development and Distribution License 1.0 (CDDL-1.0)
 [CECILL-2.1]
@@ -167,6 +171,7 @@ GNU General Public License v2 (GPLv2)
 GNU General Public License (GPL)
 GNU GPL2
 GNU GPL 2
+GNU GPL V2
 [GPL-2.0-or-later]
 GPL2+
 GPL-2+
@@ -187,6 +192,7 @@ GNU General Public License v3
 GNU General Public License v3 (GPLv3)
 GNU GPL3
 GNU GPL 3
+GNU GPL V3
 [GPL-3.0-or-later]
 GPL3+
 GPL-3+
@@ -262,6 +268,7 @@ LPPL
 [MIT]
 Expat
 Expat License
+The MIT License
 [MIT-0]
 MIT0
 MIT No Attribution License
@@ -274,15 +281,18 @@ MirOS License (MirOS)
 [MPL-1.0]
 MPL
 MPL 1.0
+Mozilla 1.0
 Mozilla Public License 1.0 (MPL)
 [MPL-1.1]
 MPLv1.1
 MPL 1.1
+Mozilla 1.1
 Mozilla Public License 1.1 (MPL 1.1)
 [MPL-2.0]
 MPLv2.0
 MPL-2
 MPL 2.0
+Mozilla 2.0
 Mozilla Public License 2.0 (MPL 2.0)
 [MulanPSL-1.0]
 Mulan Permissive Software License v1
@@ -330,6 +340,8 @@ SGI-2
 [SPL-1.0]
 SPL
 Sun Public License
+[SSPL-1.0]
+Server Side Public License
 [Unlicense]
 The Unlicense (Unlicense)
 [UPL-1.0]
