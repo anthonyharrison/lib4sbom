@@ -488,7 +488,7 @@ class SBOMGenerator:
             component_data["lifecycle"] = doc.get_value("lifecycle")
             component_data["timestamp"] = doc.get_created()
             component_data["creator"] = doc.get_creator()
-            component_data["distribution"] = doc.get_value("distribution", "CLEAR")
+            component_data["distribution"] = doc.get_value("distribution")
             if (
                 component_data["supplier"] is not None
                 and len(component_data["supplier"]) == 0
