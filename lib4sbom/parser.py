@@ -226,8 +226,9 @@ class SBOMParser:
             self.sbom.set_type(self.sbom_type)
             if parser_type is None:
                 # SBOM format not identified from the filename,
-                # so detect it from the SBOM contents
-                self.sbom.set_format(self._detect_format(sbom_string))
+                # so detect it from the SBOM contents using the
+                # SBOM type determined by the parse
+                self.sbom.set_format(self._detect_format(sbom_string, self.sbom_type))
             else:
                 self.sbom.set_format(self.set_format(parser_type))
         except KeyError:
@@ -242,31 +243,52 @@ class SBOMParser:
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type
 
-    def _detect_format(self, sbom_string: str) -> str:
+    def _detect_format(self, sbom_string: str, sbom_type: str) -> str:
         """Identify the SBOM format from the SBOM contents
 
         Parameters
         ----------
         sbom_string : string
             SBOM content
+        sbom_type : string
+            The type of SBOM (spdx or cyclonedx)
 
         Returns
         -------
         SBOMformat : string
         """
+        if sbom_type == "cyclonedx":
+            # CycloneDX is only available in JSON and XML formats
+            if sbom_string.startswith("{"):
+                return "json"
+            if sbom_string.startswith("<"):
+                return "xml"
+            return "unknown"
+        # SPDX formats
         if sbom_string.startswith("{"):
+            if '"@context"' in sbom_string or '"@graph"' in sbom_string:
+                # SPDX 3.x files are JSON-LD serialisations containing
+                # an @context and/or an @graph element
+                return "jsonld"
             return "json"
-        elif sbom_string.startswith("<"):
+        if sbom_string.startswith("<"):
             if "<spdx:packages>" in sbom_string:
+                # SPDX RDF/XML serialisation
                 return "rdf"
             return "xml"
+        # SPDX YAML and tag-value files have very similar content, so
+        # YAML files are identified by parsing the content as a YAML
+        # mapping with SPDX data (mirrors the detection performed by
+        # the SPDX parser)
         try:
             yml_data = yaml.safe_load(sbom_string)
-            if isinstance(yml_data, dict) and "SPDXID" in yml_data:
-                return "yml"
         except yaml.YAMLError:
-            pass
+            yml_data = None
+        if isinstance(yml_data, dict) and "SPDXID" in yml_data:
+            return "yml"
         if "PackageName:" in sbom_string:
+            # SPDX tag-value files contain package data on
+            # 'PackageName' lines
             return "tag"
         return "unknown"
 

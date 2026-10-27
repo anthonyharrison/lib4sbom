@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 
@@ -71,6 +72,40 @@ class TestParser:
             sbom_parser = SBOMParser()
             with pytest.raises(SBOMParserException):
                 sbom_parser.parse_file(test_filename)
+        finally:
+            os.unlink(test_filename)
+
+    def test_parse_file_jsonld_no_filename_extension(self):
+        # SPDX 3.x JSON-LD content in a file without a recognised filename
+        # extension is identified from the file contents
+        jsonld_content = json.dumps(
+            {
+                "@context": "https://spdx.org/rdf-3.0/spdx-context.jsonld",
+                "@graph": [
+                    {
+                        "type": "SpdxDocument",
+                        "spdxId": "https://spdx.org/spdxdocs/spdx-test-document",
+                        "name": "SPDX-Test-Document",
+                    },
+                    {
+                        "type": "software_Package",
+                        "spdxId": "https://spdx.org/spdxdocs/spdx-test-package-1",
+                        "name": "test-package-1",
+                    },
+                ],
+            }
+        )
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", suffix="", delete=False
+        ) as test_file:
+            test_file.write(jsonld_content)
+            test_filename = test_file.name
+        try:
+            sbom_parser = SBOMParser()
+            sbom_parser.parse_file(test_filename)
+            assert sbom_parser.get_type() == "spdx"
+            assert sbom_parser.get_format() == "jsonld"
+            assert sbom_parser.get_packages()
         finally:
             os.unlink(test_filename)
 
