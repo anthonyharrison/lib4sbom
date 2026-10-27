@@ -67,7 +67,7 @@ class SPDXParser:
                     return self._parse_spdx_data(sbom_dict)
             except json.JSONDecodeError:
                 # Unable to process file. Probably not a JSON file
-                raise SBOMParserException
+                raise SBOMParserException("SPDX: JSON file unable to be processed")
             except KeyError:
                 pass
 
@@ -532,7 +532,7 @@ class SPDXParser:
                             files[filename] = spdx_file.get_file()
                     except KeyError as e:
                         print(f"{e} Unable to store file info: {filename}")
-                        raise SBOMParserException
+                        raise SBOMParserException(f"SPDX: Key Error in processing SBOM {filename}")
             if "packages" in data:
                 for d in data["packages"]:
                     spdx_package.initialise()
@@ -649,7 +649,7 @@ class SPDXParser:
                             packages[package_tuple] = spdx_package.get_package()
                     except KeyError as e:
                         print(f"{e} Unable to store package info: {package}")
-                        raise SBOMParserException
+                        raise SBOMParserException(f"SPDX: Key Error in processing package {package} in SBOM")
             if "relationships" in data:
                 for d in data["relationships"]:
                     spdx_relationship.initialise()

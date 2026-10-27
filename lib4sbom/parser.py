@@ -85,7 +85,7 @@ class SBOMParser:
             # file will result in no data being returned.
             parser_type = ParserType.JSON
         else:
-            raise SBOMParserException
+            raise SBOMParserException("Filename does not end with a supported file extension.")
 
         with open(filename, "r", encoding="utf-8") as f:
             sbom_string = f.read()
@@ -210,11 +210,11 @@ class SBOMParser:
         except KeyError:
             if self.debug:
                 print("Key Error")
-            raise SBOMParserException
+            raise SBOMParserException("Key Error in processing SBOM")
         except TypeError:
             if self.debug:
                 print("Type Error")
-            raise SBOMParserException
+            raise SBOMParserException("Type Error in processing SBOM")
 
     def set_type(self, sbom_type: str = "auto") -> None:
         self.sbom_type = sbom_type

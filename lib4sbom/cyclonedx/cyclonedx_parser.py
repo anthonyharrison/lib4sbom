@@ -62,7 +62,7 @@ class CycloneDXParser:
                     return self.parse_cyclonedx_json(sbom_dict)
             except json.JSONDecodeError:
                 # Unable to process file. Probably not a JSON file
-                raise SBOMParserException
+                raise SBOMParserException("CycloneDX: JSON file unable to be processed")
             except KeyError:
                 pass
 
@@ -1020,7 +1020,7 @@ class CycloneDXParser:
             # Unable to process file. Probably not a JSON file
             if self.debug:
                 print("[ERROR] Unable to process file.")
-            raise SBOMParserException
+            raise SBOMParserException("CycloneDX: JSON processing error")
         self.parsed["document"] = cyclonedx_document
         self.parsed["files"] = files
         self.parsed["packages"] = self.packages
