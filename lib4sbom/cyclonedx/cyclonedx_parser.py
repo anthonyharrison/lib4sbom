@@ -773,6 +773,11 @@ class CycloneDXParser:
                             cyclonedx_document.set_value(
                                 "metadata_supplier", supplier["name"]
                             )
+                        if "purl" in data["metadata"]["component"]:
+                            purl = data["metadata"]["component"]["purl"]
+                            cyclonedx_document.set_value(
+                                "metadata_purl", purl
+                            )
                     if "properties" in data["metadata"]:
                         cyclonedx_document.set_value(
                             "property", data["metadata"]["properties"]

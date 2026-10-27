@@ -222,6 +222,8 @@ class CycloneDXGenerator:
             component["supplier"] = supplier
         if component_type["version"] is not None:
             component["version"] = component_type["version"]
+        if component_type["purl"] is not None:
+            component["purl"] = component_type["purl"]        
         if component_type["bom-ref"] is not None:
             component["bom-ref"] = component_type["bom-ref"]
         else:

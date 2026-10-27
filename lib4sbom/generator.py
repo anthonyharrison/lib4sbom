@@ -494,6 +494,7 @@ class SBOMGenerator:
                 and len(component_data["supplier"]) == 0
             ):
                 component_data["supplier"] = None
+            component_data["purl"] = doc.get_value("metadata_purl")
         if name is not None and name != "NOT DEFINED":
             # Use existing document name
             project_id = self.bom.generateDocumentHeader(
