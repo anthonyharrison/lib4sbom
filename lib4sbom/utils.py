@@ -7,7 +7,7 @@ def format_supplier(supplier_info, include_email=True):
         # See https://stackoverflow.com/questions/1207457/convert-a-unicode-string-to-a-string-in-python-containing-extra-symbols
         MAX_SUPPLIER_LENGTH = 1024
         # And convert byte object to a string
-        supplier_info = supplier_info[MAX_SUPPLIER_LENGTH]
+        supplier_info = supplier_info[:MAX_SUPPLIER_LENGTH]
         name_str = (
             unicodedata.normalize("NFKD", supplier_info)
             .encode("ascii", "ignore")
