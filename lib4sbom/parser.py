@@ -108,7 +108,7 @@ class SBOMParser:
                 # No SBOM data identified from the file contents
                 if self.debug:
                     print(f"No SBOM data identified in file {filename}")
-                raise SBOMParserException
+                raise SBOMParserException (f"No SBOM data identified in file {filename}")
             return
 
         with open(filename, "r", encoding="utf-8") as f:
