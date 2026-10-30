@@ -103,12 +103,21 @@ A SPDX JSON file submitted to the CycloneDX parser will result in no data being 
 
 **Note** SPDX files with an extension of .json will be checked for JSON-LD and JSON formats.
 
+If the filename does not follow one of the filename conventions above, the SBOM format and
+type are identified from the file's content (SBOM data which is not identified from the
+filename is detected from its content using JSON, JSON-LD, XML, RDF, YAML and TagValue
+processing).
+
 Errors in the parsing process will result in the exception SBOMParserException being raised.
+This also applies when SBOM data cannot be identified from the content of a file with an
+unrecognised filename extension.
 
 **Methods**
 
 parse_file(filename)
 Parses the SBOM file. If the file does not exist, a FileNotFoundError exception is raised.
+If the filename does not follow the filename conventions, the SBOM format and type are
+identified from the file's content.
 
 If an error occurs during the parsing of the file, a SBOMParserException exception is raised.
 
