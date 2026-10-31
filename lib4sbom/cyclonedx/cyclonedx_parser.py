@@ -865,15 +865,20 @@ class CycloneDXParser:
                                     "justification", vuln["analysis"]["justification"]
                                 )
                         if "affects" in vuln:
-                            if "ref" in vuln["affects"][0]:
-                                vuln_info.set_value(
-                                    "bom_link", vuln["affects"][0]["ref"]
-                                )
-                            if "versions" in vuln["affects"][0]:
-                                if "version" in vuln["affects"][0]["versions"]:
-                                    vuln_info.set_release(
-                                        vuln["affects"][0]["versions"]["version"]
-                                    )
+                            for affect in vuln["affects"]:
+                                version = None
+                                if "ref" in affect:
+                                    # vuln_info.set_value(
+                                    #     "bom_link", vuln["affects"][0]["ref"]
+                                    # )
+                                    id = affect["ref"]
+                                if "versions" in affect:
+                                    if "version" in affect["versions"]:
+                                        # vuln_info.set_release(
+                                        #     vuln["affects"][0]["versions"]["version"]
+                                        # )
+                                        version = affect["versions"]["version"]
+                                vuln_info.set_affects(id, version)
                         vulnerabilities.append(vuln_info.get_vulnerability())
                     if self.debug:
                         print(vulnerabilities)

@@ -887,33 +887,37 @@ class CycloneDXGenerator:
                 analysis["response"].append(vuln_info.get_value("remediation"))
                 analysis["detail"] = vuln_info.get_value("action")
             vulnerability["analysis"] = analysis
-            if "bom_link" in vuln:
+            if "affects" in vuln:
                 affects = []
-                affected = {}
-                affected["ref"] = vuln_info.get_value("bom_link")
-                version_info = {}
-                component_version = vuln_info.get_value("release")
-                if (
-                    component_version is None
-                    and vuln_info.get_value("purl") is not None
-                ):
-                    # Could be a PURL - just extract version of component
-                    component_version = vuln_info.get_value("purl").split("@")[1]
-                if analysis["state"] in ["not_affected", "false_positive"]:
-                    version_info["version"] = component_version
-                    version_info["status"] = "unaffected"
-                elif analysis["state"] != "in_triage":
-                    version_info["version"] = component_version
-                    version_info["status"] = "affected"
-                if len(version_info) > 0:
-                    affected["versions"] = [version_info]
-                affects.append(affected)
+                for bom_link in vuln_info.get_value("affects"):
+                    affected = {}
+                    # affected["ref"] = vuln_info.get_value("bom_link")
+                    affected["ref"] = bom_link["ref"]
+                    version_info = {}
+                    # component_version = vuln_info.get_value("release")
+                    component_version = bom_link.get("release")
+                    if (
+                        component_version is None
+                        and vuln_info.get_value("purl") is not None
+                    ):
+                        # Could be a PURL - just extract version of component
+                        component_version = vuln_info.get_value("purl").split("@")[1]
+                    if analysis["state"] in ["not_affected", "false_positive"]:
+                        version_info["version"] = component_version
+                        version_info["status"] = "unaffected"
+                    elif analysis["state"] != "in_triage":
+                        version_info["version"] = component_version
+                        version_info["status"] = "affected"
+                    if len(version_info) > 0:
+                        affected["versions"] = [version_info]
+                    affects.append(affected)
                 vulnerability["affects"] = affects
             # Add properties for any user defined items
             for key, value in vuln.items():
                 # Ignore elements already processed
                 if key not in [
                     "action",
+                    "affects",
                     "bom-link",
                     "bom-ref",
                     "comment",
