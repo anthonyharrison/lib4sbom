@@ -54,6 +54,9 @@ try:
             else:
                 print(f"PURL {thepackage.get_purl()}")
                 print(f"CPE {thepackage.get_cpe()}")
+                if thepackage.get_value("property") is not None:
+                    for property in thepackage.get_value("property"):
+                        print (f'Property: {property}')
     print(f"\nVulnerabilities    {len(vulnerabilities)}")
     if len(vulnerabilities) > 0:
         print("-" * 70)

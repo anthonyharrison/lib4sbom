@@ -1013,6 +1013,11 @@ class SPDXParser:
                                 element.get("software_packageUrl")
                                 or element.get("packageUrl"),
                             )
+                        if "extension" in element:
+                            # Handle properties
+                            for extension in element["extension"]:
+                                for property in extension["extension_cdxProperty"]:
+                                    spdx_package.set_property(property["extension_cdxPropName"], property["extension_cdxPropValue"])              
                         # TODO add more attributes
                 if declared_licence is not None:
                     if "NoAssertionLicense" in declared_licence:
