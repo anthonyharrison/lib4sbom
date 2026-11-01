@@ -31,6 +31,9 @@ class SBOMGenerator:
         self.format = format.lower()
         self.sbom_type = sbom_type.lower()
         self.generate_spdx3 = os.getenv("LIB4SBOM_SPDX3") is not None
+        if sbom_type == "spdx3":
+            self.generate_spdx3 = True
+            self.sbom_type = "spdx"
         # Ensure specified format is supported
         if self.format not in ["tag", "json", "yaml"]:
             # Set a default format
