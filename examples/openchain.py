@@ -21,11 +21,13 @@ my_package.set_homepage("https://pyyaml.org/")
 my_package.set_summary("YAML parser and emitter for Python")
 my_package.set_licensedeclared("MiT")
 my_package.set_licenseconcluded("MIt license")
-my_package.set_checksum("SHA256", "d858aa552c999bc8a8d57426ed01e40bef403cd8ccdd0fc5f6f04a00414cac2a")
+my_package.set_checksum(
+    "SHA256", "d858aa552c999bc8a8d57426ed01e40bef403cd8ccdd0fc5f6f04a00414cac2a"
+)
 my_package.set_purl("pkg:pypi/pyyaml@6.0.1")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 
 # Generate SBOM
 my_sbom = SBOM()

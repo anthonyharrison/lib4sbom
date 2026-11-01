@@ -21,7 +21,7 @@ for package in sbom_parser.get_packages():
     license = package.get("licenseconcluded", "NOASSERTION")
     if license == "NOASSERTION":
         # See if there is a declared licence
-        print (f"Looking for Declared licence for {product} {version}")
+        print(f"Looking for Declared licence for {product} {version}")
         license = package.get("licensedeclared", "NOASSERTION")
     modules.append(
         {
@@ -33,4 +33,4 @@ for package in sbom_parser.get_packages():
         }
     )
 for m in modules:
-    print (m)
+    print(m)

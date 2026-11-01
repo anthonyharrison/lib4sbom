@@ -31,9 +31,9 @@ my_package.set_version("9.0")
 my_package.set_supplier("organisation", "alma")
 my_package.set_licensedeclared("Apache-2.0")
 my_package.set_externalreference("OTHER", "bom-link", "alma.json")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 sbom_relationship.initialise()
 sbom_relationship.set_relationship(
     application, "DEPENDS_ON", my_package.get_value("name")
@@ -47,9 +47,9 @@ my_package.set_type("container")
 my_package.set_version("0.1.0")
 my_package.set_supplier("organisation", "aph10")
 my_package.set_externalreference("OTHER", "bom-link", "sbomlens.json")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 sbom_relationship.initialise()
 sbom_relationship.set_relationship(
     application, "DEPENDS_ON", my_package.get_value("name")

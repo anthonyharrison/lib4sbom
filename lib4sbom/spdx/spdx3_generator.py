@@ -185,7 +185,7 @@ class SPDX3Generator:
             "comment": "comment",
             "SPDXID": "spdxId",
             "copyrightText": "software_copyrightText",
-            "extension": "extension"
+            "extension": "extension",
         }
         package_details = {}
         # map licence attributes to SPDX3 relationships
@@ -616,7 +616,12 @@ class SPDX3Generator:
                 property_data["extension_cdxPropName"] = prop[0]
                 property_data["extension_cdxPropValue"] = prop[1]
                 extension.append(property_data)
-            component["extension"] = [{"type": "extension_CdxPropertiesExtension", "extension_cdxProperty" : extension}]
+            component["extension"] = [
+                {
+                    "type": "extension_CdxPropertiesExtension",
+                    "extension_cdxProperty": extension,
+                }
+            ]
         self.create_package(component)
 
     def generateJSONFileDetails(self, file, id, file_info, parent_id, relationship):

@@ -16,34 +16,34 @@ my_package.set_name("glibc")
 my_package.set_version("2.15")
 my_package.set_supplier("organisation", "gnu")
 my_package.set_licensedeclared("GPL3")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 my_package.initialise()
 my_package.set_name("almalinux")
 my_package.set_type("operating-system")
 my_package.set_version("9.0")
 my_package.set_supplier("organisation", "alma")
 my_package.set_licensedeclared("Apache-2.0")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 my_package.initialise()
 my_package.set_name("glibc")
 my_package.set_version("2.29")
 my_package.set_supplier("organisation", "gnu")
 my_package.set_licensedeclared("GPL3")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 my_package.initialise()
 my_package.set_name("tomcat")
 my_package.set_version("9.0.46")
 my_package.set_supplier("organisation", "apache")
 my_package.set_licensedeclared("Apache-2.0")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 # Duplicated data
 my_package.initialise()
 my_package.set_name("glibc")
@@ -52,9 +52,9 @@ my_package.set_property("language", "C")
 my_package.set_supplier("organisation", "gnu")
 my_package.set_licensedeclared("GPL3")
 #### This overwrites the package (same name and version)
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 
 # ML Component
 my_package.initialise()
@@ -88,9 +88,9 @@ my_service.set_externalreference(
     "https://www.microsoft.com", "Website", "Company website"
 )
 # my_service.setendpoint(name=xx, type="", data="")
-sbom_services[
-    (my_service.get_name(), my_service.get_value("version"))
-] = my_service.get_service()
+sbom_services[(my_service.get_name(), my_service.get_value("version"))] = (
+    my_service.get_service()
+)
 
 # Generate SBOM
 my_sbom = SBOM()

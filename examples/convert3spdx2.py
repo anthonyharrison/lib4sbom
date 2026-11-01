@@ -20,7 +20,9 @@ if len(sys.argv) != 3:
 
 # Check SPDX3 enabled
 if os.getenv("LIB4SBOM_SPDX3") is not None:
-    print ("Please unset environment variable LIB4SBOM_SPDX3 to disable SPDX3 generation")
+    print(
+        "Please unset environment variable LIB4SBOM_SPDX3 to disable SPDX3 generation"
+    )
 else:
     # Set up SBOM parser
     test_parser = SBOMParser()

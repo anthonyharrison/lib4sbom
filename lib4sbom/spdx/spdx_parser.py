@@ -532,7 +532,9 @@ class SPDXParser:
                             files[filename] = spdx_file.get_file()
                     except KeyError as e:
                         print(f"{e} Unable to store file info: {filename}")
-                        raise SBOMParserException(f"SPDX: Key Error in processing SBOM {filename}")
+                        raise SBOMParserException(
+                            f"SPDX: Key Error in processing SBOM {filename}"
+                        )
             if "packages" in data:
                 for d in data["packages"]:
                     spdx_package.initialise()
@@ -649,7 +651,9 @@ class SPDXParser:
                             packages[package_tuple] = spdx_package.get_package()
                     except KeyError as e:
                         print(f"{e} Unable to store package info: {package}")
-                        raise SBOMParserException(f"SPDX: Key Error in processing package {package} in SBOM")
+                        raise SBOMParserException(
+                            f"SPDX: Key Error in processing package {package} in SBOM"
+                        )
             if "relationships" in data:
                 for d in data["relationships"]:
                     spdx_relationship.initialise()
@@ -1017,7 +1021,10 @@ class SPDXParser:
                             # Handle properties
                             for extension in element["extension"]:
                                 for property in extension["extension_cdxProperty"]:
-                                    spdx_package.set_property(property["extension_cdxPropName"], property["extension_cdxPropValue"])              
+                                    spdx_package.set_property(
+                                        property["extension_cdxPropName"],
+                                        property["extension_cdxPropValue"],
+                                    )
                         # TODO add more attributes
                 if declared_licence is not None:
                     if "NoAssertionLicense" in declared_licence:

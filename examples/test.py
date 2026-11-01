@@ -32,9 +32,9 @@ def generate_sbom():
     iosapp_pkg.set_licensedeclared("Apache-2.0")
     parent_id = "iOSApp_Application"
     iosapp_pkg.set_id(parent_id)
-    sbom_packages[
-        (iosapp_pkg.get_name(), iosapp_pkg.get_value("version"))
-    ] = iosapp_pkg.get_package()
+    sbom_packages[(iosapp_pkg.get_name(), iosapp_pkg.get_value("version"))] = (
+        iosapp_pkg.get_package()
+    )
 
     # swift-log
     swiftlog_pkg = SBOMPackage()
@@ -49,9 +49,9 @@ def generate_sbom():
         + ".apple.com@"
         + swiftlog_pkg.get_value("version")
     )
-    sbom_packages[
-        (swiftlog_pkg.get_name(), swiftlog_pkg.get_value("version"))
-    ] = swiftlog_pkg.get_package()
+    sbom_packages[(swiftlog_pkg.get_name(), swiftlog_pkg.get_value("version"))] = (
+        swiftlog_pkg.get_package()
+    )
 
     # SwiftTrace
     swifttrace_pkg = SBOMPackage()
@@ -84,9 +84,9 @@ def generate_sbom():
     swifttrace_pkg.set_id(
         swifttrace_pkg.get_name().lower() + "@" + swifttrace_pkg.get_value("version")
     )
-    sbom_packages[
-        (swifttrace_pkg.get_name(), swifttrace_pkg.get_value("version"))
-    ] = swifttrace_pkg.get_package()
+    sbom_packages[(swifttrace_pkg.get_name(), swifttrace_pkg.get_value("version"))] = (
+        swifttrace_pkg.get_package()
+    )
 
     sbom.add_packages(sbom_packages)
     relationships = []
@@ -123,7 +123,8 @@ def generate_sbom():
     vulnerability.set_id("CVE-2023-1235")
     vulnerability.set_name(swifttrace_pkg.get_name())
     vulnerability.set_release(swifttrace_pkg.get_value("version"))
-    vulnerability.set_value("bom-ref", swifttrace_pkg.get_value("id"))
+    vulnerability.set_affects(swifttrace_pkg.get_value("id"))
+    vulnerability.set_affects(swiftlog_pkg.get_value("id"))
     vulnerability.set_status("in_triage")
     vulnerability.set_value("my_info", "This has not been tested")
     vulnerabilities.append(vulnerability.get_vulnerability())

@@ -1,5 +1,6 @@
-from lib4sbom.validator import SBOMValidator
 import sys
+
+from lib4sbom.validator import SBOMValidator
 
 sv = SBOMValidator(sbom_type="auto", debug=True)
 filename = sys.argv[1]
@@ -11,7 +12,6 @@ try:
         elif check.get(sbom_type) == False:
             print(f"{filename} is not a valid SBOM: {check}")
         elif check.get(sbom_type) is not None:
-            print (f"{filename} is a valid SBOM: {check}")
+            print(f"{filename} is a valid SBOM: {check}")
 except FileNotFoundError:
-    print (f"{filename} not found.")
-
+    print(f"{filename} not found.")

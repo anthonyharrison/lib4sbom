@@ -17,26 +17,26 @@ my_package.set_version("2.15")
 my_package.set_supplier("organisation", "gnu")
 my_package.set_licensedeclared("GPL3")
 my_package.set_externalreference("PACKAGE-MANAGER", "purl", "pkg/pypi:glibc@2.15")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 my_package.initialise()
 my_package.set_name("almalinux")
 my_package.set_type("operating-system")
 my_package.set_version("9.0")
 my_package.set_supplier("organisation", "alma")
 my_package.set_licensedeclared("Apache-2.0")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 my_package.initialise()
 my_package.set_name("glibc")
 my_package.set_version("2.29")
 my_package.set_supplier("organisation", "gnu")
 my_package.set_licensedeclared("GPL3")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 my_package.initialise()
 my_package.set_name("tomcat")
 my_package.set_version("9.0.46")
@@ -44,9 +44,9 @@ my_package.set_supplier("organisation", "apache")
 my_package.set_licensedeclared("Apache-2.0")
 # Not a real hash value!
 my_package.set_checksum("SHA256", "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF")
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 # Duplicated data
 my_package.initialise()
 my_package.set_name("glibc")
@@ -59,9 +59,9 @@ my_package.set_evidence("/bin/lib64/glibc.o")
 my_package.set_tag("c")
 my_package.set_tag("dynamic_library")
 #### This overwrites the package (same name and version)
-sbom_packages[
-    (my_package.get_name(), my_package.get_value("version"))
-] = my_package.get_package()
+sbom_packages[(my_package.get_name(), my_package.get_value("version"))] = (
+    my_package.get_package()
+)
 # Generate SBOM
 my_sbom = SBOM()
 my_sbom.set_type(sbom_type="spdx3")

@@ -19,7 +19,7 @@ if len(sys.argv) != 3:
     sys.exit(1)
 
 # Ensure SPDX3 enabled
-sbom_type="spdx3" if os.getenv("LIB4SBOM_SPDX3") is None else "spdx"
+sbom_type = "spdx3" if os.getenv("LIB4SBOM_SPDX3") is None else "spdx"
 # Set up SBOM parser
 test_parser = SBOMParser()
 # Load SBOM - will autodetect SBOM type

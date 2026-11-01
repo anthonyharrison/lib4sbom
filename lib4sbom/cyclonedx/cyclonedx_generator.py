@@ -4,23 +4,23 @@
 import base64
 import json
 import os
-import re
 import uuid
 from datetime import datetime
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
-# from cryptography.hazmat.primitives.serialization import (
-#     Encoding,
-#     PublicFormat,
-#     load_pem_private_key,
-# )
 
 from lib4sbom.data.identifier import SBOMIdentifier
 from lib4sbom.data.vulnerability import Vulnerability
 from lib4sbom.license import LicenseScanner
 from lib4sbom.utils import format_supplier
 from lib4sbom.version import VERSION
+
+# from cryptography.hazmat.primitives.serialization import (
+#     Encoding,
+#     PublicFormat,
+#     load_pem_private_key,
+# )
 
 
 class CycloneDXGenerator:
@@ -224,7 +224,7 @@ class CycloneDXGenerator:
         if component_type["version"] is not None:
             component["version"] = component_type["version"]
         if component_type.get("purl") is not None:
-            component["purl"] = component_type["purl"]        
+            component["purl"] = component_type["purl"]
         if component_type["bom-ref"] is not None:
             component["bom-ref"] = component_type["bom-ref"]
         else:
@@ -309,21 +309,6 @@ class CycloneDXGenerator:
         else:
             supplier = supplier_details
             email_address = ""
-        # # Get email addresses
-        # # Use RFC-5322 compliant regex (https://regex101.com/library/6EL6YF)
-        # emails = re.findall(
-        #     r"((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))",
-        #     supplier_info,
-        #     re.IGNORECASE,
-        # )
-        # # If email found, remove from string
-        # supplier_name = (
-        #     supplier_info.replace(emails[-1], "") if len(emails) > 0 else supplier_info
-        # )
-        # # Get names
-        # names = re.findall(r"[a-zA-Z0-9\.\-]+[ A-Za-z0-9]*", supplier_name)
-        # supplier = " ".join(n for n in names)
-        # email_address = emails[-1] if len(emails) > 0 else ""
         return supplier.strip(), email_address
 
     def _governance_element(self, attribute):

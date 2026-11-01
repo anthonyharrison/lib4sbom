@@ -39,9 +39,9 @@ def generate_clinician_sbom():
     iosapp_pkg.set_licensedeclared("Apache-2.0")
     parent_id = "Clientware-ans-01"
     iosapp_pkg.set_id(parent_id)
-    sbom_packages[
-        (iosapp_pkg.get_name(), iosapp_pkg.get_value("version"))
-    ] = iosapp_pkg.get_package()
+    sbom_packages[(iosapp_pkg.get_name(), iosapp_pkg.get_value("version"))] = (
+        iosapp_pkg.get_package()
+    )
 
     # NordicSemi Drivers
     nsdrivers_pkg = SBOMPackage()
@@ -55,9 +55,9 @@ def generate_clinician_sbom():
         + "nordicsemi@"
         + nsdrivers_pkg.get_value("version")
     )
-    sbom_packages[
-        (nsdrivers_pkg.get_name(), nsdrivers_pkg.get_value("version"))
-    ] = nsdrivers_pkg.get_package()
+    sbom_packages[(nsdrivers_pkg.get_name(), nsdrivers_pkg.get_value("version"))] = (
+        nsdrivers_pkg.get_package()
+    )
 
     # NordicSemi Softdevice
     nssoftdev_pkg = SBOMPackage()
@@ -72,9 +72,9 @@ def generate_clinician_sbom():
         + "nordicsemi@"
         + nssoftdev_pkg.get_value("version")
     )
-    sbom_packages[
-        (nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value("version"))
-    ] = nssoftdev_pkg.get_package()
+    sbom_packages[(nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value("version"))] = (
+        nssoftdev_pkg.get_package()
+    )
 
     # NordicSemi Bootloader
     nssoftdev_pkg = SBOMPackage()
@@ -89,9 +89,9 @@ def generate_clinician_sbom():
         + "nordicsemi@"
         + nssoftdev_pkg.get_value("version")
     )
-    sbom_packages[
-        (nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value("version"))
-    ] = nssoftdev_pkg.get_package()
+    sbom_packages[(nssoftdev_pkg.get_name(), nssoftdev_pkg.get_value("version"))] = (
+        nssoftdev_pkg.get_package()
+    )
 
     sbom_file = SBOMFile()
     sbom_files = {}

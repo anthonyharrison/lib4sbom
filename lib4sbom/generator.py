@@ -572,14 +572,25 @@ class SBOMGenerator:
             )
         if "relationships" in sbom_data:
             for relationship in sbom_data["relationships"]:
-                self.bom.generateRelationship(
-                    self._get_element(
-                        relationship["source"], relationship["source_id"]
-                    ),
-                    self._get_element(
-                        relationship["target"], relationship["target_id"]
-                    ),
-                )
+                if relationship["type"].upper() not in ["BUILD_DEPENDENCY_OF"]:
+                    self.bom.generateRelationship(
+                        self._get_element(
+                            relationship["source"], relationship["source_id"]
+                        ),
+                        self._get_element(
+                            relationship["target"], relationship["target_id"]
+                        ),
+                    )
+                else:
+                    # Swap
+                    self.bom.generateRelationship(
+                        self._get_element(
+                            relationship["target"], relationship["target_id"]
+                        ),
+                        self._get_element(
+                            relationship["source"], relationship["source_id"]
+                        ),
+                    )
 
 
 # End of file

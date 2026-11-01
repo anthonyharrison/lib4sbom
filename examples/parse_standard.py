@@ -7,8 +7,8 @@ definitions = test_parser.get_definitions()
 print("Defintions", len(definitions))
 for definition in definitions:
     for requirement in definition.get("requirement"):
-        print (requirement)
+        print(requirement)
     for level in definition.get("level"):
-        print (level)
+        print(level)
     for extref in definition.get("externalreference"):
-        print (extref)
+        print(extref)

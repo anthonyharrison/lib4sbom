@@ -23,9 +23,9 @@ class SBOMIdentifier:
             return False
 
         try:
-            # Parse using the library (handles normalization/encoding)
+            # Parse using the library (handles normalisation/encoding)
             p = PackageURL.from_string(self.purl_identifer)
-        except ValueError as e:
+        except ValueError:
             self.errors.append(f"Invalid PURL: {self.purl_identifer}")
             return False
 
