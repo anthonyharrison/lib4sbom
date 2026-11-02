@@ -864,19 +864,25 @@ class CycloneDXParser:
                                 )
                         if "affects" in vuln:
                             for affect in vuln["affects"]:
-                                version = None
-                                if "ref" in affect:
-                                    # vuln_info.set_value(
-                                    #     "bom_link", vuln["affects"][0]["ref"]
-                                    # )
-                                    id = affect["ref"]
+                                if "ref" not in affect:
+                                    # ref identifies the affected component
+                                    continue
                                 if "versions" in affect:
-                                    if "version" in affect["versions"]:
-                                        # vuln_info.set_release(
-                                        #     vuln["affects"][0]["versions"]["version"]
-                                        # )
-                                        version = affect["versions"]["version"]
-                                vuln_info.set_affects(id, version)
+                                    versions = affect["versions"]
+                                    if isinstance(versions, list):
+                                        # Specification defines a list of version objects
+                                        for version_data in versions:
+                                            vuln_info.set_affects(
+                                                affect["ref"],
+                                                version_data.get("version"),
+                                            )
+                                    else:
+                                        # Historic format with a single version
+                                        vuln_info.set_affects(
+                                            affect["ref"], versions.get("version")
+                                        )
+                                else:
+                                    vuln_info.set_affects(affect["ref"])
                         vulnerabilities.append(vuln_info.get_vulnerability())
                     if self.debug:
                         print(vulnerabilities)
