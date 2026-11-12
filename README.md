@@ -763,7 +763,7 @@ _type_ is the type of relationship being defined.
 
 **NOTE** The library does not understand the semantic meaning behind the type of the relationship. This is particularly
 important when converting between SPDX and CycloneDX. A SPDX relation 'A is a BUILD_DEPENDECY_OF B' would be represented
-as 'A depends_on B' in CycloneDX which does not convey the same semantic meaning.
+as 'A dependsOn B' in CycloneDX which does not convey the same semantic meaning.
 
 **_Getter Methods_**
 
