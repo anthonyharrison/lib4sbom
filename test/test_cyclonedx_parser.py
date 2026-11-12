@@ -19,7 +19,7 @@ class TestCcycloneDX_parser:
 
     def test_parse_cyclonedx_xml(self):
         test_parser = test_module()
-        path = self.get_test_filepath('hadoop-aliyun-3.4.1-cyclonedx.xml')
+        path = self.get_test_filepath("hadoop-aliyun-3.4.1-cyclonedx.xml")
         result = test_parser.parse(path)
         (
             cyclonedx_document,
@@ -28,7 +28,7 @@ class TestCcycloneDX_parser:
             relationships,
             vulnerabilities,
             services,
-            licenses
+            licenses,
         ) = result
 
         with open(path, "r", encoding="utf-8") as f:
@@ -41,7 +41,7 @@ class TestCcycloneDX_parser:
             relationships,
             vulnerabilities,
             services,
-            licenses
+            licenses,
         ) = result
 
     def test_parse_cyclonedx_multiple_licenses_json(self):
@@ -66,7 +66,9 @@ class TestCcycloneDX_parser:
                     multi_license = packages[(p, v)]
                     break
 
-            assert multi_license is not None, "Did not find expected package multi-license"
+            assert (
+                multi_license is not None
+            ), "Did not find expected package multi-license"
             assert "licenselist" in multi_license
             license_list = multi_license["licenselist"]
             assert len(license_list) == 2

@@ -1,9 +1,11 @@
-import os
 import json
+import os
 import sys
+
 from lib4sbom.data.identifier import SBOMIdentifier
 
 # Use this to validate the examples in the PURL spec. The directory should be the 'types' directory which contains the JSON definitions
+
 
 def extract_elements_from_directory(directory_path, target_key):
     all_extracted_items = []
@@ -13,7 +15,7 @@ def extract_elements_from_directory(directory_path, target_key):
             file_path = os.path.join(directory_path, filename)
 
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
 
                     # Extract the element (handles both single objects and lists)
@@ -29,8 +31,9 @@ def extract_elements_from_directory(directory_path, target_key):
 
     return all_extracted_items
 
+
 folder = sys.argv[1]
-key_to_find = 'examples'
+key_to_find = "examples"
 
 examples = extract_elements_from_directory(folder, key_to_find)
 print(f"Total items extracted: {len(examples)}")
@@ -39,5 +42,5 @@ print(f"Total items extracted: {len(examples)}")
 for content in examples:
     purl_validator = SBOMIdentifier(content)
     if not purl_validator.validate():
-        print (f"{content} is reported as invalid")
-        print (purl_validator.get_errors())
+        print(f"{content} is reported as invalid")
+        print(purl_validator.get_errors())

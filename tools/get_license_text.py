@@ -1,5 +1,6 @@
 import json
 import os
+
 import requests
 
 license_dir, filename = os.path.split(__file__)

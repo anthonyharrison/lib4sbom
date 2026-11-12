@@ -35,25 +35,25 @@ class TestSbom:
         test_package.set_supplier("organisation", "gnu")
         test_package.set_licensedeclared("GPL3")
         test_packages = {}
-        test_packages[
-            (test_package.get_name(), test_package.get_value("version"))
-        ] = test_package.get_package()
+        test_packages[(test_package.get_name(), test_package.get_value("version"))] = (
+            test_package.get_package()
+        )
         test_package.initialise()
         test_package.set_name("glibc")
         test_package.set_version("2.29")
         test_package.set_supplier("organisation", "gnu")
         test_package.set_licensedeclared("GPL3")
-        test_packages[
-            (test_package.get_name(), test_package.get_value("version"))
-        ] = test_package.get_package()
+        test_packages[(test_package.get_name(), test_package.get_value("version"))] = (
+            test_package.get_package()
+        )
         test_package.initialise()
         test_package.set_name("tomcat")
         test_package.set_version("9.0.46")
         test_package.set_supplier("organisation", "apache")
         test_package.set_licensedeclared("Apache-2.0")
-        test_packages[
-            (test_package.get_name(), test_package.get_value("version"))
-        ] = test_package.get_package()
+        test_packages[(test_package.get_name(), test_package.get_value("version"))] = (
+            test_package.get_package()
+        )
         return test_packages
 
     def _create_test_relationships(self):

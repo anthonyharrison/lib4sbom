@@ -48,7 +48,7 @@ class TestLicenseScanner:
             ("Apache-2.0 WITH My Exception", "NOASSERTION"),
             ("LicenseRef-MyLic", "LicenseRef-MyLic"),
             ("GPL2+", "GPL-2.0-or-later"),
-            ("wxWindows","wxWindows"),  # Deprecated license
+            ("wxWindows", "wxWindows"),  # Deprecated license
             ("Apache-1.0+", "Apache-1.0+"),
             ("NotALicence+", "NOASSERTION"),
             ("Apache-1.0+ WITH LLVM-exception", "Apache-1.0+ WITH LLVM-exception"),
@@ -71,7 +71,6 @@ class TestLicenseScanner:
             ("MIT AND Apache-1.0+", True),
         ),
     )
-
     def test_license_expresion(self, expression, expected_result):
         tm = test_module()
         result = tm.license_expression(expression)
@@ -88,7 +87,6 @@ class TestLicenseScanner:
             ("Apache-1.0+ WITH LLVM-exception", True),
         ),
     )
-
     def test_license_exception(self, exception, expected_result):
         tm = test_module()
         result = tm.license_exception(exception)
@@ -163,7 +161,6 @@ class TestLicenseScanner:
         result = tm.get_license_from_exception("Apache-1.0+")
         assert result is None
 
-
     def test_get_exception(self):
         tm = test_module()
         result = tm.get_exception("NotALicence")
@@ -198,10 +195,10 @@ class TestLicenseScanner:
         (
             ([], "unknown"),
             (["AGPL-3.0"], "networkcopyleft"),
-            (["MIT"],"permissive"),
+            (["MIT"], "permissive"),
             (["NotALicence"], "unknown"),
-            (["MIT","Apache-2.0"], "permissive"),
-            (["MIT","GPL-3.0+"], "copyleft"),
+            (["MIT", "Apache-2.0"], "permissive"),
+            (["MIT", "GPL-3.0+"], "copyleft"),
             (["Apache-2.0 WITH LLVM-exception"], "permissive"),
             (["Apache-1.0+"], "permissive"),
         ),
@@ -223,7 +220,7 @@ class TestLicenseScanner:
             ("Apache-1.0+", False),
         ),
     )
-    def test_valid_SPDX_id (self, spdxid, expected_result):
+    def test_valid_SPDX_id(self, spdxid, expected_result):
         tm = test_module()
         result = tm.valid_spdx_license(spdxid)
         assert result == expected_result
@@ -239,7 +236,10 @@ class TestLicenseScanner:
             ("MIT", ["MIT"]),
             ("MIT AND NotALicence", ["MIT", "NOASSERTION"]),
             ("Apache-2.0 with LLVM Exception", ["Apache-2.0 WITH LLVM-exception"]),
-            ("Apache-2.0 WITH LLVM-exception OR MIT", ["Apache-2.0 WITH LLVM-exception", "MIT"]),
+            (
+                "Apache-2.0 WITH LLVM-exception OR MIT",
+                ["Apache-2.0 WITH LLVM-exception", "MIT"],
+            ),
         ),
     )
     def test_expresiion_list(self, expression, expected_result):

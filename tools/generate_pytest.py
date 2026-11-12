@@ -11,11 +11,9 @@ argv = sys.argv
 app_name = "pytestgen"
 parser = argparse.ArgumentParser(
     prog=app_name,
-    description=textwrap.dedent(
-        """
+    description=textwrap.dedent("""
         Generates pytest skeleton for a Python class.
-        """
-    ),
+        """),
 )
 parser.add_argument(
     "-o",
