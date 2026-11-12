@@ -876,11 +876,9 @@ class CycloneDXGenerator:
                 affects = []
                 for bom_link in vuln_info.get_value("affects"):
                     affected = {}
-                    # affected["ref"] = vuln_info.get_value("bom_link")
                     affected["ref"] = bom_link["ref"]
                     version_info = {}
-                    # component_version = vuln_info.get_value("release")
-                    component_version = bom_link.get("release")
+                    component_version = bom_link.get("version")
                     if (
                         component_version is None
                         and vuln_info.get_value("purl") is not None
