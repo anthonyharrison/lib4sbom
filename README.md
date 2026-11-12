@@ -761,6 +761,10 @@ _source_ and _target_ are the unique identifiers of the components for which the
 
 _type_ is the type of relationship being defined.
 
+**NOTE** The library does not understand the semantic meaning behind the type of the relationship. This is particularly
+important when converting between SPDX and CycloneDX. A SPDX relation 'A is a BUILD_DEPENDECY_OF B' would be represented
+as 'A depends_on B' in CycloneDX which does not convey the same semantic meaning.
+
 **_Getter Methods_**
 
 get_relationship()
