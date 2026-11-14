@@ -160,7 +160,37 @@ class SPDXParser:
         spdx_licenses = SBOMLicense()
         spdx_licenses.initialise()
 
-        for line in lines:
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            extracted_data = ""
+            # Check for the opening tag of text entry which can be multi-line
+            if "<text>" in line and "</text>" in line:
+                start = line.find("<text>") + len("<text>")
+                end = line.find("</text>")
+                extracted_data = line[start:end]
+            elif "<text>" in line:
+                current_block = []
+                # Capture any text appearing after <text> on the same line
+                _, remainder = line.split("<text>", 1)
+                if remainder.strip():
+                    current_block.append(remainder)
+                i += 1
+                
+                # Consume lines until the closing tag is found
+                while i < len(lines):
+                    current_line = lines[i]
+                    if "</text>" in current_line:
+                        content_before, _ = current_line.split("</text>", 1)
+                        if content_before.strip():
+                            current_block.append(content_before)
+                        break
+                    else:
+                        current_block.append(current_line)
+                    i += 1
+                # Assemble the complete text block
+                extracted_data = "\n".join(current_block)
+
             line_elements = line.split(":")
             if line_elements[0] == "SPDXVersion":
                 spdx_version = line_elements[1].strip().rstrip("\n")
@@ -191,7 +221,7 @@ class SPDXParser:
                 line.find(created)
                 spdx_document.set_created(created)
             elif line_elements[0] == "Creator":
-                creator_type = line_elements[1]
+                creator_type = line_elements[1].strip()
                 # Capture all data after creator type
                 creator = (
                     line[line.find(creator_type) + len(creator_type) + 1 :]
@@ -203,7 +233,7 @@ class SPDXParser:
                 else:
                     spdx_document.set_creator(creator_type, creator)
             elif line_elements[0] == "CreatorComment":
-                comment = line[len("CreatorComment:") :].strip().rstrip("\n")
+                comment = extracted_data
                 lifecycle = self.get_lifecycle(comment)
                 if lifecycle is not None:
                     spdx_document.set_value("lifcycle", lifecycle)
@@ -246,19 +276,20 @@ class SPDXParser:
                 license_info = line_elements[1].strip().rstrip("\n")
                 spdx_file.set_licenseinfoinfile(license_info)
             elif line_elements[0] == "LicenseComments":
-                license_info = line_elements[1].strip().rstrip("\n")
+                license_info = extracted_data
                 spdx_file.set_licensecomment(license_info)
             elif line_elements[0] == "FileCopyrightText":
-                copyright_text = line_elements[1].strip().rstrip("\n")
+                copyright_text = extracted_data
                 spdx_file.set_copyrighttext(copyright_text)
             elif line_elements[0] == "FileComment":
-                comment_text = line_elements[1].strip().rstrip("\n")
+                comment_text = extracted_data
+
                 spdx_file.set_comment(comment_text)
             elif line_elements[0] == "FileNotice":
-                note = line_elements[1].strip().rstrip("\n")
+                note = extracted_data
                 spdx_file.set_notice(note)
             elif line_elements[0] == "FileAttributionText":
-                attribution = line_elements[1].strip().rstrip("\n")
+                attribution = extracted_data
                 spdx_file.set_attribution(attribution)
 
             if line_elements[0] == "PackageName":
@@ -294,8 +325,8 @@ class SPDXParser:
                 filename = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_filename(filename)
             elif line_elements[0] == "PackageSupplier":
-                if len(line_elements) == 3:
-                    supplier_type = line_elements[1]
+                if len(line_elements) > 2:
+                    supplier_type = line_elements[1].strip()
                     # Capture all data after supplier type
                     supplier = (
                         line[line.find(supplier_type) + len(supplier_type) + 1 :]
@@ -308,8 +339,8 @@ class SPDXParser:
                     supplier = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_supplier(supplier_type, supplier)
             elif line_elements[0] == "PackageOriginator":
-                if len(line_elements) == 3:
-                    originator_type = line_elements[1]
+                if len(line_elements) > 2:
+                    originator_type = line_elements[1].strip()
                     originator = line_elements[2].strip().rstrip("\n")
                 else:
                     # No type specified
@@ -333,7 +364,7 @@ class SPDXParser:
                 homepage = line[17:].strip().rstrip("\n")
                 spdx_package.set_homepage(homepage)
             elif line_elements[0] == "PackageSourceInfo":
-                sourceinfo = line[17:].strip().rstrip("\n")
+                sourceinfo = extracted_data
                 spdx_package.set_sourceinfo(sourceinfo)
             elif line_elements[0] == "PackageLicenseConcluded":
                 license_concluded = line_elements[1].strip().rstrip("\n")
@@ -346,25 +377,25 @@ class SPDXParser:
                     self._validate_license(license_declared)
                 )
             elif line_elements[0] == "PackageLicenseComments":
-                license_comments = line_elements[1].strip().rstrip("\n")
+                license_comments = extracted_data
                 spdx_package.set_licensecomments(license_comments)
             elif line_elements[0] == "PackageLicenseInfoFromFiles":
                 license_info = line_elements[1].strip().rstrip("\n")
                 spdx_package.set_licenseinfoinfiles(license_info)
             elif line_elements[0] == "PackageCopyrightText":
-                copyright_text = line[21:].strip().rstrip("\n")
+                copyright_text = extracted_data
                 spdx_package.set_copyrighttext(copyright_text)
             elif line_elements[0] == "PackageComment":
-                comments = line_elements[1].strip().rstrip("\n")
+                comments = extracted_data
                 spdx_package.set_comment(comments)
             elif line_elements[0] == "PackageSummary":
-                summary = line_elements[1].strip().rstrip("\n")
+                summary = extracted_data
                 spdx_package.set_summary(summary)
             elif line_elements[0] == "PackageDescription":
-                description = line_elements[1].strip().rstrip("\n")
+                description = extracted_data
                 spdx_package.set_description(description)
             elif line_elements[0] == "PackageAttributionText":
-                attribute_value = line[23:].strip().rstrip("\n")
+                attribute_value = extracted_data
                 spdx_package.set_attribution(attribute_value)
             elif line_elements[0] == "BuiltDate":
                 date = line_elements[1].strip().rstrip("\n")
@@ -415,8 +446,11 @@ class SPDXParser:
                 license_comment = line_elements[1].strip().rstrip("\n")
                 spdx_licenses.set_value("comment", license_comment)
             elif line_elements[0] == "ExtractedText":
-                license_text = line[14:].strip().rstrip("\n")
+                #license_text = line[14:].strip().rstrip("\n")
+                license_text = extracted_data
                 spdx_licenses.set_value("text", license_text)
+
+            i += 1
         # Save last package/file/license
         if file is not None and file not in files:
             # Save file metadata
