@@ -304,8 +304,8 @@ class CycloneDXGenerator:
         # Format is <supplier_name> (email_address )
         if "(" in supplier_details:
             # extract email address from supplier
-            supplier = supplier_details.split("(")[0].split
-            email_address = supplier_details.split("(")[1].split.replace(")", "")
+            supplier = supplier_details.split("(")[0]
+            email_address = supplier_details.split("(")[1].replace(")", "").strip()
         else:
             supplier = supplier_details
             email_address = ""
