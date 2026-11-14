@@ -1040,15 +1040,6 @@ class CycloneDXParser:
         self.parsed["definitions"] = definitions
         self.parsed["signature"] = signature
         return self.parsed
-        # return (
-        #     cyclonedx_document,
-        #     files,
-        #     self.packages,
-        #     relationships,
-        #     vulnerabilities,
-        #     services,
-        #     self.licences,
-        # )
 
     def _parse_component(self, component_element):
         """Parses a CycloneDX component element and returns a dictionary of its contents."""
@@ -1267,12 +1258,3 @@ class CycloneDXParser:
         self.parsed["services"] = services
         self.parsed["licences"] = self.licences
         return self.parsed
-        # return (
-        #     document,
-        #     {},
-        #     self.packages,
-        #     dependencies,
-        #     vulnerabilities,
-        #     services,
-        #     self.licences,
-        # )

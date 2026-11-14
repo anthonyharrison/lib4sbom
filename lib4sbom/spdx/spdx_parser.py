@@ -176,7 +176,7 @@ class SPDXParser:
                 if remainder.strip():
                     current_block.append(remainder)
                 i += 1
-                
+
                 # Consume lines until the closing tag is found
                 while i < len(lines):
                     current_line = lines[i]
@@ -283,7 +283,6 @@ class SPDXParser:
                 spdx_file.set_copyrighttext(copyright_text)
             elif line_elements[0] == "FileComment":
                 comment_text = extracted_data
-
                 spdx_file.set_comment(comment_text)
             elif line_elements[0] == "FileNotice":
                 note = extracted_data
@@ -446,7 +445,6 @@ class SPDXParser:
                 license_comment = line_elements[1].strip().rstrip("\n")
                 spdx_licenses.set_value("comment", license_comment)
             elif line_elements[0] == "ExtractedText":
-                #license_text = line[14:].strip().rstrip("\n")
                 license_text = extracted_data
                 spdx_licenses.set_value("text", license_text)
 
