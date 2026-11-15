@@ -43,6 +43,8 @@ ASL 2
 ASL 2.0
 Apache
 Apache-2.0 license
+The Apache Software License, Version 2.0
+Apache License 2.0
 [APSL-1.0]
 # Default to earliest version
 Apple Public Source License
@@ -61,6 +63,9 @@ Blue Oak Model License (BlueOak-1.0.0)
 [BSD-2-Clause]
 BSD2
 BSD-2
+BSD-2-clause
+BSD 2-Clause License
+Simplified BSD
 [BSD-3-Clause]
 BSD
 BSD License
@@ -69,6 +74,7 @@ BSD-3
 3-Clause BSD
 BSD-3-clause
 BSD 3-Clause License
+New BSD License
 [BSD-4-Clause]
 BSD4
 BSD-4
@@ -326,6 +332,7 @@ Open Software License 3.0 (OSL-3.0)
 PSF-2
 PSFL
 Python Software Foundation License
+PSF
 [Python-2.0]
 Python
 Python license
